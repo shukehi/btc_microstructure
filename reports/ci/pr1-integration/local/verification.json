@@ -1,0 +1,36 @@
+{
+  "kind": "LOCAL_MACOS",
+  "main_sha": "bb86a55050f4652cee3db577943e0e43bf966ed2",
+  "merge_sha": "dd3c082421da760d672955a71704cdb306ab87fc",
+  "results": {
+    "pytest": "0",
+    "pytest-independent-r1-01": "0",
+    "pytest-independent-r1-02": "0",
+    "ruff-check": "0",
+    "ruff-format": "0",
+    "mypy": "0",
+    "pip-check": "0",
+    "validate-config": "0"
+  },
+  "tests": {
+    "pytest": {
+      "passed": 183,
+      "failed": 0,
+      "skipped": 0
+    },
+    "pytest-independent-r1-01": {
+      "passed": 15,
+      "failed": 0,
+      "skipped": 0
+    },
+    "pytest-independent-r1-02": {
+      "passed": 9,
+      "failed": 0,
+      "skipped": 0
+    }
+  },
+  "old_content_files_preserved": 310,
+  "workflow_unchanged_from_main": true,
+  "network_namespace_validation": "NOT_RUN on macOS",
+  "preexisting_AGENTS_edit_preserved_uncommitted": true
+}
