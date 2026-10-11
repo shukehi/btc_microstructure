@@ -365,8 +365,16 @@ def _expand_feature_schedule(
     if len(base_events) + 2 * cutoff_count > config.max_events:
         raise ConfigError("synthetic fixture: expanded event count exceeds configured max_events")
     controls: list[JsonRow] = []
-    explicit = [dict(row) for row in base_events]
+    explicit = [
+        {
+            **dict(row),
+            "source_ingest_sequence": cast(int, row["ingest_sequence"]),
+            "sequence_origin": "fixture_explicit",
+        }
+        for row in base_events
+    ]
     cutoff = start_ns
+    control_index = 0
     while cutoff <= end_ns:
         controls.extend(
             [
@@ -383,6 +391,9 @@ def _expand_feature_schedule(
                     "ingest_sequence": 0,
                     "cutoff_ns": cutoff,
                     "input_cursor": 0,
+                    "input_cursor_source_ingest_sequence": 0,
+                    "sequence_origin": "feature_schedule",
+                    "schedule_sequence": control_index,
                 },
                 {
                     "kind": "FEATURE_PUBLISHED",
@@ -397,24 +408,34 @@ def _expand_feature_schedule(
                     "ingest_sequence": 0,
                     "cutoff_ns": cutoff,
                     "feature_available_ns": cutoff + publish_delay_ns,
+                    "sequence_origin": "feature_schedule",
+                    "schedule_sequence": control_index + 1,
                 },
             ]
         )
+        control_index += 2
         cutoff += grid_ns
     merged = sorted(
         [*explicit, *controls],
-        key=lambda row: (cast(int, row["ts_receive_ns"]), _event_priority(cast(str, row["kind"]))),
+        key=_scheduled_event_key,
     )
     generated: list[JsonRow] = []
     next_sequence = 1
-    last_available_cursor = 0
+    last_input_cursor = 0
+    last_input_source_sequence = 0
     for row in merged:
         if row["kind"] == "FEATURE_CUTOFF":
-            row["input_cursor"] = last_available_cursor
+            row["input_cursor"] = last_input_cursor
+            row["input_cursor_source_ingest_sequence"] = last_input_source_sequence
         row["ingest_sequence"] = next_sequence
         next_sequence += 1
         generated.append(row)
-        last_available_cursor = cast(int, row["ingest_sequence"])
+        if row.get("sequence_origin") == "fixture_explicit" and row["kind"] not in (
+            "FEATURE_CUTOFF",
+            "FEATURE_PUBLISHED",
+        ):
+            last_input_cursor = cast(int, row["ingest_sequence"])
+            last_input_source_sequence = cast(int, row["source_ingest_sequence"])
     return generated
 
 
@@ -441,6 +462,17 @@ def _event_priority(kind: str) -> int:
     if kind == "FEATURE_PUBLISHED":
         return 2
     return 1
+
+
+def _scheduled_event_key(row: JsonRow) -> tuple[int, int, int]:
+    origin = row.get("sequence_origin")
+    if origin == "fixture_explicit":
+        return (cast(int, row["ts_receive_ns"]), 1, cast(int, row["source_ingest_sequence"]))
+    return (
+        cast(int, row["ts_receive_ns"]),
+        _event_priority(cast(str, row["kind"])),
+        cast(int, row["schedule_sequence"]),
+    )
 
 
 def _base_row(event: JsonRow) -> JsonRow:

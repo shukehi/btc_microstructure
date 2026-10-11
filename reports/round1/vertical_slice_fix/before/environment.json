@@ -1,0 +1,7 @@
+{
+  "python": "3.14.7 (main, Aug  5 2026, 10:29:49) [Clang 21.0.0 (clang-2100.1.1.101)]",
+  "platform": "macOS-27.0.1-arm64-arm-64bit-Mach-O",
+  "head": "03ce9c7ea273cf0ab42915a012e10ba7e6193c24",
+  "agents_sha256": "97774315d2c048fecc4d14f55f017612756441bf55387499ac70b91f14e3bf8a",
+  "original_review_test_sha256": "426f5fea051b1196c77166fcc4b9e4921974b4d204e7067f631e9b98f469271d"
+}

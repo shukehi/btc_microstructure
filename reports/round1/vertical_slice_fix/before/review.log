@@ -1,0 +1,178 @@
+.FFFF.F.                                                                 [100%]
+=================================== FAILURES ===================================
+______________ test_failed_raw_fsync_remains_uncertain_on_reopen _______________
+
+tmp_path = PosixPath('/private/var/folders/s9/rbq781b922s1xp3jhmtct8yc0000gn/T/pytest-of-aries/pytest-118/test_failed_raw_fsync_remains_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x10833a330>
+
+    def test_failed_raw_fsync_remains_uncertain_on_reopen(tmp_path, monkeypatch):
+        first = seeded_store(tmp_path)
+        first.append(row(2))
+        with monkeypatch.context() as patch:
+            def fail_fsync(fd):
+                raise OSError('SYNTHETIC fsync failure before raw rename')
+            patch.setattr(storage.os, 'fsync', fail_fsync)
+            with pytest.raises(StorageError, match='commit raw/control'):
+                first.flush()
+        assert first.cursor == 1
+        recovered = Store(tmp_path)
+        assert recovered.cursor == 1
+        assert recovered.read_rows() == [row(1)]
+>       assert any(event['event_type'] == 'UNCERTAIN_GAP' for event in recovered.recovery_events), (
+            'a failed uncommitted raw segment was quarantined by flush(), but reopening '
+            f'forgets its uncertainty: {recovered.recovery_events}'
+        )
+E       AssertionError: a failed uncommitted raw segment was quarantined by flush(), but reopening forgets its uncertainty: []
+E       assert False
+E        +  where False = any(<generator object test_failed_raw_fsync_remains_uncertain_on_reopen.<locals>.<genexpr> at 0x10830e9b0>)
+
+review/R1_03/checks/test_r1_03_review.py:62: AssertionError
+_ test_malformed_raw_tail_is_isolated_without_losing_trusted_prefix[invalid-utf8] _
+
+tmp_path = PosixPath('/private/var/folders/s9/rbq781b922s1xp3jhmtct8yc0000gn/T/pytest-of-aries/pytest-118/test_malformed_raw_tail_is_iso0')
+tail = b'\xff'
+
+    @pytest.mark.parametrize('tail', [b'\xff', b'7\n', b'[]\n'],
+                             ids=['invalid-utf8', 'json-scalar', 'json-array'])
+    def test_malformed_raw_tail_is_isolated_without_losing_trusted_prefix(tmp_path, tail):
+        first = seeded_store(tmp_path)
+        first.close()
+        bad = tmp_path / 'raw' / 'raw-control-000002.jsonl.tmp'
+        bad.write_bytes(tail)
+>       recovered = Store(tmp_path)
+                    ^^^^^^^^^^^^^^^
+
+review/R1_03/checks/test_r1_03_review.py:75: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/btc_microstructure/offline_storage.py:172: in __init__
+    self._recover()
+src/btc_microstructure/offline_storage.py:470: in _recover
+    self._quarantine_untrusted_files(trusted_paths)
+src/btc_microstructure/offline_storage.py:553: in _quarantine_untrusted_files
+    event = _uncertain_gap_event(self.root, path)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/btc_microstructure/offline_storage.py:635: in _uncertain_gap_event
+    for line in handle:
+                ^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <encodings.utf_8.IncrementalDecoder object at 0x10833b200>
+input = b'\xff', final = False
+
+>   ???
+E   UnicodeDecodeError: 'utf-8' codec can't decode byte 0xff in position 0: invalid start byte
+
+<frozen codecs>:322: UnicodeDecodeError
+_ test_malformed_raw_tail_is_isolated_without_losing_trusted_prefix[json-scalar] _
+
+tmp_path = PosixPath('/private/var/folders/s9/rbq781b922s1xp3jhmtct8yc0000gn/T/pytest-of-aries/pytest-118/test_malformed_raw_tail_is_iso1')
+tail = b'7\n'
+
+    @pytest.mark.parametrize('tail', [b'\xff', b'7\n', b'[]\n'],
+                             ids=['invalid-utf8', 'json-scalar', 'json-array'])
+    def test_malformed_raw_tail_is_isolated_without_losing_trusted_prefix(tmp_path, tail):
+        first = seeded_store(tmp_path)
+        first.close()
+        bad = tmp_path / 'raw' / 'raw-control-000002.jsonl.tmp'
+        bad.write_bytes(tail)
+>       recovered = Store(tmp_path)
+                    ^^^^^^^^^^^^^^^
+
+review/R1_03/checks/test_r1_03_review.py:75: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/btc_microstructure/offline_storage.py:172: in __init__
+    self._recover()
+src/btc_microstructure/offline_storage.py:470: in _recover
+    self._quarantine_untrusted_files(trusted_paths)
+src/btc_microstructure/offline_storage.py:553: in _quarantine_untrusted_files
+    event = _uncertain_gap_event(self.root, path)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+root = PosixPath('/private/var/folders/s9/rbq781b922s1xp3jhmtct8yc0000gn/T/pytest-of-aries/pytest-118/test_malformed_raw_tail_is_iso1')
+path = PosixPath('/private/var/folders/s9/rbq781b922s1xp3jhmtct8yc0000gn/T/pytest-of-aries/pytest-118/test_malformed_raw_tail_is_iso1/raw/raw-control-000002.jsonl.tmp')
+
+    def _uncertain_gap_event(root: Path, path: Path) -> JsonRow:
+        sequences: list[int] = []
+        if path.suffix in {".jsonl", ".tmp"}:
+            try:
+                with path.open("r", encoding="utf-8") as handle:
+                    for line in handle:
+                        row = cast(JsonRow, json.loads(line, object_hook=_json_object_hook))
+>                       value = row.get("ingest_sequence")
+                                ^^^^^^^
+E                       AttributeError: 'int' object has no attribute 'get'
+
+src/btc_microstructure/offline_storage.py:637: AttributeError
+_ test_malformed_raw_tail_is_isolated_without_losing_trusted_prefix[json-array] _
+
+tmp_path = PosixPath('/private/var/folders/s9/rbq781b922s1xp3jhmtct8yc0000gn/T/pytest-of-aries/pytest-118/test_malformed_raw_tail_is_iso2')
+tail = b'[]\n'
+
+    @pytest.mark.parametrize('tail', [b'\xff', b'7\n', b'[]\n'],
+                             ids=['invalid-utf8', 'json-scalar', 'json-array'])
+    def test_malformed_raw_tail_is_isolated_without_losing_trusted_prefix(tmp_path, tail):
+        first = seeded_store(tmp_path)
+        first.close()
+        bad = tmp_path / 'raw' / 'raw-control-000002.jsonl.tmp'
+        bad.write_bytes(tail)
+>       recovered = Store(tmp_path)
+                    ^^^^^^^^^^^^^^^
+
+review/R1_03/checks/test_r1_03_review.py:75: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/btc_microstructure/offline_storage.py:172: in __init__
+    self._recover()
+src/btc_microstructure/offline_storage.py:470: in _recover
+    self._quarantine_untrusted_files(trusted_paths)
+src/btc_microstructure/offline_storage.py:553: in _quarantine_untrusted_files
+    event = _uncertain_gap_event(self.root, path)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+root = PosixPath('/private/var/folders/s9/rbq781b922s1xp3jhmtct8yc0000gn/T/pytest-of-aries/pytest-118/test_malformed_raw_tail_is_iso2')
+path = PosixPath('/private/var/folders/s9/rbq781b922s1xp3jhmtct8yc0000gn/T/pytest-of-aries/pytest-118/test_malformed_raw_tail_is_iso2/raw/raw-control-000002.jsonl.tmp')
+
+    def _uncertain_gap_event(root: Path, path: Path) -> JsonRow:
+        sequences: list[int] = []
+        if path.suffix in {".jsonl", ".tmp"}:
+            try:
+                with path.open("r", encoding="utf-8") as handle:
+                    for line in handle:
+                        row = cast(JsonRow, json.loads(line, object_hook=_json_object_hook))
+>                       value = row.get("ingest_sequence")
+                                ^^^^^^^
+E                       AttributeError: 'list' object has no attribute 'get'
+
+src/btc_microstructure/offline_storage.py:637: AttributeError
+______ test_schedule_preserves_explicit_ingest_order_for_equal_timestamps ______
+
+tmp_path = PosixPath('/private/var/folders/s9/rbq781b922s1xp3jhmtct8yc0000gn/T/pytest-of-aries/pytest-118/test_schedule_preserves_explic0')
+
+    def test_schedule_preserves_explicit_ingest_order_for_equal_timestamps(tmp_path):
+        path = tmp_path / 'fixture.json'
+        opening = {'kind': 'SESSION_OPEN', 'session_id': 's',
+                   'ingest_sequence': 1, 'ts_receive_ns': 1}
+        schedule = {'start_ns': 6 * NS, 'end_ns': 6 * NS, 'publish_delay_ns': 1}
+        ordered = [opening, raw(2, '0.10'), raw(3, '0.20')]
+        path.write_text(json.dumps({'events': ordered, 'feature_schedule': schedule}))
+        expected = fixture_rows(config_for(path))
+        # Only serialization order changes. Declared sequence/time/content do not.
+        path.write_text(json.dumps({'events': [ordered[0], ordered[2], ordered[1]],
+                                    'feature_schedule': schedule}))
+        actual = fixture_rows(config_for(path))
+>       assert [r['raw_ref'] for r in actual if r['kind'] == 'RAW'] == ['raw:2', 'raw:3']
+E       AssertionError: assert ['raw:3', 'raw:2'] == ['raw:2', 'raw:3']
+E         
+E         At index 0 diff: 'raw:3' != 'raw:2'
+E         Use -v to get more diff
+
+review/R1_03/checks/test_r1_03_review.py:129: AssertionError
+- generated xml file: /Users/aries/Dve/btc_microstructure/reports/round1/vertical_slice_fix/before/review.xml -
+=========================== short test summary info ============================
+FAILED review/R1_03/checks/test_r1_03_review.py::test_failed_raw_fsync_remains_uncertain_on_reopen
+FAILED review/R1_03/checks/test_r1_03_review.py::test_malformed_raw_tail_is_isolated_without_losing_trusted_prefix[invalid-utf8]
+FAILED review/R1_03/checks/test_r1_03_review.py::test_malformed_raw_tail_is_isolated_without_losing_trusted_prefix[json-scalar]
+FAILED review/R1_03/checks/test_r1_03_review.py::test_malformed_raw_tail_is_isolated_without_losing_trusted_prefix[json-array]
+FAILED review/R1_03/checks/test_r1_03_review.py::test_schedule_preserves_explicit_ingest_order_for_equal_timestamps
+5 failed, 3 passed in 0.29s

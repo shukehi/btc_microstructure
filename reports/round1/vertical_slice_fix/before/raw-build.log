@@ -1,0 +1,46 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+___ test_failed_raw_tail_propagates_through_repeated_raw_only_parquet_builds ___
+
+tmp_path = PosixPath('/private/var/folders/s9/rbq781b922s1xp3jhmtct8yc0000gn/T/pytest-of-aries/pytest-128/test_failed_raw_tail_propagate0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x10b705c10>
+
+    def test_failed_raw_tail_propagates_through_repeated_raw_only_parquet_builds(tmp_path, monkeypatch):
+        config_values = yaml.safe_load((ROOT / "config/offline.synthetic.yaml").read_text())
+        config_values["synthetic_input"] = str(
+            ROOT / "fixtures/synthetic/vertical_slice/warmed_delta.json"
+        )
+        config_values["limits"]["min_free_bytes"] = 0
+        config_path = tmp_path / "offline.yaml"
+        config_path.write_text(yaml.safe_dump(config_values))
+        config = OfflineConfig.load(config_path)
+        complete = tmp_path / "complete"
+        assert run_synthetic(config, complete)["status"] == "PASS"
+        source_root = tmp_path / "raw-only"
+        shutil.copytree(complete / "raw", source_root / "raw")
+        (source_root / "manifests").mkdir()
+        for manifest in (complete / "manifests").glob("manifest-raw-*.json"):
+            shutil.copy2(manifest, source_root / "manifests" / manifest.name)
+        source = Store(source_root)
+        trusted_cursor = source.cursor
+        pending = raw(trusted_cursor + 1)
+        pending["ts_receive_ns"] = 36_000_000_000
+        source.append(pending)
+        with monkeypatch.context() as patch:
+            fail_io(patch, "fsync")
+            with pytest.raises(StorageError):
+                source.flush()
+        for attempt in range(2):
+            destination = tmp_path / f"rebuilt-{attempt}"
+            summary = build_features(config, source_root, destination)
+>           assert summary["status"] == "FAIL"
+E           AssertionError: assert 'PASS' == 'FAIL'
+E             
+E             - FAIL
+E             + PASS
+
+tests/unit/test_r103_recovery.py:147: AssertionError
+- generated xml file: /Users/aries/Dve/btc_microstructure/reports/round1/vertical_slice_fix/before/raw-build.xml -
+=========================== short test summary info ============================
+FAILED tests/unit/test_r103_recovery.py::test_failed_raw_tail_propagates_through_repeated_raw_only_parquet_builds
+1 failed in 0.54s

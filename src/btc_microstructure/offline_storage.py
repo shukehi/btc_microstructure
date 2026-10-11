@@ -165,11 +165,28 @@ class Store:
                     event = json.loads(line)
                     if event.get("event_type") == "UNCERTAIN_GAP":
                         self.recovery_events.append(event)
+                    elif (
+                        event.get("event_type") == "STORAGE_ERROR"
+                        and event.get("reason") == "FLUSH_FAILED"
+                    ):
+                        # Historical failures may already have moved raw into quarantine.
+                        # Keep the original audit bytes; derive recovery state from them.
+                        self.recovery_events.append(
+                            {
+                                **event,
+                                "event_type": "UNCERTAIN_GAP",
+                                "reason": "RAW_COMMIT_FAILED",
+                                "trusted_cursor": event.get(
+                                    "trusted_cursor", event.get("ingest_sequence")
+                                ),
+                            }
+                        )
             except (OSError, ValueError, AttributeError):
                 self.recovery_events.append(
                     {"event_type": "UNCERTAIN_GAP", "reason": "UNREADABLE_RECOVERY_AUDIT"}
                 )
         self._recover()
+        self._recover_quarantined_raw()
 
     @property
     def cursor(self) -> int | None:
@@ -284,6 +301,9 @@ class Store:
                 {
                     "reason": "FLUSH_FAILED",
                     "segment_path": _relative_path(self.root, final_path),
+                    "trusted_cursor": before_cursor,
+                    "first_ingest_sequence": min(_row_sequence(row) for row in rows),
+                    "last_ingest_sequence": after_cursor,
                     "error_type": type(exc).__name__,
                 },
             )
@@ -572,8 +592,32 @@ class Store:
             self.error_log.parent.mkdir(parents=True, exist_ok=True)
             with self.error_log.open("ab") as handle:
                 handle.write(_json_line(event))
+                handle.flush()
+                os.fsync(handle.fileno())
         except OSError:
             pass
+
+    def _recover_quarantined_raw(self) -> None:
+        # The side audit is best effort during I/O failure. Raw bytes in quarantine
+        # are independent evidence, including failures produced by older versions.
+        known_paths = {
+            str(event[key])
+            for event in self.recovery_events
+            for key in ("path", "quarantine_path", "segment_path")
+            if event.get(key) is not None
+        }
+        for path in sorted(self.quarantine_dir.glob("raw-control-*.jsonl*")):
+            relative = _relative_path(self.root, path)
+            if relative in known_paths or not path.is_file():
+                continue
+            event = _uncertain_gap_event(self.root, path)
+            event.update(
+                reason="QUARANTINED_RAW_TAIL",
+                quarantine_path=relative,
+                trusted_cursor=self._cursor,
+            )
+            self.recovery_events.append(event)
+            self._record_error("UNCERTAIN_GAP", event)
 
     def _next_manifest_index(self, prefix: str) -> int:
         existing = sorted(self.manifest_dir.glob(f"{prefix}-*.json"))
@@ -629,22 +673,31 @@ def _fsync_dir(path: Path) -> None:
 
 def _uncertain_gap_event(root: Path, path: Path) -> JsonRow:
     sequences: list[int] = []
-    if path.suffix in {".jsonl", ".tmp"}:
+    diagnostic_errors: set[str] = set()
+    if path.suffix in {".jsonl", ".tmp"} or path.name.startswith("raw-control-"):
         try:
-            with path.open("r", encoding="utf-8") as handle:
+            with path.open("rb") as handle:
                 for line in handle:
-                    row = cast(JsonRow, json.loads(line, object_hook=_json_object_hook))
+                    try:
+                        row = json.loads(line)
+                    except (ValueError, UnicodeError, RecursionError):
+                        diagnostic_errors.add("UNDECODABLE_OR_INVALID_JSON")
+                        continue
+                    if not isinstance(row, dict):
+                        diagnostic_errors.add("NON_OBJECT_JSON")
+                        continue
                     value = row.get("ingest_sequence")
-                    if isinstance(value, int) and not isinstance(value, bool):
+                    if isinstance(value, int) and not isinstance(value, bool) and value >= 0:
                         sequences.append(value)
-        except (OSError, json.JSONDecodeError):
-            pass
+        except OSError:
+            diagnostic_errors.add("UNREADABLE_TAIL")
     return {
         "event_type": "UNCERTAIN_GAP",
         "reason": "UNCOMMITTED_RAW_TAIL",
         "path": _relative_path(root, path),
         "first_ingest_sequence": min(sequences) if sequences else None,
         "last_ingest_sequence": max(sequences) if sequences else None,
+        "diagnostic_errors": sorted(diagnostic_errors),
     }
 
 
