@@ -67,7 +67,7 @@ BOOK/OI/FUND/LIQ/研究/成本/24h验收等超范围内容 **NOT_RUN/未实现**
 
 开始前默认基线183通过、R1-01独立15通过、R1-02独立9通过，三组退出0；`vertical_slice/baseline-*.log/xml/exit`。
 初次core检查16通过/2失败，`core-initial.log`；失败为新测试质量枚举过时及发布时间拒绝消息不匹配，按既有枚举和实际时钟拒绝路径修正测试，未放宽数值/时间合同。
-最终验证和CLI命令如下；远程CI运行在PR创建后补充。验证脚本每次创建新checks-NN目录，不覆盖失败日志。
+最终验证和CLI命令如下；远程CI运行已完成，见下方记录。验证脚本每次创建新checks-NN目录，不覆盖失败日志。
 
 ## 证据限制与停止
 
@@ -109,3 +109,15 @@ fixture/config/lock SHA-256见 `input-lock-checksums.json`；合成覆盖接收�
 安装和复现使用README的Python3.12锁定环境流程及R1-03章节；实际命令包括 validate-offline、collect --mode synthetic、replay 两次、build-features。所有输出须新目录。
 
 离线子集当前 **PASS**；R1-03原任务总体仍 **PARTIAL**。仅在同配置/版本下重放比较；修改研究期限需新运行身份，原特征值/输入选择已单独反事实测试。损坏raw恢复到最后可信游标，不以派生重建关闭输入尾部不确定性。损坏派生仅DERIVED_INVALID，可以从可信raw另目录重建。
+
+## PR 与 GitHub Actions 实际证据
+
+- PR：https://github.com/shukehi/btc_microstructure/pull/5 ，base main，关联 Closes #4；未合并、未开启auto-merge。
+- 实现/审查源码提交：`6084d85b1cc7608ff349718e9c845e8af97054f5`。本次随后仅归档远程证据/修订报告；最终head以PR正文精确SHA为准。
+- Actions：https://github.com/shukehi/btc_microstructure/actions/runs/38141380824 ，该源码提交 **SUCCESS**。
+- required job `Python 3.12 offline checks` **SUCCESS**；实际Linux/Python3.12.15。
+- 默认252 passed，独立15 passed/9 passed，全部0 failed/0 skipped；Ruff、format、Mypy、pip check、原配置、新配置、raw-only CLI端到端全部退出0。
+- 日志明确 `PASS: project checks use a separate network namespace`；没有启用真实probe。项目处理阶段无外部网络接口；依赖安装和GitHub传输正常使用授权网络。
+- 小型远程日志/JUnit/results.tsv归档至 `vertical_slice/ci-38141380824/`，run/job回执见 `actions-38141380824.json`。
+- 完整人工raw/manifest/Parquet与所有检查日志artifact：`ci-logs-38141380824-1`，ID `11702369324`，323911字节，SHA-256 `68815fe842b0cea5c8bfdcc3f0eea903dc33e3856a3d32ad36656ddae731c279`；元数据见 `actions-38141380824-artifacts.json`。14天保留，到期后可按README新目录重现；不是永久托管承诺。
+- PR刚创建时comments/reviews/inline comments均为空；同会话复查结论不代替独立审查。交付后停止，等待独立审查，不开始后续任务。

@@ -1,0 +1,60 @@
+PASS: project checks use a separate network namespace
+::group::pytest
+........................................................................ [ 28%]
+........................................................................ [ 57%]
+........................................................................ [ 85%]
+....................................                                     [100%]
+- generated xml file: /home/runner/work/btc_microstructure/btc_microstructure/ci-results/pytest.xml -
+252 passed in 8.88s
+Exit code: 0
+::endgroup::
+::group::pytest-independent-r1-01
+...............                                                          [100%]
+- generated xml file: /home/runner/work/btc_microstructure/btc_microstructure/ci-results/pytest-independent-r1-01.xml -
+15 passed in 0.45s
+Exit code: 0
+::endgroup::
+::group::pytest-independent-r1-02
+.........                                                                [100%]
+- generated xml file: /home/runner/work/btc_microstructure/btc_microstructure/ci-results/pytest-independent-r1-02.xml -
+9 passed in 0.29s
+Exit code: 0
+::endgroup::
+::group::ruff-check
+All checks passed!
+Exit code: 0
+::endgroup::
+::group::ruff-format
+23 files already formatted
+Exit code: 0
+::endgroup::
+::group::mypy
+Success: no issues found in 12 source files
+Exit code: 0
+::endgroup::
+::group::pip-check
+No broken requirements found.
+Exit code: 0
+::endgroup::
+::group::validate-config
+{"runtime_capabilities": {"book_band_coverage": "UNVERIFIED", "event_time_per_source_support": "UNVERIFIED", "instrument_metadata": "UNVERIFIED", "oi_absolute_unit_evidence": "UNVERIFIED", "protocol_routes_and_budget": "UNVERIFIED"}, "sha256": "b037004b544ca834855821374bd65520a535b509c0b952d9c3f37a97a30d3b43", "status": "CONFIG_VALID"}
+Exit code: 0
+::endgroup::
+::group::validate-offline
+{"input_mode": "synthetic", "network_access": "DISABLED", "sha256": "6da02b16a314b315c6e9d3fa588c3beb2791ee240bcedd88c8178378c9e71c2b", "status": "OFFLINE_CONFIG_VALID"}
+Exit code: 0
+::endgroup::
+::group::offline-e2e
+validate 0 {"input_mode": "synthetic", "network_access": "DISABLED", "sha256": "6da02b16a314b315c6e9d3fa588c3beb2791ee240bcedd88c8178378c9e71c2b", "status": "OFFLINE_CONFIG_VALID"}
+ 
+collect 0 {"feature_rows": 70, "limitations": {"continuous_collection": "NOT_RUN", "quantity_unit_for_live": "UNKNOWN_UNVERIFIED", "real_binance_rest": "BLOCKED_HISTORICAL", "real_binance_ws": "NOT_RUN"}, "normalized_rows": 3, "offline_config_sha256": "6da02b16a314b315c6e9d3fa588c3beb2791ee240bcedd88c8178378c9e71c2b", "output_root": "ci-results/offline-smoke/collect", "quarantine_rows": 1, "run_id": "r1-03-synthetic-offline", "status": "PASS"}
+ 
+replay1 0 {"feature_available_time_source": "FEATURE_PUBLISHED_LOG", "feature_rows": 70, "input_root": "ci-results/offline-smoke/collect", "limitations": {"continuous_collection": "NOT_RUN", "quantity_unit_for_live": "UNKNOWN_UNVERIFIED", "real_binance_rest": "BLOCKED_HISTORICAL", "real_binance_ws": "NOT_RUN"}, "normalized_rows": 3, "offline_config_sha256": "6da02b16a314b315c6e9d3fa588c3beb2791ee240bcedd88c8178378c9e71c2b", "original_logical_sha256": "11257d77d101dbb197a4ae2934850a365590c108f2d15a29390120bd7cb6bbd6", "output_root": "ci-results/offline-smoke/replay1", "quarantine_rows": 1, "recovery_events": [], "replay_elapsed_ns": 122974794, "replay_logical_sha256": "11257d77d101dbb197a4ae2934850a365590c108f2d15a29390120bd7cb6bbd6", "run_id": "r1-03-synthetic-offline", "status": "PASS"}
+ 
+replay2 0 {"feature_available_time_source": "FEATURE_PUBLISHED_LOG", "feature_rows": 70, "input_root": "ci-results/offline-smoke/collect", "limitations": {"continuous_collection": "NOT_RUN", "quantity_unit_for_live": "UNKNOWN_UNVERIFIED", "real_binance_rest": "BLOCKED_HISTORICAL", "real_binance_ws": "NOT_RUN"}, "normalized_rows": 3, "offline_config_sha256": "6da02b16a314b315c6e9d3fa588c3beb2791ee240bcedd88c8178378c9e71c2b", "original_logical_sha256": "11257d77d101dbb197a4ae2934850a365590c108f2d15a29390120bd7cb6bbd6", "output_root": "ci-results/offline-smoke/replay2", "quarantine_rows": 1, "recovery_events": [], "replay_elapsed_ns": 124700643, "replay_logical_sha256": "11257d77d101dbb197a4ae2934850a365590c108f2d15a29390120bd7cb6bbd6", "run_id": "r1-03-synthetic-offline", "status": "PASS"}
+ 
+build 0 {"build_elapsed_ns": 111395526, "build_logical_sha256": "11257d77d101dbb197a4ae2934850a365590c108f2d15a29390120bd7cb6bbd6", "feature_available_time_source": "FEATURE_PUBLISHED_LOG", "feature_rows": 70, "input_root": "ci-results/offline-smoke/raw-only", "limitations": {"continuous_collection": "NOT_RUN", "quantity_unit_for_live": "UNKNOWN_UNVERIFIED", "real_binance_rest": "BLOCKED_HISTORICAL", "real_binance_ws": "NOT_RUN"}, "normalized_rows": 3, "offline_config_sha256": "6da02b16a314b315c6e9d3fa588c3beb2791ee240bcedd88c8178378c9e71c2b", "output_root": "ci-results/offline-smoke/build", "quarantine_rows": 1, "recovery_events": [], "run_id": "r1-03-synthetic-offline", "status": "PASS"}
+ 
+PASS: fixed Decimal values, raw duplicates, 1s grid, Parquet readback, two replays + build
+Exit code: 0
+::endgroup::
