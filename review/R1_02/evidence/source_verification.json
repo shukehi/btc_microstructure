@@ -1,0 +1,22 @@
+{
+  "reviewed_at_utc": "2026-10-11T05:22:02.170978+00:00",
+  "evidence_kind": "DOC_VERIFIED_NOT_RUNTIME",
+  "sources": [
+    {
+      "id": "EXT-01",
+      "url": "https://docs.aiohttp.org/en/v3.12.15/_modules/aiohttp/client.html",
+      "checked": "ClientSession defaults _retry_connection to True; GET is idempotent; ClientOSError/ServerDisconnectedError branch can continue once. WebSocket handshake also invokes the GET request path. No source code reproduced."
+    },
+    {
+      "id": "EXT-02",
+      "url": "https://developers.binance.com/en/docs/catalog/core-trading-derivatives-trading-usd-s-m-futures/api/ws-streams/market",
+      "checked": "Combined aggTrade URL, stream envelope and primary fields match submitted route scope. Not a connection or unit verification."
+    },
+    {
+      "id": "EXT-03",
+      "url": "https://developers.binance.com/en/docs/catalog/core-trading-derivatives-trading-usd-s-m-futures/api/rest-api/market-data",
+      "checked": "exchangeInfo GET path and documented weight 1; documentation not current per-IP available budget."
+    }
+  ],
+  "live_binance_access_in_this_review": false
+}

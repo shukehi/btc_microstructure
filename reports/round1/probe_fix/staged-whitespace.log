@@ -1,0 +1,102 @@
+{"command": ["git", "diff", "--cached", "--check"], "cwd": "/Users/aries/Dve/btc_microstructure", "exit_code": 2, "status": "FAIL"}
+--- stdout ---
+reports/round1/02_protocol_probe_fix.md:1: trailing whitespace.
++任务编号：R1-02 / DEV-002 修复 R102-A/B  
+reports/round1/02_protocol_probe_fix.md:2: trailing whitespace.
++原规格版本：0.1  
+reports/round1/02_protocol_probe_fix.md:3: trailing whitespace.
++代码版本/工作树：基线提交 `6b73205424d4f49eb41a29c327bc75ce3f55b2b2`；工作分支 `fix/r1-02-protocol-probe`。修复源码用 `probe_fix/implementation.sha256` 标识；本次按用户要求提交并创建指向 main 的 PR，不自动合并。  
+reports/round1/02_protocol_probe_fix.md:4: trailing whitespace.
++本次范围：仅约束客户端隐式请求重试，以及保留正文中断前已观察到的状态、预算头、可用时间和有界前缀。  
+reports/round1/02_protocol_probe_fix.md:5: trailing whitespace.
++结果：**离线修复 PASS**；真实接口仍为历史 REST **BLOCKED/TIMEOUT**、WS **NOT_RUN**。整体运行核验仍为 PARTIAL。  
+reports/round1/probe_fix/before/independent02.log:15: trailing whitespace.
++    
+reports/round1/probe_fix/before/independent02.log:19: trailing whitespace.
++    
+reports/round1/probe_fix/before/independent02.log:23: trailing whitespace.
++    
+reports/round1/probe_fix/before/independent02.log:27: trailing whitespace.
++    
+reports/round1/probe_fix/before/independent02.log:51: trailing whitespace.
++    
+reports/round1/probe_fix/before/independent02.log:55: trailing whitespace.
++    
+reports/round1/probe_fix/before/independent02.log:59: trailing whitespace.
++    
+reports/round1/probe_fix/before/independent02.log:63: trailing whitespace.
++    
+reports/round1/probe_fix/before/independent02.xml:9: trailing whitespace.
++    
+reports/round1/probe_fix/before/independent02.xml:13: trailing whitespace.
++    
+reports/round1/probe_fix/before/independent02.xml:17: trailing whitespace.
++    
+reports/round1/probe_fix/before/independent02.xml:21: trailing whitespace.
++    
+reports/round1/probe_fix/before/independent02.xml:42: trailing whitespace.
++    
+reports/round1/probe_fix/before/independent02.xml:46: trailing whitespace.
++    
+reports/round1/probe_fix/before/independent02.xml:50: trailing whitespace.
++    
+reports/round1/probe_fix/before/independent02.xml:54: trailing whitespace.
++    
+reports/round1/probe_fix/implementation.diff:10: trailing whitespace.
++ 
+reports/round1/probe_fix/implementation.diff:11: trailing whitespace.
++ 
+reports/round1/probe_fix/implementation.diff:37: trailing whitespace.
++ 
+reports/round1/probe_fix/implementation.diff:42: trailing whitespace.
++ 
+reports/round1/probe_fix/implementation.diff:135: trailing whitespace.
++ 
+reports/round1/probe_fix/implementation.diff:140: trailing whitespace.
++ 
+reports/round1/probe_fix/implementation.diff:142: trailing whitespace.
++ 
+reports/round1/probe_fix/implementation.diff:145: trailing whitespace.
++ 
+reports/round1/probe_fix/implementation.diff:146: trailing whitespace.
++ 
+reports/round1/probe_fix/implementation.diff:191: trailing whitespace.
++ 
+reports/round1/probe_fix/implementation.diff:201: trailing whitespace.
++ 
+reports/round1/probe_fix/implementation.diff:259: trailing whitespace.
++ 
+review/R1_02/evidence/r1-02-regressions.log:13: trailing whitespace.
++    
+review/R1_02/evidence/r1-02-regressions.log:17: trailing whitespace.
++    
+review/R1_02/evidence/r1-02-regressions.log:21: trailing whitespace.
++    
+review/R1_02/evidence/r1-02-regressions.log:25: trailing whitespace.
++    
+review/R1_02/evidence/r1-02-regressions.log:49: trailing whitespace.
++    
+review/R1_02/evidence/r1-02-regressions.log:53: trailing whitespace.
++    
+review/R1_02/evidence/r1-02-regressions.log:57: trailing whitespace.
++    
+review/R1_02/evidence/r1-02-regressions.log:61: trailing whitespace.
++    
+review/R1_02/evidence/r1-02-regressions.xml:9: trailing whitespace.
++    
+review/R1_02/evidence/r1-02-regressions.xml:13: trailing whitespace.
++    
+review/R1_02/evidence/r1-02-regressions.xml:17: trailing whitespace.
++    
+review/R1_02/evidence/r1-02-regressions.xml:21: trailing whitespace.
++    
+review/R1_02/evidence/r1-02-regressions.xml:42: trailing whitespace.
++    
+review/R1_02/evidence/r1-02-regressions.xml:46: trailing whitespace.
++    
+review/R1_02/evidence/r1-02-regressions.xml:50: trailing whitespace.
++    
+review/R1_02/evidence/r1-02-regressions.xml:54: trailing whitespace.
++    
+
+--- stderr ---

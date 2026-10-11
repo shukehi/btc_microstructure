@@ -1,0 +1,9 @@
+{
+  "sha256": "e5ab90935f0e0e770914bb004b7f4515e5c572eaeeca2b4a612b16ed4c903aa4",
+  "expected_sha256": "e5ab90935f0e0e770914bb004b7f4515e5c572eaeeca2b4a612b16ed4c903aa4",
+  "sha256_match": true,
+  "file_count": 228,
+  "total_uncompressed_bytes": 1037255,
+  "crc": "PASS",
+  "path_safety": "PASS"
+}

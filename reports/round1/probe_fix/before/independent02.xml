@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="7" skipped="0" tests="9" time="0.355" timestamp="2026-10-11T00:52:25.462916-05:00" hostname="AriesdeMacBook-Pro.local"><testcase classname="review.R1_02.checks.test_r1_02_regressions" name="test_no_hidden_second_attempt_on_disconnect[rest]" time="0.002"><failure message="AssertionError: rest: client entered request middleware 2 times, yet report says retry_count=0; aiohttp=3.12.15&#10;assert 2 == 1&#10; +  where 2 = len([('GET', 'https://fapi.binance.com/fapi/v1/exchangeInfo'), ('GET', 'https://fapi.binance.com/fapi/v1/exchangeInfo')])">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x108082000&gt;
+stage = 'rest'
+
+    @pytest.mark.parametrize('stage', ['rest', 'ws'])
+    def test_no_hidden_second_attempt_on_disconnect(monkeypatch, stage):
+        """R102-A: no application retries must also mean no implicit client retry."""
+        attempts = []
+        original = aiohttp.ClientSession
+    
+        async def disconnect(request, handler):
+            attempts.append((request.method, str(request.url)))
+            raise aiohttp.ServerDisconnectedError('SYNTHETIC: interrupted before response')
+    
+        def factory(**options):
+            middlewares = tuple(options.pop('middlewares', ()))
+            return original(**options, middlewares=middlewares + (disconnect,))
+    
+        class WSOnly(AioTransport):
+            async def metadata(self, limits):
+                return Reply(200, {}, (FIXTURES / 'metadata.valid.json').read_bytes())
+    
+        monkeypatch.setattr(aiohttp, 'ClientSession', factory)
+        transport = AioTransport() if stage == 'rest' else WSOnly()
+        report = asyncio.run(run_probe(transport, short_limits()))
+        assert report['status'] == 'BLOCKED'
+&gt;       assert len(attempts) == 1, (
+            f'{stage}: client entered request middleware {len(attempts)} times, '
+            f"yet report says retry_count={report['retry_count']}; aiohttp={aiohttp.__version__}"
+        )
+E       AssertionError: rest: client entered request middleware 2 times, yet report says retry_count=0; aiohttp=3.12.15
+E       assert 2 == 1
+E        +  where 2 = len([('GET', 'https://fapi.binance.com/fapi/v1/exchangeInfo'), ('GET', 'https://fapi.binance.com/fapi/v1/exchangeInfo')])
+
+review/R1_02/checks/test_r1_02_regressions.py:61: AssertionError</failure></testcase><testcase classname="review.R1_02.checks.test_r1_02_regressions" name="test_no_hidden_second_attempt_on_disconnect[ws]" time="0.001"><failure message="AssertionError: ws: client entered request middleware 2 times, yet report says retry_count=0; aiohttp=3.12.15&#10;assert 2 == 1&#10; +  where 2 = len([('GET', 'wss://fstream.binance.com/market/stream?streams=btcusdt@aggTrade'), ('GET', 'wss://fstream.binance.com/market/stream?streams=btcusdt@aggTrade')])">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x108083c50&gt;
+stage = 'ws'
+
+    @pytest.mark.parametrize('stage', ['rest', 'ws'])
+    def test_no_hidden_second_attempt_on_disconnect(monkeypatch, stage):
+        """R102-A: no application retries must also mean no implicit client retry."""
+        attempts = []
+        original = aiohttp.ClientSession
+    
+        async def disconnect(request, handler):
+            attempts.append((request.method, str(request.url)))
+            raise aiohttp.ServerDisconnectedError('SYNTHETIC: interrupted before response')
+    
+        def factory(**options):
+            middlewares = tuple(options.pop('middlewares', ()))
+            return original(**options, middlewares=middlewares + (disconnect,))
+    
+        class WSOnly(AioTransport):
+            async def metadata(self, limits):
+                return Reply(200, {}, (FIXTURES / 'metadata.valid.json').read_bytes())
+    
+        monkeypatch.setattr(aiohttp, 'ClientSession', factory)
+        transport = AioTransport() if stage == 'rest' else WSOnly()
+        report = asyncio.run(run_probe(transport, short_limits()))
+        assert report['status'] == 'BLOCKED'
+&gt;       assert len(attempts) == 1, (
+            f'{stage}: client entered request middleware {len(attempts)} times, '
+            f"yet report says retry_count={report['retry_count']}; aiohttp={aiohttp.__version__}"
+        )
+E       AssertionError: ws: client entered request middleware 2 times, yet report says retry_count=0; aiohttp=3.12.15
+E       assert 2 == 1
+E        +  where 2 = len([('GET', 'wss://fstream.binance.com/market/stream?streams=btcusdt@aggTrade'), ('GET', 'wss://fstream.binance.com/market/stream?streams=btcusdt@aggTrade')])
+
+review/R1_02/checks/test_r1_02_regressions.py:61: AssertionError</failure></testcase><testcase classname="review.R1_02.checks.test_r1_02_regressions" name="test_observed_status_and_budget_headers_survive_body_failure[timeout-429]" time="0.031"><failure message="AssertionError: already delivered HTTP 429 became {'status': 'BLOCKED', 'method': 'GET', 'url': 'https://fapi.binance.com/fapi/v1/exchangeInfo', 'params': {}, 'request_started_ns': 1791697945689901000}&#10;assert None == 429&#10; +  where None = &lt;built-in method get of dict object at 0x108120380&gt;('http_status')&#10; +    where &lt;built-in method get of dict object at 0x108120380&gt; = {'method': 'GET', 'params': {}, 'request_started_ns': 1791697945689901000, 'status': 'BLOCKED', ...}.get">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x1080efe60&gt;
+status = 429, failure = 'timeout'
+
+    @pytest.mark.parametrize('status', [429, 451])
+    @pytest.mark.parametrize('failure', ['timeout', 'payload_error'])
+    def test_observed_status_and_budget_headers_survive_body_failure(monkeypatch, status, failure):
+        """R102-B: already observed response headers cannot disappear on read failure."""
+        transport = interrupted_transport(monkeypatch, status, failure)
+        report = asyncio.run(run_probe(transport, short_limits()))
+        assert report['status'] == 'BLOCKED'
+        assert report['ws']['status'] == 'NOT_RUN'
+&gt;       assert report['rest'].get('http_status') == status, (
+            f'already delivered HTTP {status} became {report["rest"]!r}'
+        )
+E       AssertionError: already delivered HTTP 429 became {'status': 'BLOCKED', 'method': 'GET', 'url': 'https://fapi.binance.com/fapi/v1/exchangeInfo', 'params': {}, 'request_started_ns': 1791697945689901000}
+E       assert None == 429
+E        +  where None = &lt;built-in method get of dict object at 0x108120380&gt;('http_status')
+E        +    where &lt;built-in method get of dict object at 0x108120380&gt; = {'method': 'GET', 'params': {}, 'request_started_ns': 1791697945689901000, 'status': 'BLOCKED', ...}.get
+
+review/R1_02/checks/test_r1_02_regressions.py:109: AssertionError</failure></testcase><testcase classname="review.R1_02.checks.test_r1_02_regressions" name="test_observed_status_and_budget_headers_survive_body_failure[timeout-451]" time="0.032"><failure message="AssertionError: already delivered HTTP 451 became {'status': 'BLOCKED', 'method': 'GET', 'url': 'https://fapi.binance.com/fapi/v1/exchangeInfo', 'params': {}, 'request_started_ns': 1791697945724068000}&#10;assert None == 451&#10; +  where None = &lt;built-in method get of dict object at 0x1080dc1c0&gt;('http_status')&#10; +    where &lt;built-in method get of dict object at 0x1080dc1c0&gt; = {'method': 'GET', 'params': {}, 'request_started_ns': 1791697945724068000, 'status': 'BLOCKED', ...}.get">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x1080ed280&gt;
+status = 451, failure = 'timeout'
+
+    @pytest.mark.parametrize('status', [429, 451])
+    @pytest.mark.parametrize('failure', ['timeout', 'payload_error'])
+    def test_observed_status_and_budget_headers_survive_body_failure(monkeypatch, status, failure):
+        """R102-B: already observed response headers cannot disappear on read failure."""
+        transport = interrupted_transport(monkeypatch, status, failure)
+        report = asyncio.run(run_probe(transport, short_limits()))
+        assert report['status'] == 'BLOCKED'
+        assert report['ws']['status'] == 'NOT_RUN'
+&gt;       assert report['rest'].get('http_status') == status, (
+            f'already delivered HTTP {status} became {report["rest"]!r}'
+        )
+E       AssertionError: already delivered HTTP 451 became {'status': 'BLOCKED', 'method': 'GET', 'url': 'https://fapi.binance.com/fapi/v1/exchangeInfo', 'params': {}, 'request_started_ns': 1791697945724068000}
+E       assert None == 451
+E        +  where None = &lt;built-in method get of dict object at 0x1080dc1c0&gt;('http_status')
+E        +    where &lt;built-in method get of dict object at 0x1080dc1c0&gt; = {'method': 'GET', 'params': {}, 'request_started_ns': 1791697945724068000, 'status': 'BLOCKED', ...}.get
+
+review/R1_02/checks/test_r1_02_regressions.py:109: AssertionError</failure></testcase><testcase classname="review.R1_02.checks.test_r1_02_regressions" name="test_observed_status_and_budget_headers_survive_body_failure[payload_error-429]" time="0.001"><failure message="AssertionError: already delivered HTTP 429 became {'status': 'BLOCKED', 'method': 'GET', 'url': 'https://fapi.binance.com/fapi/v1/exchangeInfo', 'params': {}, 'request_started_ns': 1791697945759850000}&#10;assert None == 429&#10; +  where None = &lt;built-in method get of dict object at 0x108120a00&gt;('http_status')&#10; +    where &lt;built-in method get of dict object at 0x108120a00&gt; = {'method': 'GET', 'params': {}, 'request_started_ns': 1791697945759850000, 'status': 'BLOCKED', ...}.get">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x1080820f0&gt;
+status = 429, failure = 'payload_error'
+
+    @pytest.mark.parametrize('status', [429, 451])
+    @pytest.mark.parametrize('failure', ['timeout', 'payload_error'])
+    def test_observed_status_and_budget_headers_survive_body_failure(monkeypatch, status, failure):
+        """R102-B: already observed response headers cannot disappear on read failure."""
+        transport = interrupted_transport(monkeypatch, status, failure)
+        report = asyncio.run(run_probe(transport, short_limits()))
+        assert report['status'] == 'BLOCKED'
+        assert report['ws']['status'] == 'NOT_RUN'
+&gt;       assert report['rest'].get('http_status') == status, (
+            f'already delivered HTTP {status} became {report["rest"]!r}'
+        )
+E       AssertionError: already delivered HTTP 429 became {'status': 'BLOCKED', 'method': 'GET', 'url': 'https://fapi.binance.com/fapi/v1/exchangeInfo', 'params': {}, 'request_started_ns': 1791697945759850000}
+E       assert None == 429
+E        +  where None = &lt;built-in method get of dict object at 0x108120a00&gt;('http_status')
+E        +    where &lt;built-in method get of dict object at 0x108120a00&gt; = {'method': 'GET', 'params': {}, 'request_started_ns': 1791697945759850000, 'status': 'BLOCKED', ...}.get
+
+review/R1_02/checks/test_r1_02_regressions.py:109: AssertionError</failure></testcase><testcase classname="review.R1_02.checks.test_r1_02_regressions" name="test_observed_status_and_budget_headers_survive_body_failure[payload_error-451]" time="0.001"><failure message="AssertionError: already delivered HTTP 451 became {'status': 'BLOCKED', 'method': 'GET', 'url': 'https://fapi.binance.com/fapi/v1/exchangeInfo', 'params': {}, 'request_started_ns': 1791697945771108000}&#10;assert None == 451&#10; +  where None = &lt;built-in method get of dict object at 0x10809b340&gt;('http_status')&#10; +    where &lt;built-in method get of dict object at 0x10809b340&gt; = {'method': 'GET', 'params': {}, 'request_started_ns': 1791697945771108000, 'status': 'BLOCKED', ...}.get">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x107819b50&gt;
+status = 451, failure = 'payload_error'
+
+    @pytest.mark.parametrize('status', [429, 451])
+    @pytest.mark.parametrize('failure', ['timeout', 'payload_error'])
+    def test_observed_status_and_budget_headers_survive_body_failure(monkeypatch, status, failure):
+        """R102-B: already observed response headers cannot disappear on read failure."""
+        transport = interrupted_transport(monkeypatch, status, failure)
+        report = asyncio.run(run_probe(transport, short_limits()))
+        assert report['status'] == 'BLOCKED'
+        assert report['ws']['status'] == 'NOT_RUN'
+&gt;       assert report['rest'].get('http_status') == status, (
+            f'already delivered HTTP {status} became {report["rest"]!r}'
+        )
+E       AssertionError: already delivered HTTP 451 became {'status': 'BLOCKED', 'method': 'GET', 'url': 'https://fapi.binance.com/fapi/v1/exchangeInfo', 'params': {}, 'request_started_ns': 1791697945771108000}
+E       assert None == 451
+E        +  where None = &lt;built-in method get of dict object at 0x10809b340&gt;('http_status')
+E        +    where &lt;built-in method get of dict object at 0x10809b340&gt; = {'method': 'GET', 'params': {}, 'request_started_ns': 1791697945771108000, 'status': 'BLOCKED', ...}.get
+
+review/R1_02/checks/test_r1_02_regressions.py:109: AssertionError</failure></testcase><testcase classname="review.R1_02.checks.test_r1_02_regressions" name="test_partial_200_body_is_retained_as_incomplete_evidence" time="0.036"><failure message="AssertionError: 21 bytes were delivered to metadata() but the evidence lost the prefix&#10;assert None == '7b2273796e746865746963223a227061727469616c'&#10; +  where None = &lt;built-in method get of dict object at 0x10811db40&gt;('body_hex')&#10; +    where &lt;built-in method get of dict object at 0x10811db40&gt; = {'method': 'GET', 'params': {}, 'request_started_ns': 1791697945778928000, 'status': 'BLOCKED', ...}.get&#10; +  and   '7b2273796e746865746963223a227061727469616c' = &lt;built-in method hex of bytes object at 0x107867df0&gt;()&#10; +    where &lt;built-in method hex of bytes object at 0x107867df0&gt; = b'{&quot;synthetic&quot;:&quot;partial'.hex">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x1080ee3c0&gt;
+tmp_path = PosixPath('/private/var/folders/s9/rbq781b922s1xp3jhmtct8yc0000gn/T/pytest-of-aries/pytest-23/test_partial_200_body_is_retai0')
+
+    def test_partial_200_body_is_retained_as_incomplete_evidence(monkeypatch, tmp_path):
+        """R102-B: preserve delivered application bytes, not imaginary wire totals."""
+        transport = interrupted_transport(monkeypatch, 200, 'timeout')
+        report = asyncio.run(run_probe(transport, short_limits()))
+        assert report['status'] != 'PASS'
+&gt;       assert report['rest'].get('body_hex') == PREFIX.hex(), (
+            '21 bytes were delivered to metadata() but the evidence lost the prefix'
+        )
+E       AssertionError: 21 bytes were delivered to metadata() but the evidence lost the prefix
+E       assert None == '7b2273796e746865746963223a227061727469616c'
+E        +  where None = &lt;built-in method get of dict object at 0x10811db40&gt;('body_hex')
+E        +    where &lt;built-in method get of dict object at 0x10811db40&gt; = {'method': 'GET', 'params': {}, 'request_started_ns': 1791697945778928000, 'status': 'BLOCKED', ...}.get
+E        +  and   '7b2273796e746865746963223a227061727469616c' = &lt;built-in method hex of bytes object at 0x107867df0&gt;()
+E        +    where &lt;built-in method hex of bytes object at 0x107867df0&gt; = b'{"synthetic":"partial'.hex
+
+review/R1_02/checks/test_r1_02_regressions.py:122: AssertionError</failure></testcase><testcase classname="review.R1_02.checks.test_r1_02_regressions" name="test_control_complete_denial_is_recorded" time="0.001" /><testcase classname="review.R1_02.checks.test_r1_02_regressions" name="test_control_complete_synthetic_success_preserves_hashes" time="0.003" /></testsuite></testsuites>

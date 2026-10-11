@@ -1,0 +1,261 @@
+--- R1-02/src/btc_microstructure/probe.py
++++ R1-02-fixed/src/btc_microstructure/probe.py
+@@ -32,6 +32,9 @@
+     status: int
+     headers: dict[str, str]
+     body: bytes = b""
++    body_complete: bool = True
++    headers_received_ns: int | None = None
++    body_read_state: str = "COMPLETE"
+ 
+ 
+ class Transport(Protocol):
+@@ -201,7 +204,7 @@
+     evidence_kind: Literal["SYNTHETIC", "LIVE"] = "SYNTHETIC",
+ ) -> dict[str, Any]:
+     report: dict[str, Any] = {
+-        "schema_version": "probe-0.1",
++        "schema_version": "probe-0.2",
+         "evidence_kind": evidence_kind,
+         "started_ns": time.time_ns(),
+         "limits": limits.model_dump(),
+@@ -215,6 +218,8 @@
+             "frames_seen": 0,
+         },
+         "bytes_received": 0,
++        "logical_calls": {"rest": 0, "ws": 0},
++        "transport_attempts": None,
+         "retry_count": 0,
+         "backoff_cap_seconds": 0,
+         "continuous_collection_enabled": False,
+@@ -226,21 +231,38 @@
+         item["http_status"] = reply.status
+         item["rate_headers"] = budget_headers(reply.headers)
+         item["response_received_ns"] = time.time_ns()
++        if reply.headers_received_ns is not None:
++            item["headers_received_ns"] = reply.headers_received_ns
+ 
+     def account(body: bytes) -> bool:
+         remaining = limits.max_bytes - int(report["bytes_received"])
+         report["bytes_received"] += len(body)
+         return len(body) <= remaining
+ 
++    def retain_metadata(reply: Reply) -> bool:
++        store(reply, "rest")
++        fits = account(reply.body)
++        report["rest"]["body_hex"] = reply.body[: limits.max_bytes].hex()
++        report["rest"]["body_bytes_observed"] = len(reply.body)
++        report["rest"]["body_complete"] = reply.body_complete and fits
++        report["rest"]["body_read_state"] = reply.body_read_state
++        report["rest"]["truncated"] = not fits or not reply.body_complete
++        return fits
++
++    def retain_observation() -> None:
++        # Optional additive interface: legacy injected transports still return Reply.
++        if "body_hex" not in report["rest"]:
++            observation = getattr(transport, "metadata_observation", None)
++            if isinstance(observation, Reply):
++                retain_metadata(observation)
++
+     async def perform() -> None:
+         nonlocal stage
+         report["rest"]["request_started_ns"] = time.time_ns()
++        report["logical_calls"]["rest"] += 1
+         async with asyncio.timeout(limits.connect_seconds):
+             reply = await transport.metadata(limits)
+-        store(reply, "rest")
+-        fits = account(reply.body)
+-        report["rest"]["body_hex"] = reply.body[: limits.max_bytes].hex()
+-        report["rest"]["truncated"] = not fits
++        fits = retain_metadata(reply)
+         if reply.status != 200:
+             report["rest"]["status"] = (
+                 "BLOCKED" if reply.status in (401, 403, 418, 429, 451) else "FAIL"
+@@ -250,10 +272,13 @@
+             return
+         if not fits:
+             raise ProbeError("rest: response byte limit exceeded")
++        if not reply.body_complete:
++            raise AccessError("REST_BODY_INCOMPLETE", reply)
+         report["metadata"] = inspect_metadata(reply.body)
+         report["rest"]["status"] = "PASS"
+         stage = "ws"
+         report["ws"]["request_started_ns"] = time.time_ns()
++        report["logical_calls"]["ws"] += 1
+         async with asyncio.timeout(limits.connect_seconds):
+             handshake = await transport.connect(limits)
+         store(handshake, "ws")
+@@ -298,7 +323,10 @@
+         report[stage]["status"] = report["status"] = "BLOCKED"
+         report["reason"] = exc.reason
+         if exc.reply:
+-            store(exc.reply, stage)
++            if stage == "rest" and "body_hex" not in report["rest"]:
++                retain_metadata(exc.reply)
++            else:
++                store(exc.reply, stage)
+     except ProbeError as exc:
+         report[stage]["status"] = report["status"] = "FAIL"
+         report["reason"] = str(exc)
+@@ -306,6 +334,19 @@
+         report[stage]["status"] = report["status"] = "BLOCKED"
+         report["reason"] = "NETWORK_ERROR; exception details omitted to exclude credentials"
+     finally:
++        # Also retain progress when the timeout scope cancels metadata(), while
++        # external CancelledError still propagates after bounded cleanup.
++        retain_observation()
++        attempts = getattr(transport, "request_attempts", None)
++        report["transport_attempts"] = attempts
++        report["retry_count_scope"] = (
++            "APPLICATION_AND_REQUEST_HANDLER"
++            if isinstance(attempts, dict)
++            else "APPLICATION_ONLY_TRANSPORT_UNOBSERVED"
++        )
++        observed = attempts if isinstance(attempts, dict) else report["logical_calls"]
++        report["retry_count"] = sum(max(0, count - 1) for count in observed.values())
++        report["blocked_retry_count"] = getattr(transport, "blocked_reentries", None)
+         try:
+             async with asyncio.timeout(1):
+                 await transport.close()
+@@ -344,6 +385,10 @@
+         "observed_usage_headers": report["rest"].get("rate_headers", {}),
+         "probe_limits": report["limits"],
+         "max_retries": 0,
++        "observed_transport_attempts": report.get("transport_attempts"),
++        "observed_retry_count": report["retry_count"],
++        "retry_count_scope": report.get("retry_count_scope"),
++        "blocked_retry_count": report.get("blocked_retry_count"),
+         "backoff_cap_seconds": 0,
+         "status": "UNVERIFIED_FOR_CONTINUOUS_COLLECTION",
+         "continuous_collection_enabled": False,
+--- R1-02/src/btc_microstructure/probe_transport.py
++++ R1-02-fixed/src/btc_microstructure/probe_transport.py
+@@ -1,17 +1,59 @@
+ """Fixed public endpoints only; lazy session, no credentials, redirects or retries."""
+ 
+ import asyncio
++from dataclasses import replace
++import time
+ from typing import Any
+ 
+ import aiohttp
+ 
+-from .probe import AccessError, ProbeLimits, Reply, REST_URL, WS_URL
++from .probe import AccessError, ProbeLimits, Reply, REST_URL, WS_URL, budget_headers
+ 
+ 
+ class AioTransport:
+     def __init__(self) -> None:
+         self.session: aiohttp.ClientSession | None = None
+         self.ws: aiohttp.ClientWebSocketResponse | None = None
++        self._request_attempts = {"rest": 0, "ws": 0}
++        self._blocked_reentries = 0
++        self._metadata_reply: Reply | None = None
++        self._metadata_body = bytearray()
++
++    @property
++    def request_attempts(self) -> dict[str, int]:
++        """Allowed request-handler entries, not claimed socket/wire send counts."""
++        return dict(self._request_attempts)
++
++    @property
++    def blocked_reentries(self) -> int:
++        return self._blocked_reentries
++
++    @property
++    def metadata_observation(self) -> Reply | None:
++        """Last bounded header/body snapshot, including after caller cancellation."""
++        if self._metadata_reply is None:
++            return None
++        return replace(self._metadata_reply, body=bytes(self._metadata_body))
++
++    async def _single_attempt(
++        self, request: aiohttp.ClientRequest, handler: aiohttp.ClientHandlerType
++    ) -> aiohttp.ClientResponse:
++        url = str(request.url)
++        if request.method != "GET" or url not in (REST_URL, WS_URL):
++            raise AccessError("UNEXPECTED_REQUEST_SCOPE")
++        stage = "rest" if url == REST_URL else "ws"
++        if self._request_attempts[stage] >= 1:
++            self._blocked_reentries += 1
++            raise AccessError("IMPLICIT_RETRY_BLOCKED")
++        self._request_attempts[stage] += 1
++        try:
++            return await handler(request)
++        except (aiohttp.ClientOSError, aiohttp.ServerDisconnectedError) as exc:
++            # Public middleware boundary: these errors otherwise trigger aiohttp's
++            # retry of idempotent GETs. AccessError is NOT an aiohttp.ClientError.
++            raise AccessError(
++                "REST_NETWORK_ERROR" if stage == "rest" else "WS_NETWORK_ERROR"
++            ) from exc
+ 
+     async def _get_session(self, limits: ProbeLimits) -> aiohttp.ClientSession:
+         if self.session is None:
+@@ -36,25 +78,60 @@
+                 cookie_jar=aiohttp.DummyCookieJar(),
+                 trace_configs=[trace],
+                 auto_decompress=False,
++                middlewares=(self._single_attempt,),
+             )
+         return self.session
+ 
+     async def metadata(self, limits: ProbeLimits) -> Reply:
+         session = await self._get_session(limits)
++        self._metadata_reply = None
++        self._metadata_body.clear()
+         try:
+             async with session.get(REST_URL, allow_redirects=False) as response:
+-                body = bytearray()
+-                # At most one extra byte is read to detect truncation; no unbounded read.
+-                while len(body) <= limits.max_bytes:
++                self._metadata_reply = Reply(
++                    response.status,
++                    budget_headers(dict(response.headers)),
++                    body_complete=False,
++                    headers_received_ns=time.time_ns(),
++                    body_read_state="READING",
++                )
++                # Rejection is already conclusive; do not wait on an untrusted body.
++                if response.status != 200:
++                    self._metadata_reply = replace(
++                        self._metadata_reply, body_read_state="NOT_READ_HTTP_REJECTION"
++                    )
++                    observation = self.metadata_observation
++                    assert observation is not None
++                    return observation
++                while len(self._metadata_body) <= limits.max_bytes:
+                     chunk = await response.content.read(
+-                        min(16384, limits.max_bytes + 1 - len(body))
++                        min(16384, limits.max_bytes + 1 - len(self._metadata_body))
+                     )
+                     if not chunk:
++                        self._metadata_reply = replace(
++                            self._metadata_reply, body_complete=True, body_read_state="COMPLETE"
++                        )
+                         break
+-                    body.extend(chunk)
+-                return Reply(response.status, dict(response.headers), bytes(body))
++                    self._metadata_body.extend(chunk)
++                if len(self._metadata_body) > limits.max_bytes:
++                    self._metadata_reply = replace(
++                        self._metadata_reply, body_read_state="BYTE_LIMIT"
++                    )
++                observation = self.metadata_observation
++                assert observation is not None
++                return observation
++        except TimeoutError:
++            raise
+         except aiohttp.ClientError as exc:
+-            raise AccessError("REST_NETWORK_ERROR") from exc
++            if self._metadata_reply is not None:
++                self._metadata_reply = replace(self._metadata_reply, body_read_state="INTERRUPTED")
++            raise AccessError("REST_NETWORK_ERROR", self.metadata_observation) from exc
++        finally:
++            if (
++                self._metadata_reply is not None
++                and self._metadata_reply.body_read_state == "READING"
++            ):
++                self._metadata_reply = replace(self._metadata_reply, body_read_state="INTERRUPTED")
+ 
+     async def connect(self, limits: ProbeLimits) -> Reply:
+         session = await self._get_session(limits)

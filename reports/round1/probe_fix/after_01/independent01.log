@@ -1,0 +1,7 @@
+{"name": "independent01", "command": [".venv/bin/python", "-m", "pytest", "-q", "review/R1_01/checks/test_review_regressions.py", "--junitxml=reports/round1/probe_fix/after_01/independent01.xml"], "cwd": "/Users/aries/Dve/btc_microstructure", "exit_code": 0, "expected_exit_code": 0, "status": "PASS", "time_utc": "2026-10-11T06:00:33.347310+00:00", "log": "reports/round1/probe_fix/after_01/independent01.log", "tests": {"passed": 15, "failed": 0, "skipped": 0}}
+--- stdout ---
+...............                                                          [100%]
+- generated xml file: /Users/aries/Dve/btc_microstructure/reports/round1/probe_fix/after_01/independent01.xml -
+15 passed in 0.45s
+
+--- stderr ---

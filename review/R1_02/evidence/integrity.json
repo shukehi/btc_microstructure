@@ -1,0 +1,17 @@
+{
+  "manifest_count": 227,
+  "manifest_failures": [],
+  "prior_unchanged_count": 147,
+  "prior_changed": [
+    "README.md",
+    "pyproject.toml",
+    "requirements-dev.lock",
+    "src/btc_microstructure/cli.py"
+  ],
+  "prior_deleted": [],
+  "new_count": 77,
+  "supplied_report_matches_archived": true,
+  "current_implementation_hash_count": 16,
+  "current_implementation_hash_failures": [],
+  "readme_prior_text_preserved_as_prefix": true
+}

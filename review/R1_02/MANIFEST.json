@@ -1,0 +1,120 @@
+{
+  "status": "CHANGES_REQUESTED",
+  "files": [
+    {
+      "path": "R1_02_FIX_PROMPT.md",
+      "size": 3516,
+      "sha256": "95a14851fd5ff8dfaef0ea21685ff5b7a0673c504332b2b8849c78c809fdf1c8"
+    },
+    {
+      "path": "R1_02_Independent_Review.md",
+      "size": 10746,
+      "sha256": "52d8348350392739065128d3f956e0ee3ad1b22e2a225202d8d26b0c6ead6898"
+    },
+    {
+      "path": "README.md",
+      "size": 906,
+      "sha256": "a42b86cb5b7ef4dc6a87dc15bb90a91eb531608d4bcbb42f4a8ab9e617c52852"
+    },
+    {
+      "path": "checks/test_r1_02_regressions.py",
+      "size": 7037,
+      "sha256": "d56a67329e637e83fcf56a9fbce5d08d5b1f3b0f9d3926e30f1c523dcea63bb9"
+    },
+    {
+      "path": "evidence/aiohttp-public-index.log",
+      "size": 423,
+      "sha256": "d96d415aa7fd07b743e328b2367badaf3b0bdc5b4e82553e654674abb3be79ae"
+    },
+    {
+      "path": "evidence/aiohttp-version-install.log",
+      "size": 423,
+      "sha256": "d96d415aa7fd07b743e328b2367badaf3b0bdc5b4e82553e654674abb3be79ae"
+    },
+    {
+      "path": "evidence/archive_check.json",
+      "size": 297,
+      "sha256": "03ab8f977461cdd8acaee6a51414db2a752ed4e988ea0906fcd6fa904ef62ad2"
+    },
+    {
+      "path": "evidence/boundary_experiments.json",
+      "size": 5319,
+      "sha256": "ecd6ef5c2a1df5460b2d78418df2892d072f9bc43a1277c7c395753942560980"
+    },
+    {
+      "path": "evidence/boundary_experiments.log",
+      "size": 5320,
+      "sha256": "8277265026dddeca58a7ae5a6d2fcae5838ec319a6dcaa8f92a90c9fbdfb061b"
+    },
+    {
+      "path": "evidence/commands.json",
+      "size": 2060,
+      "sha256": "5684fe7f46a846bb0458f6ae790e0c4776e1e67cac3fc0a755055fb98afa1353"
+    },
+    {
+      "path": "evidence/default-tests.log",
+      "size": 371,
+      "sha256": "290c5a85f257b61ca49837f6bae6cfa33eaa93988045c6b076766c3b4ebe9bc2"
+    },
+    {
+      "path": "evidence/default-tests.xml",
+      "size": 24186,
+      "sha256": "e0a17d696eddd0459c44151cab21a18e1d29ac4e18ed4032f5350f9f0e2db4ac"
+    },
+    {
+      "path": "evidence/environment.json",
+      "size": 355,
+      "sha256": "4fe5082cd0410b9213f94d7cb6f5c448d4bf8068d03d96a49fb5990e6b6041c1"
+    },
+    {
+      "path": "evidence/independent-r1-01.log",
+      "size": 261,
+      "sha256": "5bdf0fed7db2690c99accb1ffff30b13a7182fbbf2a46a98ba13a2805c041945"
+    },
+    {
+      "path": "evidence/independent-r1-01.xml",
+      "size": 2557,
+      "sha256": "79dd6dd3e63c3c8df4c06bca666d91574ddb6dd3e8b178cd408007e33a92aeb9"
+    },
+    {
+      "path": "evidence/integrity.json",
+      "size": 440,
+      "sha256": "d5d69cb5d94e51d761d7aae3621b9b570819ae281cb3ca14a3021fbe07a5f56b"
+    },
+    {
+      "path": "evidence/network-disabled/endpoint_budget.json",
+      "size": 366,
+      "sha256": "2e055c8535431f938faee9a9adcf11feb3058c8e39e6473f000b102c5cb7a84a"
+    },
+    {
+      "path": "evidence/network-disabled/protocol_probe_report.json",
+      "size": 360,
+      "sha256": "85e10fd7d730e3a6abfd07fcc22f6c5f3cff83a8d29236632db558affbf00868"
+    },
+    {
+      "path": "evidence/network-disabled.log",
+      "size": 195,
+      "sha256": "456402384bd227424919a6ecfe23aee30da9060ab3f696ef215375003022db2f"
+    },
+    {
+      "path": "evidence/r1-02-regressions.log",
+      "size": 15155,
+      "sha256": "4feb48ac18b7c99d5749d4d1c2a205e01120c1d610e3cd1f9931623919830f12"
+    },
+    {
+      "path": "evidence/r1-02-regressions.xml",
+      "size": 15560,
+      "sha256": "7a2ca5c4339ae8543fea846264a3fc757a6b5cae8bba6fa2dd4a2348770911dc"
+    },
+    {
+      "path": "evidence/source_verification.json",
+      "size": 1126,
+      "sha256": "bfccba4f85416712a81c3a5c7b4545bd4d4c46c6c2ae938614af409a6834e6e5"
+    },
+    {
+      "path": "evidence/valid-config.log",
+      "size": 443,
+      "sha256": "ced9332fdcb30c60047813a8842b8f589dc3b2c6bf9cc2ec3095e3697b1832bd"
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "status": "PASS",
+  "selection": "explicit root-file and text-directory allowlist",
+  "scanned_files": 325,
+  "detected_secret_patterns": 0,
+  "redactions": [],
+  "synthetic_false_positive": "Exact user:password@example.com fixture URL allowed for screening only; original test and log bytes preserved.",
+  "redaction_note": "No sensitive values detected in selected artifacts; no log redactions made.",
+  "excluded": [
+    ".venv",
+    ".git",
+    ".omx",
+    "caches",
+    "build/dist",
+    "*.egg-info",
+    ".DS_Store",
+    "data/logs",
+    ".env*",
+    "unlisted root files",
+    "symlinks",
+    "large files"
+  ],
+  "limitation": "Pattern screening and allowlist inspection are not a guarantee against every possible secret."
+}

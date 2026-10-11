@@ -1,0 +1,14 @@
+{
+  "status": "PASS",
+  "protected_content_files": 243,
+  "changed_content_files": [],
+  "excluded_os_metadata": [
+    "review/.DS_Store",
+    "review/R1_01/.DS_Store",
+    "review/R1_02/.DS_Store",
+    "reports/round1/.DS_Store"
+  ],
+  "reason": "Finder metadata is not authored content and is excluded from ZIP/Git; original hash manifest and diagnostic are preserved.",
+  "exact_locked_versions": 26,
+  "exchange_network_run_this_turn": false
+}

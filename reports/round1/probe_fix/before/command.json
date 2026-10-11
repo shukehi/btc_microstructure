@@ -1,0 +1,14 @@
+{
+  "command": [
+    ".venv/bin/python",
+    "-m",
+    "pytest",
+    "-q",
+    "review/R1_02/checks/test_r1_02_regressions.py",
+    "--junitxml=reports/round1/probe_fix/before/independent02.xml"
+  ],
+  "cwd": "/Users/aries/Dve/btc_microstructure",
+  "exit_code": 1,
+  "status": "FAIL",
+  "time_utc": "2026-10-11T05:52:25.934185+00:00"
+}

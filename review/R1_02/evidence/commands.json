@@ -1,0 +1,83 @@
+[
+  {
+    "name": "default-tests",
+    "command": [
+      "/opt/pyvenv/bin/python",
+      "-m",
+      "pytest",
+      "-q",
+      "--junitxml=/mnt/data/r1_02_audit/evidence/default-tests.xml"
+    ],
+    "cwd": "/mnt/data/r1_02_audit/project",
+    "returncode": 0,
+    "elapsed": 9.926867008209229
+  },
+  {
+    "name": "independent-r1-01",
+    "command": [
+      "/opt/pyvenv/bin/python",
+      "-m",
+      "pytest",
+      "-q",
+      "review/R1_01/checks/test_review_regressions.py",
+      "--junitxml=/mnt/data/r1_02_audit/evidence/independent-r1-01.xml"
+    ],
+    "cwd": "/mnt/data/r1_02_audit/project",
+    "returncode": 0,
+    "elapsed": 1.1070773601531982
+  },
+  {
+    "name": "valid-config",
+    "command": [
+      "/opt/pyvenv/bin/python",
+      "-m",
+      "btc_microstructure",
+      "validate-config",
+      "config/research.example.yaml"
+    ],
+    "cwd": "/mnt/data/r1_02_audit/project",
+    "returncode": 0,
+    "elapsed": 0.6267993450164795
+  },
+  {
+    "name": "network-disabled",
+    "command": [
+      "/opt/pyvenv/bin/python",
+      "-m",
+      "btc_microstructure",
+      "probe",
+      "config/research.example.yaml",
+      "--output",
+      "/mnt/data/r1_02_audit/evidence/network-disabled"
+    ],
+    "cwd": "/mnt/data/r1_02_audit/project",
+    "returncode": 2,
+    "elapsed": 0.6351478099822998
+  },
+  {
+    "name": "boundary-experiments",
+    "command": [
+      "python",
+      "/mnt/data/r1_02_audit/checks/probe_boundary_experiments.py"
+    ],
+    "cwd": "/mnt/data/r1_02_audit/project",
+    "returncode": 0,
+    "evidence": "boundary_experiments.log",
+    "scope": "all sources synthetic; socket creation/connect path blocked"
+  },
+  {
+    "name": "r1-02-regressions",
+    "command": [
+      "python",
+      "-m",
+      "pytest",
+      "-q",
+      "/mnt/data/r1_02_audit/checks/test_r1_02_regressions.py",
+      "--junitxml=/mnt/data/r1_02_audit/evidence/r1-02-regressions.xml"
+    ],
+    "cwd": "/mnt/data/r1_02_audit/project",
+    "returncode": 1,
+    "summary": "7 failed, 2 passed",
+    "evidence": "r1-02-regressions.log"
+  }
+]

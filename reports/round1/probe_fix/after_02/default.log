@@ -1,0 +1,9 @@
+{"name": "default", "command": [".venv/bin/python", "-m", "pytest", "-q", "--junitxml=reports/round1/probe_fix/after_02/default.xml"], "cwd": "/Users/aries/Dve/btc_microstructure", "exit_code": 0, "expected_exit_code": 0, "status": "PASS", "time_utc": "2026-10-11T06:01:09.855058+00:00", "log": "reports/round1/probe_fix/after_02/default.log", "tests": {"passed": 183, "failed": 0, "skipped": 0}}
+--- stdout ---
+........................................................................ [ 39%]
+........................................................................ [ 78%]
+.......................................                                  [100%]
+- generated xml file: /Users/aries/Dve/btc_microstructure/reports/round1/probe_fix/after_02/default.xml -
+183 passed in 6.89s
+
+--- stderr ---

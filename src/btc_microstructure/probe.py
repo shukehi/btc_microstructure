@@ -32,6 +32,9 @@ class Reply:
     status: int
     headers: dict[str, str]
     body: bytes = b""
+    body_complete: bool = True
+    headers_received_ns: int | None = None
+    body_read_state: str = "COMPLETE"
 
 
 class Transport(Protocol):
@@ -201,7 +204,7 @@ async def run_probe(
     evidence_kind: Literal["SYNTHETIC", "LIVE"] = "SYNTHETIC",
 ) -> dict[str, Any]:
     report: dict[str, Any] = {
-        "schema_version": "probe-0.1",
+        "schema_version": "probe-0.2",
         "evidence_kind": evidence_kind,
         "started_ns": time.time_ns(),
         "limits": limits.model_dump(),
@@ -215,6 +218,8 @@ async def run_probe(
             "frames_seen": 0,
         },
         "bytes_received": 0,
+        "logical_calls": {"rest": 0, "ws": 0},
+        "transport_attempts": None,
         "retry_count": 0,
         "backoff_cap_seconds": 0,
         "continuous_collection_enabled": False,
@@ -226,21 +231,38 @@ async def run_probe(
         item["http_status"] = reply.status
         item["rate_headers"] = budget_headers(reply.headers)
         item["response_received_ns"] = time.time_ns()
+        if reply.headers_received_ns is not None:
+            item["headers_received_ns"] = reply.headers_received_ns
 
     def account(body: bytes) -> bool:
         remaining = limits.max_bytes - int(report["bytes_received"])
         report["bytes_received"] += len(body)
         return len(body) <= remaining
 
-    async def perform() -> None:
-        nonlocal stage
-        report["rest"]["request_started_ns"] = time.time_ns()
-        async with asyncio.timeout(limits.connect_seconds):
-            reply = await transport.metadata(limits)
+    def retain_metadata(reply: Reply) -> bool:
         store(reply, "rest")
         fits = account(reply.body)
         report["rest"]["body_hex"] = reply.body[: limits.max_bytes].hex()
-        report["rest"]["truncated"] = not fits
+        report["rest"]["body_bytes_observed"] = len(reply.body)
+        report["rest"]["body_complete"] = reply.body_complete and fits
+        report["rest"]["body_read_state"] = reply.body_read_state
+        report["rest"]["truncated"] = not fits or not reply.body_complete
+        return fits
+
+    def retain_observation() -> None:
+        # Optional additive interface: legacy injected transports still return Reply.
+        if "body_hex" not in report["rest"]:
+            observation = getattr(transport, "metadata_observation", None)
+            if isinstance(observation, Reply):
+                retain_metadata(observation)
+
+    async def perform() -> None:
+        nonlocal stage
+        report["rest"]["request_started_ns"] = time.time_ns()
+        report["logical_calls"]["rest"] += 1
+        async with asyncio.timeout(limits.connect_seconds):
+            reply = await transport.metadata(limits)
+        fits = retain_metadata(reply)
         if reply.status != 200:
             report["rest"]["status"] = (
                 "BLOCKED" if reply.status in (401, 403, 418, 429, 451) else "FAIL"
@@ -250,10 +272,13 @@ async def run_probe(
             return
         if not fits:
             raise ProbeError("rest: response byte limit exceeded")
+        if not reply.body_complete:
+            raise AccessError("REST_BODY_INCOMPLETE", reply)
         report["metadata"] = inspect_metadata(reply.body)
         report["rest"]["status"] = "PASS"
         stage = "ws"
         report["ws"]["request_started_ns"] = time.time_ns()
+        report["logical_calls"]["ws"] += 1
         async with asyncio.timeout(limits.connect_seconds):
             handshake = await transport.connect(limits)
         store(handshake, "ws")
@@ -298,7 +323,10 @@ async def run_probe(
         report[stage]["status"] = report["status"] = "BLOCKED"
         report["reason"] = exc.reason
         if exc.reply:
-            store(exc.reply, stage)
+            if stage == "rest" and "body_hex" not in report["rest"]:
+                retain_metadata(exc.reply)
+            else:
+                store(exc.reply, stage)
     except ProbeError as exc:
         report[stage]["status"] = report["status"] = "FAIL"
         report["reason"] = str(exc)
@@ -306,6 +334,19 @@ async def run_probe(
         report[stage]["status"] = report["status"] = "BLOCKED"
         report["reason"] = "NETWORK_ERROR; exception details omitted to exclude credentials"
     finally:
+        # Also retain progress when the timeout scope cancels metadata(), while
+        # external CancelledError still propagates after bounded cleanup.
+        retain_observation()
+        attempts = getattr(transport, "request_attempts", None)
+        report["transport_attempts"] = attempts
+        report["retry_count_scope"] = (
+            "APPLICATION_AND_REQUEST_HANDLER"
+            if isinstance(attempts, dict)
+            else "APPLICATION_ONLY_TRANSPORT_UNOBSERVED"
+        )
+        observed = attempts if isinstance(attempts, dict) else report["logical_calls"]
+        report["retry_count"] = sum(max(0, count - 1) for count in observed.values())
+        report["blocked_retry_count"] = getattr(transport, "blocked_reentries", None)
         try:
             async with asyncio.timeout(1):
                 await transport.close()
@@ -344,6 +385,10 @@ def save_probe(report: dict[str, Any], output: Path) -> None:
         "observed_usage_headers": report["rest"].get("rate_headers", {}),
         "probe_limits": report["limits"],
         "max_retries": 0,
+        "observed_transport_attempts": report.get("transport_attempts"),
+        "observed_retry_count": report["retry_count"],
+        "retry_count_scope": report.get("retry_count_scope"),
+        "blocked_retry_count": report.get("blocked_retry_count"),
         "backoff_cap_seconds": 0,
         "status": "UNVERIFIED_FOR_CONTINUOUS_COLLECTION",
         "continuous_collection_enabled": False,

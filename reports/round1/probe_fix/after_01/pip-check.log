@@ -1,0 +1,5 @@
+{"name": "pip-check", "command": [".venv/bin/python", "-m", "pip", "check"], "cwd": "/Users/aries/Dve/btc_microstructure", "exit_code": 0, "expected_exit_code": 0, "status": "PASS", "time_utc": "2026-10-11T06:00:35.065326+00:00", "log": "reports/round1/probe_fix/after_01/pip-check.log"}
+--- stdout ---
+No broken requirements found.
+
+--- stderr ---
