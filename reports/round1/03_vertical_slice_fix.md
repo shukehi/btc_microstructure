@@ -73,4 +73,16 @@ C的兼容规则：原schema `r1-03.1`继续读取；新增可选追踪字段 `s
 .venv/bin/python reports/round1/vertical_slice_fix/verify.py
 ```
 
-verify.py自动创建新的after-NN及CLI输出目录。修复状态按实际证据 **PASS**，仅指R103-A/B/C离线修复；独立验收仍待复核。PR #5保留OPEN；新SHA/Actions在远程完成后记录于本报告及PR正文。交付后停止，不启动后续任务。
+verify.py自动创建新的after-NN及CLI输出目录。修复状态按实际证据 **PASS**，仅指R103-A/B/C离线修复；独立验收仍待复核。PR #5保留OPEN；修复源码SHA/远程Actions见下方；后续仅归档证据的最新head及对应运行由PR正文记录。交付后停止，不启动后续任务。
+
+## 远程验收与PR更新
+
+- PR：[shukehi/btc_microstructure#5](https://github.com/shukehi/btc_microstructure/pull/5)，继续原分支；未合并、未启用auto-merge、三条审查线程未自动resolve。
+- 修复源码提交：`7c2949e73d97f07d1f6e024076f51576d0551762`。
+- Actions：[38144200970](https://github.com/shukehi/btc_microstructure/actions/runs/38144200970)，**SUCCESS**，对应上述精确源码SHA。
+- required job `Python 3.12 offline checks` **SUCCESS**；Linux/Python3.12.15实际默认269及独立15/9/8通过，全部0失败/0错误/0跳过。十一项检查退出0；新独立R1-03有单独log/JUnit，失败会令job失败。
+- 远程日志明确网络命名空间隔离，CLI两次重放/raw-only build/Parquet读回PASS；项目阶段未访问Binance。
+- 小型实际日志/JUnit及results.tsv归档至 `vertical_slice_fix/ci-38144200970/`；run/job回执和artifact元数据独立保存。
+- artifact：`ci-logs-38144200970-1`，ID11704192241，330078字节，SHA-256 `f5f22ea623e6b3107a2a32c565cedd30c1fe2356f1dc6a4642d854a99c4e4d3a`。实际下载ZIP校验SHA与GitHub一致、CRC通过，见artifact-validation.json。保留14天；本轮不生成整个工程ZIP。
+
+代码复查当时未完成的“报告/推送”交付项现已完成：修复报告、源码推送及远程检查均有上述证据；最终归档提交后的Actions和head在PR正文/交付答复中提供。独立复核仍待进行，历史审查记录不改写为批准。
