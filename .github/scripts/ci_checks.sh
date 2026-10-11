@@ -37,11 +37,13 @@ run_check() {
 run_check pytest .venv/bin/python -m pytest -q --junitxml=ci-results/pytest.xml
 run_check pytest-independent-r1-01 .venv/bin/python -m pytest -q review/R1_01/checks/test_review_regressions.py --junitxml=ci-results/pytest-independent-r1-01.xml
 run_check pytest-independent-r1-02 .venv/bin/python -m pytest -q review/R1_02/checks/test_r1_02_regressions.py --junitxml=ci-results/pytest-independent-r1-02.xml
-run_check ruff-check .venv/bin/ruff check src tests
-run_check ruff-format .venv/bin/ruff format --check src tests
-run_check mypy .venv/bin/mypy src
+run_check ruff-check .venv/bin/ruff check src tests .github/scripts/offline_smoke.py
+run_check ruff-format .venv/bin/ruff format --check src tests .github/scripts/offline_smoke.py
+run_check mypy .venv/bin/mypy src .github/scripts/offline_smoke.py
 run_check pip-check .venv/bin/python -m pip check
 run_check validate-config .venv/bin/python -m btc_microstructure validate-config config/research.example.yaml
+run_check validate-offline .venv/bin/python -m btc_microstructure validate-offline config/offline.synthetic.yaml
+run_check offline-e2e .venv/bin/python .github/scripts/offline_smoke.py
 
 if [[ -n "${GITHUB_STEP_SUMMARY:-}" ]]; then
   {

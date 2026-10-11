@@ -1,0 +1,14 @@
+[
+  {
+    "path": "config/offline.synthetic.yaml",
+    "sha256": "62465c42566cbf7e3c949cba88e14bc544429537ca1cb18a00e79b9c24bbd427"
+  },
+  {
+    "path": "fixtures/synthetic/vertical_slice/warmed_delta.json",
+    "sha256": "e9fe002d6b8b1ddcd87f7fc01be68f62cf18f9b689fce33ca2640d1349aa4357"
+  },
+  {
+    "path": "requirements-dev.lock",
+    "sha256": "7fe9043dac17556e80030e61786aaeb9cd95dce480661b01c8e207064defa0bc"
+  }
+]

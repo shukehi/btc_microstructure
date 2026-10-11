@@ -1,0 +1,50 @@
+..F...........                                                           [100%]
+=================================== FAILURES ===================================
+________________ test_raw_rename_failure_keeps_cursor_and_queue ________________
+
+src = PosixPath('/private/var/folders/s9/rbq781b922s1xp3jhmtct8yc0000gn/T/pytest-of-aries/pytest-66/test_raw_rename_failure_keeps_0/raw/raw-control-000001.jsonl.tmp')
+dst = PosixPath('/private/var/folders/s9/rbq781b922s1xp3jhmtct8yc0000gn/T/pytest-of-aries/pytest-66/test_raw_rename_failure_keeps_0/raw/raw-control-000001.jsonl')
+
+    def fail_raw_replace(src: str | Path, dst: str | Path) -> None:
+        if str(dst).endswith(".jsonl"):
+>           raise OSError("rename failed")
+E           OSError: rename failed
+
+tests/unit/test_offline_storage.py:98: OSError
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = PosixPath('/private/var/folders/s9/rbq781b922s1xp3jhmtct8yc0000gn/T/pytest-of-aries/pytest-66/test_raw_rename_failure_keeps_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x10b49b830>
+
+    def test_raw_rename_failure_keeps_cursor_and_queue(tmp_path, monkeypatch):
+        store = Store(tmp_path)
+        store.append(row(3))
+    
+        def fail_raw_replace(src: str | Path, dst: str | Path) -> None:
+            if str(dst).endswith(".jsonl"):
+                raise OSError("rename failed")
+            os.replace(src, dst)
+    
+        monkeypatch.setattr(offline_storage.os, "replace", fail_raw_replace)
+    
+        with pytest.raises(StorageError):
+>           store.flush()
+
+tests/unit/test_offline_storage.py:104: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/btc_microstructure/offline_storage.py:277: in flush
+    _best_effort_quarantine(tmp_path, self.quarantine_dir)
+src/btc_microstructure/offline_storage.py:604: in _best_effort_quarantine
+    os.replace(path, destination)
+tests/unit/test_offline_storage.py:99: in fail_raw_replace
+    os.replace(src, dst)
+tests/unit/test_offline_storage.py:99: in fail_raw_replace
+    os.replace(src, dst)
+E   RecursionError: maximum recursion depth exceeded
+!!! Recursion detected (same locals & position)
+=========================== short test summary info ============================
+FAILED tests/unit/test_offline_storage.py::test_raw_rename_failure_keeps_cursor_and_queue
+1 failed, 13 passed in 0.32s
+..............                                                           [100%]
+14 passed in 0.25s

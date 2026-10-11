@@ -1,0 +1,27 @@
+input_mode: "synthetic"
+source_stream: "um_agg_trade"
+time_view: "as_received"
+grid_seconds: 1
+window_seconds: [5, 30]
+horizon_seconds: [5, 30, 300]
+synthetic_input: "../fixtures/synthetic/vertical_slice/warmed_delta.json"
+output_root: "../reports/round1/vertical_slice/run"
+run_id: "r1-03-synthetic-offline"
+metadata:
+  venue: "binance"
+  market_type: "um_perpetual"
+  instrument_id: "binance:um_perpetual:BTCUSDT"
+  source_stream: "um_agg_trade"
+  symbol: "BTCUSDT"
+  metadata_version: "synthetic-btc-unit-v1"
+  quantity_unit: "BTC"
+  unit_evidence_id: "SYNTHETIC:manual-btc-quantity"
+  evidence_kind: "SYNTHETIC"
+  price_tick: "0.10"
+  quantity_step: "0.001"
+  minimum_quantity: "0.001"
+limits:
+  max_events: 100000
+  max_fixture_bytes: 16777216
+  max_output_grid_rows: 100000
+  min_free_bytes: 2147483648

@@ -1,0 +1,118 @@
+[
+  {
+    "name": "default",
+    "command": [
+      "/Users/aries/Dve/btc_microstructure/.venv/bin/python",
+      "-m",
+      "pytest",
+      "-q",
+      "--junitxml=/Users/aries/Dve/btc_microstructure/reports/round1/vertical_slice/checks-01/default.xml"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "independent01",
+    "command": [
+      "/Users/aries/Dve/btc_microstructure/.venv/bin/python",
+      "-m",
+      "pytest",
+      "-q",
+      "review/R1_01/checks/test_review_regressions.py",
+      "--junitxml=/Users/aries/Dve/btc_microstructure/reports/round1/vertical_slice/checks-01/independent01.xml"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "independent02",
+    "command": [
+      "/Users/aries/Dve/btc_microstructure/.venv/bin/python",
+      "-m",
+      "pytest",
+      "-q",
+      "review/R1_02/checks/test_r1_02_regressions.py",
+      "--junitxml=/Users/aries/Dve/btc_microstructure/reports/round1/vertical_slice/checks-01/independent02.xml"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "ruff",
+    "command": [
+      "/Users/aries/Dve/btc_microstructure/.venv/bin/ruff",
+      "check",
+      "src",
+      "tests",
+      ".github/scripts/offline_smoke.py"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "format",
+    "command": [
+      "/Users/aries/Dve/btc_microstructure/.venv/bin/ruff",
+      "format",
+      "--check",
+      "src",
+      "tests",
+      ".github/scripts/offline_smoke.py"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "mypy",
+    "command": [
+      "/Users/aries/Dve/btc_microstructure/.venv/bin/mypy",
+      "src",
+      ".github/scripts/offline_smoke.py"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "pip-check",
+    "command": [
+      "/Users/aries/Dve/btc_microstructure/.venv/bin/python",
+      "-m",
+      "pip",
+      "check"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "config",
+    "command": [
+      "/Users/aries/Dve/btc_microstructure/.venv/bin/python",
+      "-m",
+      "btc_microstructure",
+      "validate-config",
+      "config/research.example.yaml"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "offline-config",
+    "command": [
+      "/Users/aries/Dve/btc_microstructure/.venv/bin/python",
+      "-m",
+      "btc_microstructure",
+      "validate-offline",
+      "config/offline.synthetic.yaml"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "integrity",
+    "command": [
+      "git",
+      "diff",
+      "--exit-code",
+      "origin/main",
+      "--",
+      "docs",
+      "examples/synthetic_cases.json",
+      "config/research.example.yaml",
+      "review",
+      "tasks",
+      "CODEX_START_HERE.md"
+    ],
+    "exit_code": 0
+  }
+]
