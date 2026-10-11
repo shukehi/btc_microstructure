@@ -1,0 +1,4 @@
+$ /opt/pyvenv/bin/python -m btc_microstructure probe config/research.example.yaml --output /mnt/data/r1_02_audit/evidence/network-disabled
+NOT_RUN: explicit --allow-network required
+
+EXIT_CODE=2

@@ -1,0 +1,20 @@
+{
+  "status": "DOC_VERIFIED_FOR_FIX",
+  "verified_at_utc": "2026-10-11T06:00:12.890152+00:00",
+  "environment": {
+    "python": "3.12.13",
+    "aiohttp": "3.12.15"
+  },
+  "sources": [
+    {
+      "url": "https://docs.aiohttp.org/en/v3.12.15/_modules/aiohttp/client.html",
+      "facts": "GET disconnect retry encloses middleware invocation; WS handshake uses the same request path. Conversion to a non-ClientError prevents retry."
+    },
+    {
+      "url": "https://docs.aiohttp.org/en/v3.12.15/client_advanced.html#client-middleware",
+      "facts": "Public client middleware runs per attempt and can wrap the downstream handler. Session middleware covers probe REST and WS; no per-request override is used."
+    }
+  ],
+  "private_api_mutation": false,
+  "exchange_network_access": false
+}

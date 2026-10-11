@@ -35,6 +35,8 @@ run_check() {
 }
 
 run_check pytest .venv/bin/python -m pytest -q --junitxml=ci-results/pytest.xml
+run_check pytest-independent-r1-01 .venv/bin/python -m pytest -q review/R1_01/checks/test_review_regressions.py --junitxml=ci-results/pytest-independent-r1-01.xml
+run_check pytest-independent-r1-02 .venv/bin/python -m pytest -q review/R1_02/checks/test_r1_02_regressions.py --junitxml=ci-results/pytest-independent-r1-02.xml
 run_check ruff-check .venv/bin/ruff check src tests
 run_check ruff-format .venv/bin/ruff format --check src tests
 run_check mypy .venv/bin/mypy src

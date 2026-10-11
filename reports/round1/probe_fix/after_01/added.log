@@ -1,0 +1,7 @@
+{"name": "added", "command": [".venv/bin/python", "-m", "pytest", "-q", "tests/unit/test_probe_attempts.py", "tests/unit/test_probe_interruptions.py", "--junitxml=reports/round1/probe_fix/after_01/added.xml"], "cwd": "/Users/aries/Dve/btc_microstructure", "exit_code": 0, "expected_exit_code": 0, "status": "PASS", "time_utc": "2026-10-11T06:00:28.371633+00:00", "log": "reports/round1/probe_fix/after_01/added.log", "tests": {"passed": 16, "failed": 0, "skipped": 0}}
+--- stdout ---
+................                                                         [100%]
+- generated xml file: /Users/aries/Dve/btc_microstructure/reports/round1/probe_fix/after_01/added.xml -
+16 passed in 0.15s
+
+--- stderr ---

@@ -1,0 +1,4 @@
+{"command": ["git", "diff", "--cached", "--check", "--", "src", "tests"], "cwd": "/Users/aries/Dve/btc_microstructure", "exit_code": 0, "status": "PASS"}
+--- stdout ---
+
+--- stderr ---

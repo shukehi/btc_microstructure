@@ -1,0 +1,8 @@
+Provenance: complete failed integrity-check diagnostic recovered from the actual tool output in this session, not re-executed.
+Working directory: /Users/aries/Dve/btc_microstructure
+Command: inline Python check of reports/round1/probe_fix/protected.json
+Exit code: 1
+Protected changed: ['review/R1_02/.DS_Store']
+Traceback (most recent call last):
+  File "<stdin>", line 8, in <module>
+AssertionError

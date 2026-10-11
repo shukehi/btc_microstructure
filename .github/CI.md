@@ -7,7 +7,7 @@ Official actions are pinned to immutable SHAs with their verified release tags.
 Python 3.12 installs the existing `requirements-dev.lock`, then installs the project
 with `--no-build-isolation --no-deps -e .`. No lockfile or business/test changes are made.
 Dependency download and GitHub artifact transfer need normal package/GitHub access.
-All six project checks run as the runner user inside a fresh Linux network namespace
+All project checks run as the runner user inside a fresh Linux network namespace
 with no external interface/default route. `setpriv --no-new-privs` prevents privilege
 escalation by the checks. The host network and proxy settings are not modified.
 No trading keys, project secrets, live probe, collection or trading commands are used.
@@ -21,5 +21,8 @@ this PR is not automatically merged to enable it.
 
 The first PR-triggered run is the Linux/network-isolation acceptance evidence.
 Local macOS execution of the check script cannot validate Linux `unshare` behavior.
-The workflow runs the default pytest selection from pyproject.toml; historical
-independent-review scripts are not silently folded into that default selection.
+The default pytest selection from pyproject.toml remains unchanged. Two additional
+explicit pytest invocations run the R1-01 and R1-02 independent review files in the
+same network-isolated check flow. Each receives a separate .log, JUnit .xml and row
+in results.tsv. Either nonzero exit code fails the job without skipping the other
+checks. No assertion or historical review evidence is edited.

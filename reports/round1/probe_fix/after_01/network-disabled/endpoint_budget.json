@@ -1,0 +1,15 @@
+{
+  "status": "NOT_RUN",
+  "evidence_kind": "LIVE",
+  "scope": "BTCUSDT um_perpetual metadata + aggTrade",
+  "observed_rate_limits": null,
+  "probe_limits": {
+    "total_seconds": 30.0,
+    "connect_seconds": 5.0,
+    "idle_seconds": 5.0,
+    "max_messages": 20,
+    "max_bytes": 2097152,
+    "max_frame_bytes": 65536
+  },
+  "continuous_collection_enabled": false
+}

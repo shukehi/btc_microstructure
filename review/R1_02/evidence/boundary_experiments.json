@@ -1,0 +1,177 @@
+{
+  "retry": {
+    "aiohttp_version": "3.13.3",
+    "middleware_attempts": [
+      {
+        "method": "GET",
+        "url": "https://fapi.binance.com/fapi/v1/exchangeInfo"
+      },
+      {
+        "method": "GET",
+        "url": "https://fapi.binance.com/fapi/v1/exchangeInfo"
+      }
+    ],
+    "reported_retry_count": 0,
+    "report": {
+      "schema_version": "probe-0.1",
+      "evidence_kind": "SYNTHETIC",
+      "started_ns": 1791695958926970412,
+      "limits": {
+        "total_seconds": 30.0,
+        "connect_seconds": 5.0,
+        "idle_seconds": 5.0,
+        "max_messages": 1,
+        "max_bytes": 2097152,
+        "max_frame_bytes": 65536
+      },
+      "status": "BLOCKED",
+      "rest": {
+        "status": "BLOCKED",
+        "method": "GET",
+        "url": "https://fapi.binance.com/fapi/v1/exchangeInfo",
+        "params": {},
+        "request_started_ns": 1791695958927018873
+      },
+      "ws": {
+        "status": "NOT_RUN",
+        "url": "wss://fstream.binance.com/market/stream?streams=btcusdt@aggTrade",
+        "subscription": "URL combined stream",
+        "messages": [],
+        "frames_seen": 0
+      },
+      "bytes_received": 0,
+      "retry_count": 0,
+      "backoff_cap_seconds": 0,
+      "continuous_collection_enabled": false,
+      "reason": "REST_NETWORK_ERROR",
+      "cleanup": "PASS",
+      "ended_ns": 1791695958927421526,
+      "elapsed_seconds": 0.00042283300001599855
+    }
+  },
+  "body_interruptions": [
+    {
+      "synthetic_http_status": 429,
+      "failure_mode": "timeout",
+      "partial_bytes_delivered": 21,
+      "report": {
+        "schema_version": "probe-0.1",
+        "evidence_kind": "SYNTHETIC",
+        "started_ns": 1791695958927488685,
+        "limits": {
+          "total_seconds": 2.0,
+          "connect_seconds": 0.03,
+          "idle_seconds": 0.03,
+          "max_messages": 1,
+          "max_bytes": 2097152,
+          "max_frame_bytes": 65536
+        },
+        "status": "BLOCKED",
+        "rest": {
+          "status": "BLOCKED",
+          "method": "GET",
+          "url": "https://fapi.binance.com/fapi/v1/exchangeInfo",
+          "params": {},
+          "request_started_ns": 1791695958927500703
+        },
+        "ws": {
+          "status": "NOT_RUN",
+          "url": "wss://fstream.binance.com/market/stream?streams=btcusdt@aggTrade",
+          "subscription": "URL combined stream",
+          "messages": [],
+          "frames_seen": 0
+        },
+        "bytes_received": 0,
+        "retry_count": 0,
+        "backoff_cap_seconds": 0,
+        "continuous_collection_enabled": false,
+        "reason": "TIMEOUT; no retry",
+        "cleanup": "PASS",
+        "ended_ns": 1791695958957798859,
+        "elapsed_seconds": 0.0303042449999964
+      }
+    },
+    {
+      "synthetic_http_status": 451,
+      "failure_mode": "payload_error",
+      "partial_bytes_delivered": 21,
+      "report": {
+        "schema_version": "probe-0.1",
+        "evidence_kind": "SYNTHETIC",
+        "started_ns": 1791695958957960347,
+        "limits": {
+          "total_seconds": 2.0,
+          "connect_seconds": 0.03,
+          "idle_seconds": 0.03,
+          "max_messages": 1,
+          "max_bytes": 2097152,
+          "max_frame_bytes": 65536
+        },
+        "status": "BLOCKED",
+        "rest": {
+          "status": "BLOCKED",
+          "method": "GET",
+          "url": "https://fapi.binance.com/fapi/v1/exchangeInfo",
+          "params": {},
+          "request_started_ns": 1791695958957982900
+        },
+        "ws": {
+          "status": "NOT_RUN",
+          "url": "wss://fstream.binance.com/market/stream?streams=btcusdt@aggTrade",
+          "subscription": "URL combined stream",
+          "messages": [],
+          "frames_seen": 0
+        },
+        "bytes_received": 0,
+        "retry_count": 0,
+        "backoff_cap_seconds": 0,
+        "continuous_collection_enabled": false,
+        "reason": "REST_NETWORK_ERROR",
+        "cleanup": "PASS",
+        "ended_ns": 1791695958958032693,
+        "elapsed_seconds": 5.594199998881777e-05
+      }
+    },
+    {
+      "synthetic_http_status": 200,
+      "failure_mode": "timeout",
+      "partial_bytes_delivered": 21,
+      "report": {
+        "schema_version": "probe-0.1",
+        "evidence_kind": "SYNTHETIC",
+        "started_ns": 1791695958958076368,
+        "limits": {
+          "total_seconds": 2.0,
+          "connect_seconds": 0.03,
+          "idle_seconds": 0.03,
+          "max_messages": 1,
+          "max_bytes": 2097152,
+          "max_frame_bytes": 65536
+        },
+        "status": "BLOCKED",
+        "rest": {
+          "status": "BLOCKED",
+          "method": "GET",
+          "url": "https://fapi.binance.com/fapi/v1/exchangeInfo",
+          "params": {},
+          "request_started_ns": 1791695958958084359
+        },
+        "ws": {
+          "status": "NOT_RUN",
+          "url": "wss://fstream.binance.com/market/stream?streams=btcusdt@aggTrade",
+          "subscription": "URL combined stream",
+          "messages": [],
+          "frames_seen": 0
+        },
+        "bytes_received": 0,
+        "retry_count": 0,
+        "backoff_cap_seconds": 0,
+        "continuous_collection_enabled": false,
+        "reason": "TIMEOUT; no retry",
+        "cleanup": "PASS",
+        "ended_ns": 1791695958988359737,
+        "elapsed_seconds": 0.03027989399998887
+      }
+    }
+  ]
+}

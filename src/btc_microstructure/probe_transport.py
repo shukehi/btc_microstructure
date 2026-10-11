@@ -1,17 +1,59 @@
 """Fixed public endpoints only; lazy session, no credentials, redirects or retries."""
 
 import asyncio
+from dataclasses import replace
+import time
 from typing import Any
 
 import aiohttp
 
-from .probe import AccessError, ProbeLimits, Reply, REST_URL, WS_URL
+from .probe import AccessError, ProbeLimits, Reply, REST_URL, WS_URL, budget_headers
 
 
 class AioTransport:
     def __init__(self) -> None:
         self.session: aiohttp.ClientSession | None = None
         self.ws: aiohttp.ClientWebSocketResponse | None = None
+        self._request_attempts = {"rest": 0, "ws": 0}
+        self._blocked_reentries = 0
+        self._metadata_reply: Reply | None = None
+        self._metadata_body = bytearray()
+
+    @property
+    def request_attempts(self) -> dict[str, int]:
+        """Allowed request-handler entries, not claimed socket/wire send counts."""
+        return dict(self._request_attempts)
+
+    @property
+    def blocked_reentries(self) -> int:
+        return self._blocked_reentries
+
+    @property
+    def metadata_observation(self) -> Reply | None:
+        """Last bounded header/body snapshot, including after caller cancellation."""
+        if self._metadata_reply is None:
+            return None
+        return replace(self._metadata_reply, body=bytes(self._metadata_body))
+
+    async def _single_attempt(
+        self, request: aiohttp.ClientRequest, handler: aiohttp.ClientHandlerType
+    ) -> aiohttp.ClientResponse:
+        url = str(request.url)
+        if request.method != "GET" or url not in (REST_URL, WS_URL):
+            raise AccessError("UNEXPECTED_REQUEST_SCOPE")
+        stage = "rest" if url == REST_URL else "ws"
+        if self._request_attempts[stage] >= 1:
+            self._blocked_reentries += 1
+            raise AccessError("IMPLICIT_RETRY_BLOCKED")
+        self._request_attempts[stage] += 1
+        try:
+            return await handler(request)
+        except (aiohttp.ClientOSError, aiohttp.ServerDisconnectedError) as exc:
+            # Public middleware boundary: these errors otherwise trigger aiohttp's
+            # retry of idempotent GETs. AccessError is NOT an aiohttp.ClientError.
+            raise AccessError(
+                "REST_NETWORK_ERROR" if stage == "rest" else "WS_NETWORK_ERROR"
+            ) from exc
 
     async def _get_session(self, limits: ProbeLimits) -> aiohttp.ClientSession:
         if self.session is None:
@@ -36,25 +78,60 @@ class AioTransport:
                 cookie_jar=aiohttp.DummyCookieJar(),
                 trace_configs=[trace],
                 auto_decompress=False,
+                middlewares=(self._single_attempt,),
             )
         return self.session
 
     async def metadata(self, limits: ProbeLimits) -> Reply:
         session = await self._get_session(limits)
+        self._metadata_reply = None
+        self._metadata_body.clear()
         try:
             async with session.get(REST_URL, allow_redirects=False) as response:
-                body = bytearray()
-                # At most one extra byte is read to detect truncation; no unbounded read.
-                while len(body) <= limits.max_bytes:
+                self._metadata_reply = Reply(
+                    response.status,
+                    budget_headers(dict(response.headers)),
+                    body_complete=False,
+                    headers_received_ns=time.time_ns(),
+                    body_read_state="READING",
+                )
+                # Rejection is already conclusive; do not wait on an untrusted body.
+                if response.status != 200:
+                    self._metadata_reply = replace(
+                        self._metadata_reply, body_read_state="NOT_READ_HTTP_REJECTION"
+                    )
+                    observation = self.metadata_observation
+                    assert observation is not None
+                    return observation
+                while len(self._metadata_body) <= limits.max_bytes:
                     chunk = await response.content.read(
-                        min(16384, limits.max_bytes + 1 - len(body))
+                        min(16384, limits.max_bytes + 1 - len(self._metadata_body))
                     )
                     if not chunk:
+                        self._metadata_reply = replace(
+                            self._metadata_reply, body_complete=True, body_read_state="COMPLETE"
+                        )
                         break
-                    body.extend(chunk)
-                return Reply(response.status, dict(response.headers), bytes(body))
+                    self._metadata_body.extend(chunk)
+                if len(self._metadata_body) > limits.max_bytes:
+                    self._metadata_reply = replace(
+                        self._metadata_reply, body_read_state="BYTE_LIMIT"
+                    )
+                observation = self.metadata_observation
+                assert observation is not None
+                return observation
+        except TimeoutError:
+            raise
         except aiohttp.ClientError as exc:
-            raise AccessError("REST_NETWORK_ERROR") from exc
+            if self._metadata_reply is not None:
+                self._metadata_reply = replace(self._metadata_reply, body_read_state="INTERRUPTED")
+            raise AccessError("REST_NETWORK_ERROR", self.metadata_observation) from exc
+        finally:
+            if (
+                self._metadata_reply is not None
+                and self._metadata_reply.body_read_state == "READING"
+            ):
+                self._metadata_reply = replace(self._metadata_reply, body_read_state="INTERRUPTED")
 
     async def connect(self, limits: ProbeLimits) -> Reply:
         session = await self._get_session(limits)

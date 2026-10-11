@@ -1,0 +1,11 @@
+{
+  "python": "3.13.5 (main, Jul 15 2026, 20:25:40) [GCC 14.2.0]",
+  "executable": "/opt/pyvenv/bin/python",
+  "dependencies": {
+    "pytest": "9.0.2",
+    "pydantic": "2.13.5",
+    "PyYAML": "6.0.3",
+    "aiohttp": "3.13.3"
+  },
+  "note": "Using installed review environment with PYTHONPATH; no editable install and no Binance network probe performed."
+}

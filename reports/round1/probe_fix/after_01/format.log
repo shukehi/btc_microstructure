@@ -1,0 +1,6 @@
+{"name": "format", "command": [".venv/bin/ruff", "format", "--check", "src", "tests"], "cwd": "/Users/aries/Dve/btc_microstructure", "exit_code": 1, "expected_exit_code": 0, "status": "FAIL", "time_utc": "2026-10-11T06:00:33.996176+00:00", "log": "reports/round1/probe_fix/after_01/format.log"}
+--- stdout ---
+Would reformat: tests/unit/test_probe_interruptions.py
+1 file would be reformatted, 14 files already formatted
+
+--- stderr ---

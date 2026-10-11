@@ -1,0 +1,5 @@
+{"name": "network-disabled", "command": [".venv/bin/python", "-m", "btc_microstructure", "probe", "config/research.example.yaml", "--output", "reports/round1/probe_fix/after_01/network-disabled"], "cwd": "/Users/aries/Dve/btc_microstructure", "exit_code": 2, "expected_exit_code": 2, "status": "PASS", "time_utc": "2026-10-11T06:00:33.932963+00:00", "log": "reports/round1/probe_fix/after_01/network-disabled.log"}
+--- stdout ---
+NOT_RUN: explicit --allow-network required
+
+--- stderr ---

@@ -1,0 +1,30 @@
+{
+  "evidence_kind": "SYNTHETIC",
+  "scope": "BTCUSDT um_perpetual metadata + aggTrade",
+  "documented_metadata_request_weight": 1,
+  "documentation_url": "https://developers.binance.com/en/docs/catalog/core-trading-derivatives-trading-usd-s-m-futures/api/rest-api/market-data",
+  "observed_rate_limits": null,
+  "observed_usage_headers": {
+    "x-mbx-used-weight-1m": "7",
+    "retry-after": "5"
+  },
+  "probe_limits": {
+    "total_seconds": 2.0,
+    "connect_seconds": 5.0,
+    "idle_seconds": 5.0,
+    "max_messages": 20,
+    "max_bytes": 2097152,
+    "max_frame_bytes": 65536
+  },
+  "max_retries": 0,
+  "observed_transport_attempts": {
+    "rest": 0,
+    "ws": 0
+  },
+  "observed_retry_count": 0,
+  "retry_count_scope": "APPLICATION_AND_REQUEST_HANDLER",
+  "blocked_retry_count": 0,
+  "backoff_cap_seconds": 0,
+  "status": "UNVERIFIED_FOR_CONTINUOUS_COLLECTION",
+  "continuous_collection_enabled": false
+}
