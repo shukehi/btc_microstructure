@@ -1,0 +1,17 @@
+{
+  "platform": "Linux-6.18.44-x86_64-with-glibc2.41",
+  "machine": "x86_64",
+  "python": "3.13.5 (main, Jul 15 2026, 20:25:40) [GCC 14.2.0]",
+  "dependencies": {
+    "pydantic": "2.13.5",
+    "pydantic_core": "2.46.5",
+    "PyYAML": "6.0.3",
+    "pytest": "9.0.2",
+    "setuptools": "82.0.1"
+  },
+  "same_environment_as_delivery": false,
+  "python312_runtime": "BLOCKED: interpreter absent; attempted install failed with DNS resolution error",
+  "ruff": "NOT_RUN: tool unavailable",
+  "mypy": "NOT_RUN: tool unavailable",
+  "binance_network_probe": "NOT_RUN: outside R1-01 review scope"
+}

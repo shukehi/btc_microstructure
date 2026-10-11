@@ -1,0 +1,11 @@
+{
+  "status": "PASS",
+  "archive": "/Users/aries/Dve/btc_microstructure/foundation_review_fixed.zip",
+  "size_bytes": 264200,
+  "file_count": 151,
+  "sha256": "6928ac7b8cdf971a05acaa12da14b77398449082378750e099274b0e473d4530",
+  "crc": "PASS",
+  "payload_hashes": "PASS",
+  "secret_scan": "PASS (allowlist + pattern screening)",
+  "manifest": "reports/round1/fixed_package_manifest.json"
+}

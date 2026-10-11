@@ -1,0 +1,7 @@
+{"command": ["sw_vers"], "cwd": "/Users/aries/Dve/btc_microstructure", "exit_code": 0, "status": "PASS", "started_utc": "2026-10-11T04:30:43.558784+00:00", "log": "reports/round1/fix/before/os.log"}
+--- stdout ---
+ProductName:		macOS
+ProductVersion:		27.0.1
+BuildVersion:		26A434
+
+--- stderr ---

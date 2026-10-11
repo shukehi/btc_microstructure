@@ -1,0 +1,5 @@
+{"name": "ruff", "command": [".venv/bin/ruff", "check", "src", "tests"], "cwd": "/Users/aries/Dve/btc_microstructure", "started_utc": "2026-10-11T05:03:51.976236+00:00", "exit_code": 0, "expected_exit_code": 0, "status": "PASS", "log": "reports/round1/probe/offline_01/ruff.log"}
+--- stdout ---
+All checks passed!
+
+--- stderr ---

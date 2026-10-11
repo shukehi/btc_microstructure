@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="0.151" timestamp="2026-10-11T00:10:23.245933-05:00" hostname="AriesdeMacBook-Pro.local"><testcase classname="tests.unit.test_probe" name="test_partial_sample_exhausting_byte_budget_cannot_pass" time="0.002"><failure message="AssertionError: assert 'PASS' == 'BLOCKED'&#10;  &#10;  - BLOCKED&#10;  + PASS">def test_partial_sample_exhausting_byte_budget_cannot_pass() -&gt; None:
+        transport = FakeTransport(
+            metadata_reply=valid_metadata_reply(), frames=[combined_trade_frame()] * 20
+        )
+        report = asyncio.run(
+            run_probe(transport, limits(max_messages=20, max_bytes=2048, max_frame_bytes=512))
+        )
+        assert 0 &lt; len(report["ws"]["messages"]) &lt; 20
+        assert report["reason"] == "BYTE_BUDGET_REACHED; no additional receive"
+&gt;       assert report["status"] == "BLOCKED"
+E       AssertionError: assert 'PASS' == 'BLOCKED'
+E         
+E         - BLOCKED
+E         + PASS
+
+tests/unit/test_probe.py:502: AssertionError</failure></testcase></testsuite></testsuites>

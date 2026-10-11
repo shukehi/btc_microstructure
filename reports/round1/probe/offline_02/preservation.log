@@ -1,0 +1,27 @@
+{"name": "preservation", "command": ["shasum", "-a", "256", "-c", "reports/round1/preserved.sha256"], "cwd": "/Users/aries/Dve/btc_microstructure", "started_utc": "2026-10-11T05:10:38.010446+00:00", "exit_code": 0, "expected_exit_code": 0, "status": "PASS", "log": "reports/round1/probe/offline_02/preservation.log"}
+--- stdout ---
+AGENTS.md: OK
+CODEX_START_HERE.md: OK
+COMPLETE_SPEC.md: OK
+MANIFEST.json: OK
+HANDOFF_MANIFEST.json: OK
+VALIDATION_REPORT.md: OK
+config/research.example.yaml: OK
+examples/synthetic_cases.json: OK
+docs/00_scope.md: OK
+docs/01_data_contracts.md: OK
+docs/02_ingestion_and_replay.md: OK
+docs/03_feature_specifications.md: OK
+docs/04_state_and_research_spec.md: OK
+docs/05_testing_and_acceptance.md: OK
+docs/06_operations.md: OK
+docs/07_implementation_tasks.md: OK
+docs/08_sources_and_decisions.md: OK
+tasks/01_foundation.md: OK
+tasks/02_protocol_probe.md: OK
+tasks/03_vertical_slice.md: OK
+tasks/04_review.md: OK
+tasks/OPENAI_SOURCES.md: OK
+tasks/REPORT_TEMPLATE.md: OK
+
+--- stderr ---

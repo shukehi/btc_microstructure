@@ -1,0 +1,160 @@
+# BTC微观结构研究规格v0.1配置样例；不是现成采集程序。
+# 数值默认值均待工程验证，不能作为已验证交易参数。
+spec_version: "0.1"
+project:
+  name: "btc_microstructure"
+  language: "zh-CN"
+  timezone: "UTC"
+  mode: "research_read_only"
+  automatic_trading: false
+
+instruments:
+  perpetual:
+    venue: "binance"
+    market_type: "um_perpetual"
+    symbol: "BTCUSDT"
+    expected_base_asset: "BTC"
+    expected_quote_asset: "USDT"
+    expected_margin_asset: "USDT"
+    expected_contract_type: "PERPETUAL"
+    oi_unit: "UNKNOWN"
+    unit_evidence_id: null
+  spot:
+    venue: "binance"
+    market_type: "spot"
+    symbol: "BTCUSDT"
+    expected_base_asset: "BTC"
+    expected_quote_asset: "USDT"
+
+endpoints:
+  um_public_ws: "wss://fstream.binance.com/public/stream"
+  um_market_ws: "wss://fstream.binance.com/market/stream"
+  um_rest: "https://fapi.binance.com"
+  spot_ws: "wss://stream.binance.com:9443/stream"
+  spot_rest: "https://api.binance.com"
+
+streams:
+  um_public: ["btcusdt@bookTicker", "btcusdt@depth@100ms"]
+  um_market: ["btcusdt@aggTrade", "btcusdt@markPrice@1s", "btcusdt@forceOrder"]
+  spot: ["btcusdt@aggTrade", "btcusdt@bookTicker"]
+  liquidation_required_for_core: false
+  spot_full_depth_enabled: false
+  rpi_depth_enabled: false
+
+collector:
+  oi_poll_seconds: 5
+  metadata_refresh_seconds: 3600
+  funding_info_refresh_seconds: 900
+  funding_history_check_seconds: 300
+  snapshot_limit: 1000
+  checkpoint_seconds: 60
+  connection_rotate_seconds: 82800
+  reconnect_initial_seconds: 1
+  reconnect_max_seconds: 60
+  max_concurrent_oi_requests: 1
+  protocol_probe_required: true
+  protocol_probe_completed: false
+  endpoint_budget_file: null
+  queue_max_records: 100000
+  queue_max_bytes: 268435456
+  queue_warning_fraction: 0.8
+
+storage:
+  root: "./data"
+  normalized_format: "parquet"
+  compression: "zstd"
+  raw_commit_interval_seconds: 1
+  disk_warning_gib: 10
+  disk_stop_gib: 2
+  delete_raw_automatically: false
+  source_payload_preserved: true
+
+features:
+  time_view: "as_received"
+  optional_time_views: ["event_time_revised"]
+  grid_seconds: 1
+  window_boundary: "left_closed_right_open"
+  trade_lookbacks_seconds: [1, 5, 30, 60, 300, 900]
+  ofi_lookbacks_seconds: [1, 5, 30, 60]
+  oi_lookbacks_seconds: [30, 60, 300, 900]
+  depth_bps: [5, 10, 25]
+  ofi_source: "validated_standard_l2_observations"
+  cvd_reset: "utc_day_or_new_continuous_segment"
+  settled_funding_z_lookback_days: 30
+  settled_funding_z_min_unique_events: 30
+  settled_funding_z_same_interval_only: true
+  rolling_std_ddof: 1
+  quantile_method: "linear"
+
+quality:
+  max_bbo_age_ms: 2000
+  max_book_age_ms: 2000
+  max_mark_index_age_ms: 5000
+  max_oi_poll_age_ms: 15000
+  max_oi_source_observation_age_ms: 30000
+  max_cross_market_quote_skew_ms: 1000
+  unknown_as_null: true
+  known_gap_invalidates_flow_window: true
+  require_complete_book_price_band: true
+  require_complete_path_for_mfe_mae: true
+  clock_uncertain_disables_lead_lag: true
+
+states:
+  enabled: true
+  context_lookback_seconds: 300
+  dead_zone_abs_change_quantile: 0.20
+  thresholds_fit_on: "training_fold_only"
+  freeze_thresholds_in_validation_and_test: true
+  absorption:
+    lookback_seconds: 30
+    high_side_volume_quantile: 0.90
+    low_past_excursion_quantile: 0.25
+    low_response_quantile: 0.25
+    require_oi_expansion: false
+    require_l2_confirmation: false
+  event_cooldown_seconds: 60
+  allow_unknown: true
+
+research:
+  horizon_seconds: [5, 10, 30, 60, 180, 300, 900, 1800, 3600, 14400]
+  label_start: "feature_or_state_actual_available_time"
+  return_definition: "log_return_bps"
+  quote_alignment: "backward_asof_with_max_age"
+  mfe_mae_grid_seconds: 1
+  report_all_horizons: true
+  report_common_event_sample: true
+  split:
+    method: "walk_forward"
+    train_days: 30
+    validation_days: 7
+    test_days: 7
+    step_days: 7
+    purge_by_actual_label_intervals: true
+    minimum_boundary_buffer_seconds: 14400
+    shuffle: false
+  inference:
+    confidence_level: 0.95
+    block_bootstrap_min_block_seconds: 14400
+    bootstrap_repetitions: 1000
+    multiple_testing_method: "holm"
+    alpha: 0.05
+    random_seed: 42
+
+cost_analysis:
+  enabled: false
+  position_quantity_btc: null
+  entry_fee_rate: null
+  exit_fee_rate: null
+  entry_latency_ms: null
+  exit_latency_ms: null
+  extra_slippage_bps: null
+  execution_model: "taker_quote_or_validated_l2"
+  funding_model: "actual_crossed_settlement_events"
+  missing_cost_policy: "block_net_result"
+
+acceptance_targets:
+  continuous_run_hours: 24
+  core_valid_coverage_fraction: 0.99
+  feature_publish_lag_p99_ms: 1000
+  unflagged_known_gaps: 0
+  status: "NOT_RUN"

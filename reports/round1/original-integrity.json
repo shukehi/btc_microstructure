@@ -1,0 +1,77 @@
+[
+  {
+    "path": "COMPLETE_SPEC.md",
+    "original_prefix_only": false,
+    "passed": true
+  },
+  {
+    "path": "MANIFEST.json",
+    "original_prefix_only": false,
+    "passed": true
+  },
+  {
+    "path": "README.md",
+    "original_prefix_only": true,
+    "passed": true
+  },
+  {
+    "path": "VALIDATION_REPORT.md",
+    "original_prefix_only": false,
+    "passed": true
+  },
+  {
+    "path": "config/research.example.yaml",
+    "original_prefix_only": false,
+    "passed": true
+  },
+  {
+    "path": "docs/00_scope.md",
+    "original_prefix_only": false,
+    "passed": true
+  },
+  {
+    "path": "docs/01_data_contracts.md",
+    "original_prefix_only": false,
+    "passed": true
+  },
+  {
+    "path": "docs/02_ingestion_and_replay.md",
+    "original_prefix_only": false,
+    "passed": true
+  },
+  {
+    "path": "docs/03_feature_specifications.md",
+    "original_prefix_only": false,
+    "passed": true
+  },
+  {
+    "path": "docs/04_state_and_research_spec.md",
+    "original_prefix_only": false,
+    "passed": true
+  },
+  {
+    "path": "docs/05_testing_and_acceptance.md",
+    "original_prefix_only": false,
+    "passed": true
+  },
+  {
+    "path": "docs/06_operations.md",
+    "original_prefix_only": false,
+    "passed": true
+  },
+  {
+    "path": "docs/07_implementation_tasks.md",
+    "original_prefix_only": false,
+    "passed": true
+  },
+  {
+    "path": "docs/08_sources_and_decisions.md",
+    "original_prefix_only": false,
+    "passed": true
+  },
+  {
+    "path": "examples/synthetic_cases.json",
+    "original_prefix_only": false,
+    "passed": true
+  }
+]

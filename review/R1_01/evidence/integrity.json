@@ -1,0 +1,30 @@
+{
+  "payload_manifest": {
+    "checked": 77,
+    "failures": []
+  },
+  "preserved.sha256": {
+    "checked": 23,
+    "failures": []
+  },
+  "implementation.sha256": {
+    "checked": 10,
+    "failures": []
+  },
+  "direct_original_handoff_comparison": {
+    "unchanged": 23,
+    "changes": [
+      {
+        "path": ".gitignore",
+        "kind": "modified",
+        "original_is_prefix": false
+      },
+      {
+        "path": "README.md",
+        "kind": "modified",
+        "original_is_prefix": true
+      }
+    ]
+  },
+  "separate_report_matches_archive": true
+}

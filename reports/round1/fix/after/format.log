@@ -1,0 +1,5 @@
+{"command": [".venv/bin/ruff", "format", "--check", "src", "tests"], "cwd": "/Users/aries/Dve/btc_microstructure", "exit_code": 0, "status": "PASS", "started_utc": "2026-10-11T04:31:46.275553+00:00", "log": "reports/round1/fix/after/format.log"}
+--- stdout ---
+9 files already formatted
+
+--- stderr ---

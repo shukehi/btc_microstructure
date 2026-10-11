@@ -1,0 +1,18 @@
+{
+  "stream": "btcusdt@aggTrade",
+  "data": {
+    "e": "aggTrade",
+    "E": 1700000000001,
+    "s": "BTCUSDT",
+    "a": 900000001,
+    "p": "12345.67000000",
+    "q": "0.12345678",
+    "f": 700000001,
+    "l": 700000003,
+    "T": 1700000000000,
+    "m": true,
+    "nq": "0.02345678",
+    "st": 1
+  },
+  "synthetic_note": "offline combined stream envelope"
+}

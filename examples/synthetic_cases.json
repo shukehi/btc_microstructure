@@ -1,0 +1,205 @@
+{
+  "fixture_kind": "synthetic_only",
+  "spec_version": "0.1",
+  "warning_zh": "人工构造的计算样例，不是真实行情、实际费率或回测业绩。",
+  "cases": [
+    {
+      "test_id": "TEST-TRADE-01",
+      "input": {
+        "m": true,
+        "q": "0.10"
+      },
+      "expected": {
+        "aggressor_side": "SELL",
+        "signed_quantity_base": "-0.10"
+      }
+    },
+    {
+      "test_id": "TEST-FEAT-01",
+      "input": [
+        {
+          "a": 1,
+          "p": "100",
+          "q": "0.30",
+          "m": false
+        },
+        {
+          "a": 2,
+          "p": "100",
+          "q": "0.20",
+          "m": false
+        },
+        {
+          "a": 3,
+          "p": "100",
+          "q": "0.10",
+          "m": true
+        },
+        {
+          "a": 2,
+          "p": "100",
+          "q": "0.20",
+          "m": false
+        }
+      ],
+      "expected": {
+        "volume_base": "0.60",
+        "delta_base": "0.40",
+        "trade_imbalance": 0.6666666666666666,
+        "agg_message_count": 3
+      }
+    },
+    {
+      "test_id": "TEST-BOOK-01",
+      "input": {
+        "snapshot_lastUpdateId": 100,
+        "first_update": {
+          "U": 98,
+          "u": 102,
+          "pu": 97
+        }
+      },
+      "expected": {
+        "bridge_valid": true
+      }
+    },
+    {
+      "test_id": "TEST-BOOK-03",
+      "input": {
+        "previous_u": 102,
+        "new_update": {
+          "U": 111,
+          "u": 115,
+          "pu": 110
+        }
+      },
+      "expected": {
+        "book_state": "INVALID"
+      }
+    },
+    {
+      "test_id": "TEST-FEAT-03",
+      "input": {
+        "previous": {
+          "bid": "100",
+          "ask": "102",
+          "bid_qty": "2",
+          "ask_qty": "4"
+        },
+        "current": {
+          "bid": "100",
+          "ask": "102",
+          "bid_qty": "5",
+          "ask_qty": "3"
+        }
+      },
+      "expected": {
+        "ofi_step_base": "4"
+      }
+    },
+    {
+      "test_id": "TEST-FEAT-04",
+      "input": {
+        "bid": "100",
+        "ask": "102",
+        "bid_qty": "3",
+        "ask_qty": "1"
+      },
+      "expected": {
+        "mid": "101",
+        "spread": "2",
+        "weighted_mid": "101.5",
+        "spread_bps": 198.01980198019803
+      }
+    },
+    {
+      "test_id": "TEST-TIME-01",
+      "input": {
+        "ts_trade_utc": "2026-10-10T12:00:00.900Z",
+        "ts_receive_utc": "2026-10-10T12:00:01.300Z",
+        "feature_cutoff_utc": "2026-10-10T12:00:01.000Z"
+      },
+      "expected": {
+        "included_as_received": false
+      }
+    },
+    {
+      "test_id": "TEST-OI-01",
+      "input": {
+        "oi_before": "100",
+        "oi_after": "100",
+        "price_before": "100",
+        "price_after": "110",
+        "unit": "BTC"
+      },
+      "expected": {
+        "oi_change_fraction": "0",
+        "notional_change_fraction": "0.10"
+      }
+    },
+    {
+      "test_id": "TEST-LIQ-01",
+      "input": {
+        "q": "2",
+        "p": "101",
+        "ap": "100",
+        "z": "1",
+        "S": "SELL"
+      },
+      "expected": {
+        "snapshot_cumulative_notional_usdt": "100",
+        "position_side_observed": "LONG"
+      }
+    },
+    {
+      "test_id": "TEST-RES-01",
+      "input": {
+        "entry_mid": "100",
+        "exit_mid": "101",
+        "horizon_seconds": 30
+      },
+      "expected": {
+        "return_log_bps": 99.50330853168091
+      }
+    },
+    {
+      "test_id": "TEST-FEAT-05",
+      "input": {
+        "direction": 1,
+        "mid_path": [
+          "100",
+          "102",
+          "99",
+          "101"
+        ]
+      },
+      "expected": {
+        "mfe_log_bps": 198.0262729617973,
+        "mae_log_bps": -100.5033585350145
+      }
+    },
+    {
+      "test_id": "TEST-COST-02",
+      "input": {
+        "direction": 1,
+        "quantity_btc": "1",
+        "entry_fill": "100",
+        "exit_fill": "101",
+        "entry_fee_rate": "0.001",
+        "exit_fee_rate": "0.001",
+        "funding_events": [
+          {
+            "mark": "100",
+            "rate": "0.0001"
+          }
+        ]
+      },
+      "expected": {
+        "gross_pnl_usdt": "1",
+        "fees_usdt": "0.201",
+        "funding_cost_usdt": "0.01",
+        "net_pnl_usdt": "0.789"
+      }
+    }
+  ]
+}

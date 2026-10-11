@@ -1,0 +1,5 @@
+{"command": [".venv/bin/python", "-m", "btc_microstructure", "probe", "config/research.example.yaml", "--allow-network", "--seconds", "20", "--messages", "20", "--max-bytes", "2097152", "--output", "fixtures/protocol/r1_02_run01"], "cwd": "/Users/aries/Dve/btc_microstructure", "started_utc": "2026-10-11T05:05:04.597096+00:00", "ended_utc": "2026-10-11T05:05:09.915325+00:00", "exit_code": 1, "status": "BLOCKED", "reason": "TIMEOUT; no retry", "report": "fixtures/protocol/r1_02_run01/protocol_probe_report.json"}
+--- stdout ---
+{"status": "BLOCKED", "reason": "TIMEOUT; no retry", "output": "fixtures/protocol/r1_02_run01"}
+
+--- stderr ---

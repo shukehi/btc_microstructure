@@ -1,0 +1,9 @@
+{"name": "default", "command": [".venv/bin/python", "-m", "pytest", "-q", "--junitxml=reports/round1/probe/offline_01/default.xml"], "cwd": "/Users/aries/Dve/btc_microstructure", "started_utc": "2026-10-11T05:03:47.291261+00:00", "exit_code": 0, "expected_exit_code": 0, "status": "PASS", "log": "reports/round1/probe/offline_01/default.log", "tests": {"passed": 165, "failed": 0, "skipped": 0}}
+--- stdout ---
+........................................................................ [ 43%]
+........................................................................ [ 87%]
+.....................                                                    [100%]
+- generated xml file: /Users/aries/Dve/btc_microstructure/reports/round1/probe/offline_01/default.xml -
+165 passed in 3.79s
+
+--- stderr ---

@@ -1,0 +1,7 @@
+{
+  "status": "PASS",
+  "protected_file_count": 46,
+  "protected_hashes_unchanged": true,
+  "prior_locked_dependencies_unchanged": 17,
+  "current_lock_entries": 26
+}

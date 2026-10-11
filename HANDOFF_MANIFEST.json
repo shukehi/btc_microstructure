@@ -1,0 +1,164 @@
+{
+  "artifact_type": "codex_round1_handoff_not_software",
+  "spec_version": "0.1",
+  "guidance_version": "1.0",
+  "reference_date": "2026-10-10",
+  "original_spec_file_count": 15,
+  "added_guidance_file_count": 9,
+  "original_files_preserved_byte_for_byte": true,
+  "software_implementation_status": "NOT_STARTED",
+  "software_tests": "NOT_RUN",
+  "binance_runtime_probe": "NOT_RUN",
+  "validation": {
+    "original_sha256_comparison": "PASS",
+    "relative_links_in_new_markdown": "PASS",
+    "relative_links_checked": 4,
+    "agents_md_bytes": 4117
+  },
+  "files": [
+    {
+      "path": ".gitignore",
+      "bytes": 329,
+      "sha256": "c125498cb94757d78368641094061525ae265ad4da9fa58dcaa26181fbf78cc1",
+      "origin": "new_handoff"
+    },
+    {
+      "path": "AGENTS.md",
+      "bytes": 4117,
+      "sha256": "12be6d2944c8c52a987903d80d6e55de5a6081c1f2879b0f830df2b0755bb6cd",
+      "origin": "new_handoff"
+    },
+    {
+      "path": "CODEX_START_HERE.md",
+      "bytes": 5383,
+      "sha256": "197c7c1dfc313a84990b44d94c784976f21d974ae433283945619a6c28556592",
+      "origin": "new_handoff"
+    },
+    {
+      "path": "COMPLETE_SPEC.md",
+      "bytes": 96160,
+      "sha256": "b5afc15b55a63b97f4d5f97a87b49ae88848410e05c47ee2d64ef975ab48fbab",
+      "origin": "original_spec"
+    },
+    {
+      "path": "MANIFEST.json",
+      "bytes": 2475,
+      "sha256": "896fc70c207b28334770fbeb532660e8536c39d18d39a44c0d5651691c1660c6",
+      "origin": "original_spec"
+    },
+    {
+      "path": "README.md",
+      "bytes": 3277,
+      "sha256": "12a0e70fed38ab5ece0d445babeae10a560fee1cca828067b591c582575b09b6",
+      "origin": "original_spec"
+    },
+    {
+      "path": "VALIDATION_REPORT.md",
+      "bytes": 891,
+      "sha256": "090441a302c89ff8ea8645e50ce532358a4920eb0609b02a28bf92e0406ff5b2",
+      "origin": "original_spec"
+    },
+    {
+      "path": "config/research.example.yaml",
+      "bytes": 4629,
+      "sha256": "d0556ac8d91986da157bb2844a415d53536b67df92856518adf8fda4058490e4",
+      "origin": "original_spec"
+    },
+    {
+      "path": "docs/00_scope.md",
+      "bytes": 7375,
+      "sha256": "a35b2ca5343219ebf9597803c652111080c2c29bd0a1fc79ccc3ffb4566c3c0a",
+      "origin": "original_spec"
+    },
+    {
+      "path": "docs/01_data_contracts.md",
+      "bytes": 15209,
+      "sha256": "e3fa0acd58ca7da19fe334a65f8fc58bfb9ab5537341b80a3f93d6a7e9e8a100",
+      "origin": "original_spec"
+    },
+    {
+      "path": "docs/02_ingestion_and_replay.md",
+      "bytes": 10152,
+      "sha256": "a0a76de6a0847a429bbb028678080c40a5a1de6b5b576482bdc413d9043b0605",
+      "origin": "original_spec"
+    },
+    {
+      "path": "docs/03_feature_specifications.md",
+      "bytes": 11977,
+      "sha256": "d8e039265dad70c2815d365f42ad5b560c77c9506d704383ff8738b9d4522104",
+      "origin": "original_spec"
+    },
+    {
+      "path": "docs/04_state_and_research_spec.md",
+      "bytes": 11231,
+      "sha256": "4f45849f60613c072ec6119bcaba6da5ba8d96fd3a7ce13b89d421b9190d2469",
+      "origin": "original_spec"
+    },
+    {
+      "path": "docs/05_testing_and_acceptance.md",
+      "bytes": 8540,
+      "sha256": "7d149080c5b11cba00fc8b14b9eda2d2b708b84335b7493185c952755bdd5b34",
+      "origin": "original_spec"
+    },
+    {
+      "path": "docs/06_operations.md",
+      "bytes": 5164,
+      "sha256": "29091cee0a6b3340d4d02b553b1ae4037836a9e36ce4fddb52813f5d42e0a61c",
+      "origin": "original_spec"
+    },
+    {
+      "path": "docs/07_implementation_tasks.md",
+      "bytes": 4433,
+      "sha256": "7df84ab4e0b368fd3f4b5eb20d3db41a52ee9d404f8be604a927d77556e77a6e",
+      "origin": "original_spec"
+    },
+    {
+      "path": "docs/08_sources_and_decisions.md",
+      "bytes": 9282,
+      "sha256": "be286c65df201289fef13baa56b145cbd3f6ba1400d34d8d8726405a87836727",
+      "origin": "original_spec"
+    },
+    {
+      "path": "examples/synthetic_cases.json",
+      "bytes": 4233,
+      "sha256": "e2c081837f81bc2f0a97491ec355faca11c2130e2afe679faaceda74f0bffa72",
+      "origin": "original_spec"
+    },
+    {
+      "path": "tasks/01_foundation.md",
+      "bytes": 2957,
+      "sha256": "5c1883de7bf85f33fadd4f72db83d29c599d9320e86170246c26adfbcccb7672",
+      "origin": "new_handoff"
+    },
+    {
+      "path": "tasks/02_protocol_probe.md",
+      "bytes": 2578,
+      "sha256": "062efc7c83bcbc0ba37c7f6ff1d8e9a643353a69dd56aa0817df90b2a3e88a36",
+      "origin": "new_handoff"
+    },
+    {
+      "path": "tasks/03_vertical_slice.md",
+      "bytes": 4380,
+      "sha256": "a16a5b73bc30d958d4522e5d03fc00c36ae08a133ceb4563fd5c2fa51fcfcdb6",
+      "origin": "new_handoff"
+    },
+    {
+      "path": "tasks/04_review.md",
+      "bytes": 2325,
+      "sha256": "b4805ee919e51c5897412d67fb8ed84c50a590eb9e0e0a3804dc4fd7dc945dfd",
+      "origin": "new_handoff"
+    },
+    {
+      "path": "tasks/OPENAI_SOURCES.md",
+      "bytes": 1433,
+      "sha256": "682ff01f096e351a6e82adfe8094545c501a97929ae0e3cf0f6cc76017f580a3",
+      "origin": "new_handoff"
+    },
+    {
+      "path": "tasks/REPORT_TEMPLATE.md",
+      "bytes": 1429,
+      "sha256": "c2ad1a102ce6969e200c2e3936548353d331125342f3d87fca29756bffd1b34a",
+      "origin": "new_handoff"
+    }
+  ]
+}

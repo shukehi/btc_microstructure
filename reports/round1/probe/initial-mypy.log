@@ -1,0 +1,2 @@
+src/btc_microstructure/probe.py:230: error: Returning Any from function declared to return "bool"  [no-any-return]
+Found 1 error in 1 file (checked 8 source files)

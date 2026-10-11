@@ -1,0 +1,356 @@
+{"command": [".venv/bin/ruff", "check", "."], "cwd": "/Users/aries/Dve/btc_microstructure", "exit_code": 1, "status": "FAIL"}
+--- stdout ---
+F401 [*] `hashlib` imported but unused
+ --> reports/round1/fix/run_checks.py:3:8
+  |
+1 | """Capture real R1-01 fix verification output without changing test expectations."""
+2 | import datetime
+3 | import hashlib
+  |        ^^^^^^^
+4 | import json
+5 | from pathlib import Path
+  |
+help: Remove unused import: `hashlib`
+
+F401 [*] `decimal.Decimal` imported but unused
+ --> review/R1_01/checks/explore_edges.py:3:21
+  |
+1 | from pathlib import Path
+2 | from copy import deepcopy
+3 | from decimal import Decimal
+  |                     ^^^^^^^
+4 | import json, subprocess, os, tempfile
+5 | import yaml
+  |
+help: Remove unused import: `decimal.Decimal`
+
+E401 [*] Multiple imports on one line
+ --> review/R1_01/checks/explore_edges.py:4:1
+  |
+2 | from copy import deepcopy
+3 | from decimal import Decimal
+4 | import json, subprocess, os, tempfile
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+5 | import yaml
+6 | from btc_microstructure.config_models import ResearchConfig
+  |
+help: Split imports
+
+F401 [*] `os` imported but unused
+ --> review/R1_01/checks/explore_edges.py:4:26
+  |
+2 | from copy import deepcopy
+3 | from decimal import Decimal
+4 | import json, subprocess, os, tempfile
+  |                          ^^
+5 | import yaml
+6 | from btc_microstructure.config_models import ResearchConfig
+  |
+help: Remove unused import: `os`
+
+F401 [*] `btc_microstructure.config.config_digest` imported but unused
+ --> review/R1_01/checks/explore_edges.py:7:39
+  |
+5 | import yaml
+6 | from btc_microstructure.config_models import ResearchConfig
+7 | from btc_microstructure.config import config_digest
+  |                                       ^^^^^^^^^^^^^
+8 | from pydantic import ValidationError
+9 | root=Path('/mnt/data/foundation_audit/project')
+  |
+help: Remove unused import: `btc_microstructure.config.config_digest`
+
+E702 Multiple statements on one line (semicolon)
+  --> review/R1_01/checks/explore_edges.py:12:20
+   |
+10 | raw=yaml.safe_load((root/'config/research.example.yaml').read_text())
+11 | def changed(path,value):
+12 |  data=deepcopy(raw); bits=path.split('.'); n=data
+   |                    ^
+13 |  for key in bits[:-1]:n=n[key]
+14 |  n[bits[-1]]=value
+   |
+
+E702 Multiple statements on one line (semicolon)
+  --> review/R1_01/checks/explore_edges.py:12:42
+   |
+10 | raw=yaml.safe_load((root/'config/research.example.yaml').read_text())
+11 | def changed(path,value):
+12 |  data=deepcopy(raw); bits=path.split('.'); n=data
+   |                                          ^
+13 |  for key in bits[:-1]:n=n[key]
+14 |  n[bits[-1]]=value
+   |
+
+E701 Multiple statements on one line (colon)
+  --> review/R1_01/checks/explore_edges.py:13:22
+   |
+11 | def changed(path,value):
+12 |  data=deepcopy(raw); bits=path.split('.'); n=data
+13 |  for key in bits[:-1]:n=n[key]
+   |                      ^
+14 |  n[bits[-1]]=value
+15 |  return data
+   |
+
+E702 Multiple statements on one line (semicolon)
+  --> review/R1_01/checks/explore_edges.py:39:48
+   |
+37 | for p,v in cases:
+38 |  try:
+39 |   c=ResearchConfig.model_validate(changed(p,v)); outcome='ACCEPTED'
+   |                                                ^
+40 |  except ValidationError as e:outcome='REJECTED'
+41 |  results.append({'field':p,'value':v,'outcome':outcome})
+   |
+
+F841 [*] Local variable `e` is assigned to but never used
+  --> review/R1_01/checks/explore_edges.py:40:28
+   |
+38 |  try:
+39 |   c=ResearchConfig.model_validate(changed(p,v)); outcome='ACCEPTED'
+40 |  except ValidationError as e:outcome='REJECTED'
+   |                            ^
+41 |  results.append({'field':p,'value':v,'outcome':outcome})
+42 | print(json.dumps(results,indent=2,ensure_ascii=False))
+   |
+help: Remove assignment to unused variable `e`
+
+E701 Multiple statements on one line (colon)
+  --> review/R1_01/checks/explore_edges.py:40:29
+   |
+38 |  try:
+39 |   c=ResearchConfig.model_validate(changed(p,v)); outcome='ACCEPTED'
+40 |  except ValidationError as e:outcome='REJECTED'
+   |                             ^
+41 |  results.append({'field':p,'value':v,'outcome':outcome})
+42 | print(json.dumps(results,indent=2,ensure_ascii=False))
+   |
+
+E702 Multiple statements on one line (semicolon)
+  --> review/R1_01/checks/explore_edges.py:46:14
+   |
+44 | # Deliberately short-lived isolated Git repository, not the uploaded project.
+45 | with tempfile.TemporaryDirectory(prefix='ignore-check-',dir=root.parent) as temp:
+46 |  p=Path(temp); (p/'.gitignore').write_bytes((root/'.gitignore').read_bytes())
+   |              ^
+47 |  subprocess.run(['git','init','-q',temp],check=True,capture_output=True)
+48 |  paths=['.env','.env.production','private.key','certificate.pem','.venv/file','data/file','codex-local-logs/session.log']
+   |
+
+E702 Multiple statements on one line (semicolon)
+  --> review/R1_01/checks/explore_edges.py:51:40
+   |
+49 |  proc=subprocess.run(['git','-C',temp,'check-ignore','--stdin'],input='\n'.join(paths)+'\n',text=True,capture_output=True)
+50 |  result={'paths':paths,'ignored':proc.stdout.splitlines(),'not_ignored':[x for x in paths if x not in proc.stdout.splitlines()],'exit_…
+51 |  print('GIT_IGNORE',json.dumps(result)); (root.parent/'evidence/ignore-observations.json').write_text(json.dumps(result,indent=2))
+   |                                        ^
+52 | # In-memory mutability only; never written to the uploaded config.
+53 | c=ResearchConfig.model_validate(raw)
+   |
+
+E701 Multiple statements on one line (colon)
+  --> review/R1_01/checks/explore_edges.py:54:4
+   |
+52 | # In-memory mutability only; never written to the uploaded config.
+53 | c=ResearchConfig.model_validate(raw)
+54 | try:c.collector.reconnect_initial_seconds=1000
+   |    ^
+55 | except ValidationError: print('ASSIGNMENT_RAISED=True')
+56 | print('STATE_AFTER_ASSIGNMENT_ERROR',c.collector.reconnect_initial_seconds,c.collector.reconnect_max_seconds)
+   |
+
+E701 Multiple statements on one line (colon)
+  --> review/R1_01/checks/explore_edges.py:55:23
+   |
+53 | c=ResearchConfig.model_validate(raw)
+54 | try:c.collector.reconnect_initial_seconds=1000
+55 | except ValidationError: print('ASSIGNMENT_RAISED=True')
+   |                       ^
+56 | print('STATE_AFTER_ASSIGNMENT_ERROR',c.collector.reconnect_initial_seconds,c.collector.reconnect_max_seconds)
+57 | c=ResearchConfig.model_validate(raw); c.research.horizon_seconds.append(-5)
+   |
+
+E702 Multiple statements on one line (semicolon)
+  --> review/R1_01/checks/explore_edges.py:57:37
+   |
+55 | except ValidationError: print('ASSIGNMENT_RAISED=True')
+56 | print('STATE_AFTER_ASSIGNMENT_ERROR',c.collector.reconnect_initial_seconds,c.collector.reconnect_max_seconds)
+57 | c=ResearchConfig.model_validate(raw); c.research.horizon_seconds.append(-5)
+   |                                     ^
+58 | print('LIST_MUTATION_ACCEPTED',c.research.horizon_seconds)
+   |
+
+F401 [*] `decimal.Decimal` imported but unused
+ --> review/R1_01/checks/explore_edges_portable.py:3:21
+  |
+1 | from pathlib import Path
+2 | from copy import deepcopy
+3 | from decimal import Decimal
+  |                     ^^^^^^^
+4 | import json, subprocess, os, tempfile
+5 | import yaml
+  |
+help: Remove unused import: `decimal.Decimal`
+
+E401 [*] Multiple imports on one line
+ --> review/R1_01/checks/explore_edges_portable.py:4:1
+  |
+2 | from copy import deepcopy
+3 | from decimal import Decimal
+4 | import json, subprocess, os, tempfile
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+5 | import yaml
+6 | from btc_microstructure.config_models import ResearchConfig
+  |
+help: Split imports
+
+F401 [*] `os` imported but unused
+ --> review/R1_01/checks/explore_edges_portable.py:4:26
+  |
+2 | from copy import deepcopy
+3 | from decimal import Decimal
+4 | import json, subprocess, os, tempfile
+  |                          ^^
+5 | import yaml
+6 | from btc_microstructure.config_models import ResearchConfig
+  |
+help: Remove unused import: `os`
+
+F401 [*] `btc_microstructure.config.config_digest` imported but unused
+ --> review/R1_01/checks/explore_edges_portable.py:7:39
+  |
+5 | import yaml
+6 | from btc_microstructure.config_models import ResearchConfig
+7 | from btc_microstructure.config import config_digest
+  |                                       ^^^^^^^^^^^^^
+8 | from pydantic import ValidationError
+9 | root=Path.cwd()
+  |
+help: Remove unused import: `btc_microstructure.config.config_digest`
+
+E702 Multiple statements on one line (semicolon)
+  --> review/R1_01/checks/explore_edges_portable.py:14:20
+   |
+12 | raw=yaml.safe_load((root/'config/research.example.yaml').read_text())
+13 | def changed(path,value):
+14 |  data=deepcopy(raw); bits=path.split('.'); n=data
+   |                    ^
+15 |  for key in bits[:-1]:n=n[key]
+16 |  n[bits[-1]]=value
+   |
+
+E702 Multiple statements on one line (semicolon)
+  --> review/R1_01/checks/explore_edges_portable.py:14:42
+   |
+12 | raw=yaml.safe_load((root/'config/research.example.yaml').read_text())
+13 | def changed(path,value):
+14 |  data=deepcopy(raw); bits=path.split('.'); n=data
+   |                                          ^
+15 |  for key in bits[:-1]:n=n[key]
+16 |  n[bits[-1]]=value
+   |
+
+E701 Multiple statements on one line (colon)
+  --> review/R1_01/checks/explore_edges_portable.py:15:22
+   |
+13 | def changed(path,value):
+14 |  data=deepcopy(raw); bits=path.split('.'); n=data
+15 |  for key in bits[:-1]:n=n[key]
+   |                      ^
+16 |  n[bits[-1]]=value
+17 |  return data
+   |
+
+E702 Multiple statements on one line (semicolon)
+  --> review/R1_01/checks/explore_edges_portable.py:41:48
+   |
+39 | for p,v in cases:
+40 |  try:
+41 |   c=ResearchConfig.model_validate(changed(p,v)); outcome='ACCEPTED'
+   |                                                ^
+42 |  except ValidationError as e:outcome='REJECTED'
+43 |  results.append({'field':p,'value':v,'outcome':outcome})
+   |
+
+F841 [*] Local variable `e` is assigned to but never used
+  --> review/R1_01/checks/explore_edges_portable.py:42:28
+   |
+40 |  try:
+41 |   c=ResearchConfig.model_validate(changed(p,v)); outcome='ACCEPTED'
+42 |  except ValidationError as e:outcome='REJECTED'
+   |                            ^
+43 |  results.append({'field':p,'value':v,'outcome':outcome})
+44 | print(json.dumps(results,indent=2,ensure_ascii=False))
+   |
+help: Remove assignment to unused variable `e`
+
+E701 Multiple statements on one line (colon)
+  --> review/R1_01/checks/explore_edges_portable.py:42:29
+   |
+40 |  try:
+41 |   c=ResearchConfig.model_validate(changed(p,v)); outcome='ACCEPTED'
+42 |  except ValidationError as e:outcome='REJECTED'
+   |                             ^
+43 |  results.append({'field':p,'value':v,'outcome':outcome})
+44 | print(json.dumps(results,indent=2,ensure_ascii=False))
+   |
+
+E702 Multiple statements on one line (semicolon)
+  --> review/R1_01/checks/explore_edges_portable.py:48:14
+   |
+46 | # Deliberately short-lived isolated Git repository, not the uploaded project.
+47 | with tempfile.TemporaryDirectory(prefix='ignore-check-',dir=root.parent) as temp:
+48 |  p=Path(temp); (p/'.gitignore').write_bytes((root/'.gitignore').read_bytes())
+   |              ^
+49 |  subprocess.run(['git','init','-q',temp],check=True,capture_output=True)
+50 |  paths=['.env','.env.production','private.key','certificate.pem','.venv/file','data/file','codex-local-logs/session.log']
+   |
+
+E702 Multiple statements on one line (semicolon)
+  --> review/R1_01/checks/explore_edges_portable.py:53:40
+   |
+51 |  proc=subprocess.run(['git','-C',temp,'check-ignore','--stdin'],input='\n'.join(paths)+'\n',text=True,capture_output=True)
+52 |  result={'paths':paths,'ignored':proc.stdout.splitlines(),'not_ignored':[x for x in paths if x not in proc.stdout.splitlines()],'exit_…
+53 |  print('GIT_IGNORE',json.dumps(result)); (evidence/'ignore-observations.json').write_text(json.dumps(result,indent=2))
+   |                                        ^
+54 | # In-memory mutability only; never written to the uploaded config.
+55 | c=ResearchConfig.model_validate(raw)
+   |
+
+E701 Multiple statements on one line (colon)
+  --> review/R1_01/checks/explore_edges_portable.py:56:4
+   |
+54 | # In-memory mutability only; never written to the uploaded config.
+55 | c=ResearchConfig.model_validate(raw)
+56 | try:c.collector.reconnect_initial_seconds=1000
+   |    ^
+57 | except ValidationError: print('ASSIGNMENT_RAISED=True')
+58 | print('STATE_AFTER_ASSIGNMENT_ERROR',c.collector.reconnect_initial_seconds,c.collector.reconnect_max_seconds)
+   |
+
+E701 Multiple statements on one line (colon)
+  --> review/R1_01/checks/explore_edges_portable.py:57:23
+   |
+55 | c=ResearchConfig.model_validate(raw)
+56 | try:c.collector.reconnect_initial_seconds=1000
+57 | except ValidationError: print('ASSIGNMENT_RAISED=True')
+   |                       ^
+58 | print('STATE_AFTER_ASSIGNMENT_ERROR',c.collector.reconnect_initial_seconds,c.collector.reconnect_max_seconds)
+59 | c=ResearchConfig.model_validate(raw); c.research.horizon_seconds.append(-5)
+   |
+
+E702 Multiple statements on one line (semicolon)
+  --> review/R1_01/checks/explore_edges_portable.py:59:37
+   |
+57 | except ValidationError: print('ASSIGNMENT_RAISED=True')
+58 | print('STATE_AFTER_ASSIGNMENT_ERROR',c.collector.reconnect_initial_seconds,c.collector.reconnect_max_seconds)
+59 | c=ResearchConfig.model_validate(raw); c.research.horizon_seconds.append(-5)
+   |                                     ^
+60 | print('LIST_MUTATION_ACCEPTED',c.research.horizon_seconds)
+   |
+
+Found 31 errors.
+[*] 11 fixable with the `--fix` option.
+
+--- stderr ---

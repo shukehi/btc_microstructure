@@ -1,0 +1,28 @@
+{"command": [".venv/bin/python", "-m", "pytest", "-q", "tests/unit/test_probe.py::test_partial_sample_exhausting_byte_budget_cannot_pass", "--junitxml=reports/round1/probe/review-before.xml"], "cwd": "/Users/aries/Dve/btc_microstructure", "exit_code": 1, "status": "FAIL"}
+--- stdout ---
+F                                                                        [100%]
+=================================== FAILURES ===================================
+____________ test_partial_sample_exhausting_byte_budget_cannot_pass ____________
+
+    def test_partial_sample_exhausting_byte_budget_cannot_pass() -> None:
+        transport = FakeTransport(
+            metadata_reply=valid_metadata_reply(), frames=[combined_trade_frame()] * 20
+        )
+        report = asyncio.run(
+            run_probe(transport, limits(max_messages=20, max_bytes=2048, max_frame_bytes=512))
+        )
+        assert 0 < len(report["ws"]["messages"]) < 20
+        assert report["reason"] == "BYTE_BUDGET_REACHED; no additional receive"
+>       assert report["status"] == "BLOCKED"
+E       AssertionError: assert 'PASS' == 'BLOCKED'
+E         
+E         - BLOCKED
+E         + PASS
+
+tests/unit/test_probe.py:502: AssertionError
+- generated xml file: /Users/aries/Dve/btc_microstructure/reports/round1/probe/review-before.xml -
+=========================== short test summary info ============================
+FAILED tests/unit/test_probe.py::test_partial_sample_exhausting_byte_budget_cannot_pass
+1 failed in 0.15s
+
+--- stderr ---

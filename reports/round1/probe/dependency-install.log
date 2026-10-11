@@ -1,0 +1,33 @@
+Collecting aiohttp==3.12.15
+  Downloading aiohttp-3.12.15-cp312-cp312-macosx_11_0_arm64.whl.metadata (7.7 kB)
+Collecting aiohappyeyeballs>=2.5.0 (from aiohttp==3.12.15)
+  Downloading aiohappyeyeballs-2.7.1-py3-none-any.whl.metadata (5.9 kB)
+Collecting aiosignal>=1.4.0 (from aiohttp==3.12.15)
+  Downloading aiosignal-1.4.0-py3-none-any.whl.metadata (3.7 kB)
+Collecting attrs>=17.3.0 (from aiohttp==3.12.15)
+  Downloading attrs-26.1.0-py3-none-any.whl.metadata (8.8 kB)
+Collecting frozenlist>=1.1.1 (from aiohttp==3.12.15)
+  Downloading frozenlist-1.8.0-cp312-cp312-macosx_11_0_arm64.whl.metadata (20 kB)
+Collecting multidict<7.0,>=4.5 (from aiohttp==3.12.15)
+  Downloading multidict-6.9.1-cp312-cp312-macosx_11_0_arm64.whl.metadata (5.3 kB)
+Collecting propcache>=0.2.0 (from aiohttp==3.12.15)
+  Downloading propcache-0.5.4-cp312-cp312-macosx_11_0_arm64.whl.metadata (25 kB)
+Collecting yarl<2.0,>=1.17.0 (from aiohttp==3.12.15)
+  Downloading yarl-1.25.1-cp312-cp312-macosx_11_0_arm64.whl.metadata (111 kB)
+Requirement already satisfied: typing-extensions>=4.2 in ./.venv/lib/python3.12/site-packages (from aiosignal>=1.4.0->aiohttp==3.12.15) (4.16.0)
+Collecting idna>=2.0 (from yarl<2.0,>=1.17.0->aiohttp==3.12.15)
+  Using cached idna-3.20-py3-none-any.whl.metadata (7.2 kB)
+Downloading aiohttp-3.12.15-cp312-cp312-macosx_11_0_arm64.whl (469 kB)
+Downloading aiohappyeyeballs-2.7.1-py3-none-any.whl (15 kB)
+Downloading aiosignal-1.4.0-py3-none-any.whl (7.5 kB)
+Downloading attrs-26.1.0-py3-none-any.whl (67 kB)
+Downloading frozenlist-1.8.0-cp312-cp312-macosx_11_0_arm64.whl (50 kB)
+Downloading multidict-6.9.1-cp312-cp312-macosx_11_0_arm64.whl (57 kB)
+Downloading propcache-0.5.4-cp312-cp312-macosx_11_0_arm64.whl (52 kB)
+Downloading yarl-1.25.1-cp312-cp312-macosx_11_0_arm64.whl (104 kB)
+Using cached idna-3.20-py3-none-any.whl (69 kB)
+Installing collected packages: propcache, multidict, idna, frozenlist, attrs, aiohappyeyeballs, yarl, aiosignal, aiohttp
+Successfully installed aiohappyeyeballs-2.7.1 aiohttp-3.12.15 aiosignal-1.4.0 attrs-26.1.0 frozenlist-1.8.0 idna-3.20 multidict-6.9.1 propcache-0.5.4 yarl-1.25.1
+
+[notice] A new release of pip is available: 25.0.1 -> 26.2.1
+[notice] To update, run: /Users/aries/Dve/btc_microstructure/.venv/bin/python -m pip install --upgrade pip

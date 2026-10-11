@@ -1,0 +1,475 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="22" skipped="0" tests="58" time="2.245" timestamp="2026-10-10T23:31:27.831976-05:00" hostname="AriesdeMacBook-Pro.local"><testcase classname="tests.unit.test_foundation_guards" name="test_required_guards_reject_false_and_non_booleans[False-storage.source_payload_preserved]" time="0.008"><failure message="Failed: DID NOT RAISE &lt;class 'pydantic_core._pydantic_core.ValidationError'&gt;">raw_config = {'acceptance_targets': {'continuous_run_hours': 24, 'core_valid_coverage_fraction': 0.99, 'feature_publish_lag_p99_ms'...t_ws': 'wss://fstream.binance.com/market/stream', 'um_public_ws': 'wss://fstream.binance.com/public/stream', ...}, ...}
+field = 'storage.source_payload_preserved', value = False
+
+    @pytest.mark.parametrize("field", REQUIRED)
+    @pytest.mark.parametrize("value", [False, 0, 1, "false", "true"])
+    def test_required_guards_reject_false_and_non_booleans(raw_config, field, value):
+        set_field(raw_config, field, value)
+&gt;       with pytest.raises(ValidationError) as caught:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE &lt;class 'pydantic_core._pydantic_core.ValidationError'&gt;
+
+tests/unit/test_foundation_guards.py:39: Failed</failure></testcase><testcase classname="tests.unit.test_foundation_guards" name="test_required_guards_reject_false_and_non_booleans[False-quality.unknown_as_null]" time="0.005"><failure message="Failed: DID NOT RAISE &lt;class 'pydantic_core._pydantic_core.ValidationError'&gt;">raw_config = {'acceptance_targets': {'continuous_run_hours': 24, 'core_valid_coverage_fraction': 0.99, 'feature_publish_lag_p99_ms'...t_ws': 'wss://fstream.binance.com/market/stream', 'um_public_ws': 'wss://fstream.binance.com/public/stream', ...}, ...}
+field = 'quality.unknown_as_null', value = False
+
+    @pytest.mark.parametrize("field", REQUIRED)
+    @pytest.mark.parametrize("value", [False, 0, 1, "false", "true"])
+    def test_required_guards_reject_false_and_non_booleans(raw_config, field, value):
+        set_field(raw_config, field, value)
+&gt;       with pytest.raises(ValidationError) as caught:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE &lt;class 'pydantic_core._pydantic_core.ValidationError'&gt;
+
+tests/unit/test_foundation_guards.py:39: Failed</failure></testcase><testcase classname="tests.unit.test_foundation_guards" name="test_required_guards_reject_false_and_non_booleans[False-quality.known_gap_invalidates_flow_window]" time="0.005"><failure message="Failed: DID NOT RAISE &lt;class 'pydantic_core._pydantic_core.ValidationError'&gt;">raw_config = {'acceptance_targets': {'continuous_run_hours': 24, 'core_valid_coverage_fraction': 0.99, 'feature_publish_lag_p99_ms'...t_ws': 'wss://fstream.binance.com/market/stream', 'um_public_ws': 'wss://fstream.binance.com/public/stream', ...}, ...}
+field = 'quality.known_gap_invalidates_flow_window', value = False
+
+    @pytest.mark.parametrize("field", REQUIRED)
+    @pytest.mark.parametrize("value", [False, 0, 1, "false", "true"])
+    def test_required_guards_reject_false_and_non_booleans(raw_config, field, value):
+        set_field(raw_config, field, value)
+&gt;       with pytest.raises(ValidationError) as caught:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE &lt;class 'pydantic_core._pydantic_core.ValidationError'&gt;
+
+tests/unit/test_foundation_guards.py:39: Failed</failure></testcase><testcase classname="tests.unit.test_foundation_guards" name="test_required_guards_reject_false_and_non_booleans[False-research.report_all_horizons]" time="0.005"><failure message="Failed: DID NOT RAISE &lt;class 'pydantic_core._pydantic_core.ValidationError'&gt;">raw_config = {'acceptance_targets': {'continuous_run_hours': 24, 'core_valid_coverage_fraction': 0.99, 'feature_publish_lag_p99_ms'...t_ws': 'wss://fstream.binance.com/market/stream', 'um_public_ws': 'wss://fstream.binance.com/public/stream', ...}, ...}
+field = 'research.report_all_horizons', value = False
+
+    @pytest.mark.parametrize("field", REQUIRED)
+    @pytest.mark.parametrize("value", [False, 0, 1, "false", "true"])
+    def test_required_guards_reject_false_and_non_booleans(raw_config, field, value):
+        set_field(raw_config, field, value)
+&gt;       with pytest.raises(ValidationError) as caught:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE &lt;class 'pydantic_core._pydantic_core.ValidationError'&gt;
+
+tests/unit/test_foundation_guards.py:39: Failed</failure></testcase><testcase classname="tests.unit.test_foundation_guards" name="test_required_guards_reject_false_and_non_booleans[False-research.report_common_event_sample]" time="0.006"><failure message="Failed: DID NOT RAISE &lt;class 'pydantic_core._pydantic_core.ValidationError'&gt;">raw_config = {'acceptance_targets': {'continuous_run_hours': 24, 'core_valid_coverage_fraction': 0.99, 'feature_publish_lag_p99_ms'...t_ws': 'wss://fstream.binance.com/market/stream', 'um_public_ws': 'wss://fstream.binance.com/public/stream', ...}, ...}
+field = 'research.report_common_event_sample', value = False
+
+    @pytest.mark.parametrize("field", REQUIRED)
+    @pytest.mark.parametrize("value", [False, 0, 1, "false", "true"])
+    def test_required_guards_reject_false_and_non_booleans(raw_config, field, value):
+        set_field(raw_config, field, value)
+&gt;       with pytest.raises(ValidationError) as caught:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE &lt;class 'pydantic_core._pydantic_core.ValidationError'&gt;
+
+tests/unit/test_foundation_guards.py:39: Failed</failure></testcase><testcase classname="tests.unit.test_foundation_guards" name="test_required_guards_reject_false_and_non_booleans[False-states.freeze_thresholds_in_validation_and_test]" time="0.005"><failure message="Failed: DID NOT RAISE &lt;class 'pydantic_core._pydantic_core.ValidationError'&gt;">raw_config = {'acceptance_targets': {'continuous_run_hours': 24, 'core_valid_coverage_fraction': 0.99, 'feature_publish_lag_p99_ms'...t_ws': 'wss://fstream.binance.com/market/stream', 'um_public_ws': 'wss://fstream.binance.com/public/stream', ...}, ...}
+field = 'states.freeze_thresholds_in_validation_and_test', value = False
+
+    @pytest.mark.parametrize("field", REQUIRED)
+    @pytest.mark.parametrize("value", [False, 0, 1, "false", "true"])
+    def test_required_guards_reject_false_and_non_booleans(raw_config, field, value):
+        set_field(raw_config, field, value)
+&gt;       with pytest.raises(ValidationError) as caught:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE &lt;class 'pydantic_core._pydantic_core.ValidationError'&gt;
+
+tests/unit/test_foundation_guards.py:39: Failed</failure></testcase><testcase classname="tests.unit.test_foundation_guards" name="test_required_guards_reject_false_and_non_booleans[False-research.split.purge_by_actual_label_intervals]" time="0.005"><failure message="Failed: DID NOT RAISE &lt;class 'pydantic_core._pydantic_core.ValidationError'&gt;">raw_config = {'acceptance_targets': {'continuous_run_hours': 24, 'core_valid_coverage_fraction': 0.99, 'feature_publish_lag_p99_ms'...t_ws': 'wss://fstream.binance.com/market/stream', 'um_public_ws': 'wss://fstream.binance.com/public/stream', ...}, ...}
+field = 'research.split.purge_by_actual_label_intervals', value = False
+
+    @pytest.mark.parametrize("field", REQUIRED)
+    @pytest.mark.parametrize("value", [False, 0, 1, "false", "true"])
+    def test_required_guards_reject_false_and_non_booleans(raw_config, field, value):
+        set_field(raw_config, field, value)
+&gt;       with pytest.raises(ValidationError) as caught:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE &lt;class 'pydantic_core._pydantic_core.ValidationError'&gt;
+
+tests/unit/test_foundation_guards.py:39: Failed</failure></testcase><testcase classname="tests.unit.test_foundation_guards" name="test_required_guards_reject_false_and_non_booleans[0-storage.source_payload_preserved]" time="0.006" /><testcase classname="tests.unit.test_foundation_guards" name="test_required_guards_reject_false_and_non_booleans[0-quality.unknown_as_null]" time="0.005" /><testcase classname="tests.unit.test_foundation_guards" name="test_required_guards_reject_false_and_non_booleans[0-quality.known_gap_invalidates_flow_window]" time="0.005" /><testcase classname="tests.unit.test_foundation_guards" name="test_required_guards_reject_false_and_non_booleans[0-research.report_all_horizons]" time="0.006" /><testcase classname="tests.unit.test_foundation_guards" name="test_required_guards_reject_false_and_non_booleans[0-research.report_common_event_sample]" time="0.005" /><testcase classname="tests.unit.test_foundation_guards" name="test_required_guards_reject_false_and_non_booleans[0-states.freeze_thresholds_in_validation_and_test]" time="0.006" /><testcase classname="tests.unit.test_foundation_guards" name="test_required_guards_reject_false_and_non_booleans[0-research.split.purge_by_actual_label_intervals]" time="0.006" /><testcase classname="tests.unit.test_foundation_guards" name="test_required_guards_reject_false_and_non_booleans[1-storage.source_payload_preserved]" time="0.005" /><testcase classname="tests.unit.test_foundation_guards" name="test_required_guards_reject_false_and_non_booleans[1-quality.unknown_as_null]" time="0.005" /><testcase classname="tests.unit.test_foundation_guards" name="test_required_guards_reject_false_and_non_booleans[1-quality.known_gap_invalidates_flow_window]" time="0.005" /><testcase classname="tests.unit.test_foundation_guards" name="test_required_guards_reject_false_and_non_booleans[1-research.report_all_horizons]" time="0.006" /><testcase classname="tests.unit.test_foundation_guards" name="test_required_guards_reject_false_and_non_booleans[1-research.report_common_event_sample]" time="0.005" /><testcase classname="tests.unit.test_foundation_guards" name="test_required_guards_reject_false_and_non_booleans[1-states.freeze_thresholds_in_validation_and_test]" time="0.012" /><testcase classname="tests.unit.test_foundation_guards" name="test_required_guards_reject_false_and_non_booleans[1-research.split.purge_by_actual_label_intervals]" time="0.005" /><testcase classname="tests.unit.test_foundation_guards" name="test_required_guards_reject_false_and_non_booleans[false-storage.source_payload_preserved]" time="0.005" /><testcase classname="tests.unit.test_foundation_guards" name="test_required_guards_reject_false_and_non_booleans[false-quality.unknown_as_null]" time="0.005" /><testcase classname="tests.unit.test_foundation_guards" name="test_required_guards_reject_false_and_non_booleans[false-quality.known_gap_invalidates_flow_window]" time="0.005" /><testcase classname="tests.unit.test_foundation_guards" name="test_required_guards_reject_false_and_non_booleans[false-research.report_all_horizons]" time="0.005" /><testcase classname="tests.unit.test_foundation_guards" name="test_required_guards_reject_false_and_non_booleans[false-research.report_common_event_sample]" time="0.005" /><testcase classname="tests.unit.test_foundation_guards" name="test_required_guards_reject_false_and_non_booleans[false-states.freeze_thresholds_in_validation_and_test]" time="0.006" /><testcase classname="tests.unit.test_foundation_guards" name="test_required_guards_reject_false_and_non_booleans[false-research.split.purge_by_actual_label_intervals]" time="0.006" /><testcase classname="tests.unit.test_foundation_guards" name="test_required_guards_reject_false_and_non_booleans[true-storage.source_payload_preserved]" time="0.005" /><testcase classname="tests.unit.test_foundation_guards" name="test_required_guards_reject_false_and_non_booleans[true-quality.unknown_as_null]" time="0.007" /><testcase classname="tests.unit.test_foundation_guards" name="test_required_guards_reject_false_and_non_booleans[true-quality.known_gap_invalidates_flow_window]" time="0.008" /><testcase classname="tests.unit.test_foundation_guards" name="test_required_guards_reject_false_and_non_booleans[true-research.report_all_horizons]" time="0.006" /><testcase classname="tests.unit.test_foundation_guards" name="test_required_guards_reject_false_and_non_booleans[true-research.report_common_event_sample]" time="0.006" /><testcase classname="tests.unit.test_foundation_guards" name="test_required_guards_reject_false_and_non_booleans[true-states.freeze_thresholds_in_validation_and_test]" time="0.005" /><testcase classname="tests.unit.test_foundation_guards" name="test_required_guards_reject_false_and_non_booleans[true-research.split.purge_by_actual_label_intervals]" time="0.005" /><testcase classname="tests.unit.test_foundation_guards" name="test_guard_cli_process_rejects_with_full_field_path[storage.source_payload_preserved]" time="0.166"><failure message="assert 0 == 1&#10; +  where 0 = CompletedProcess(args=['/Users/aries/Dve/btc_microstructure/.venv/bin/python', '-m', 'btc_microstructure', 'validate-c... &quot;sha256&quot;: &quot;8c011caabc4ddf07cd2b83e814595060535640c3cb896e66ddabd87fb110f2cd&quot;, &quot;status&quot;: &quot;CONFIG_VALID&quot;}\n', stderr='').returncode">raw_config = {'acceptance_targets': {'continuous_run_hours': 24, 'core_valid_coverage_fraction': 0.99, 'feature_publish_lag_p99_ms'...t_ws': 'wss://fstream.binance.com/market/stream', 'um_public_ws': 'wss://fstream.binance.com/public/stream', ...}, ...}
+tmp_path = PosixPath('/private/var/folders/s9/rbq781b922s1xp3jhmtct8yc0000gn/T/pytest-of-aries/pytest-6/test_guard_cli_process_rejects0')
+field = 'storage.source_payload_preserved'
+
+    @pytest.mark.parametrize("field", REQUIRED)
+    def test_guard_cli_process_rejects_with_full_field_path(raw_config, tmp_path, field):
+        set_field(raw_config, field, False)
+        source = tmp_path / "disabled-guard.yaml"
+        source.write_text(yaml.safe_dump(raw_config))
+        result = subprocess.run(
+            [sys.executable, "-m", "btc_microstructure", "validate-config", str(source)],
+            capture_output=True,
+            text=True,
+            timeout=10,
+        )
+&gt;       assert result.returncode == 1
+E       assert 0 == 1
+E        +  where 0 = CompletedProcess(args=['/Users/aries/Dve/btc_microstructure/.venv/bin/python', '-m', 'btc_microstructure', 'validate-c... "sha256": "8c011caabc4ddf07cd2b83e814595060535640c3cb896e66ddabd87fb110f2cd", "status": "CONFIG_VALID"}\n', stderr='').returncode
+
+tests/unit/test_foundation_guards.py:59: AssertionError</failure></testcase><testcase classname="tests.unit.test_foundation_guards" name="test_guard_cli_process_rejects_with_full_field_path[quality.unknown_as_null]" time="0.175"><failure message="assert 0 == 1&#10; +  where 0 = CompletedProcess(args=['/Users/aries/Dve/btc_microstructure/.venv/bin/python', '-m', 'btc_microstructure', 'validate-c... &quot;sha256&quot;: &quot;48801004f343e05566fbf09df0f7fc301bb4e22bd161e6ab05dc0f954c62e18d&quot;, &quot;status&quot;: &quot;CONFIG_VALID&quot;}\n', stderr='').returncode">raw_config = {'acceptance_targets': {'continuous_run_hours': 24, 'core_valid_coverage_fraction': 0.99, 'feature_publish_lag_p99_ms'...t_ws': 'wss://fstream.binance.com/market/stream', 'um_public_ws': 'wss://fstream.binance.com/public/stream', ...}, ...}
+tmp_path = PosixPath('/private/var/folders/s9/rbq781b922s1xp3jhmtct8yc0000gn/T/pytest-of-aries/pytest-6/test_guard_cli_process_rejects1')
+field = 'quality.unknown_as_null'
+
+    @pytest.mark.parametrize("field", REQUIRED)
+    def test_guard_cli_process_rejects_with_full_field_path(raw_config, tmp_path, field):
+        set_field(raw_config, field, False)
+        source = tmp_path / "disabled-guard.yaml"
+        source.write_text(yaml.safe_dump(raw_config))
+        result = subprocess.run(
+            [sys.executable, "-m", "btc_microstructure", "validate-config", str(source)],
+            capture_output=True,
+            text=True,
+            timeout=10,
+        )
+&gt;       assert result.returncode == 1
+E       assert 0 == 1
+E        +  where 0 = CompletedProcess(args=['/Users/aries/Dve/btc_microstructure/.venv/bin/python', '-m', 'btc_microstructure', 'validate-c... "sha256": "48801004f343e05566fbf09df0f7fc301bb4e22bd161e6ab05dc0f954c62e18d", "status": "CONFIG_VALID"}\n', stderr='').returncode
+
+tests/unit/test_foundation_guards.py:59: AssertionError</failure></testcase><testcase classname="tests.unit.test_foundation_guards" name="test_guard_cli_process_rejects_with_full_field_path[quality.known_gap_invalidates_flow_window]" time="0.141"><failure message="assert 0 == 1&#10; +  where 0 = CompletedProcess(args=['/Users/aries/Dve/btc_microstructure/.venv/bin/python', '-m', 'btc_microstructure', 'validate-c... &quot;sha256&quot;: &quot;5bef1b1920a4d8f3125080ef6e2b698b3724b93543ff0eaf42de886b14fa5880&quot;, &quot;status&quot;: &quot;CONFIG_VALID&quot;}\n', stderr='').returncode">raw_config = {'acceptance_targets': {'continuous_run_hours': 24, 'core_valid_coverage_fraction': 0.99, 'feature_publish_lag_p99_ms'...t_ws': 'wss://fstream.binance.com/market/stream', 'um_public_ws': 'wss://fstream.binance.com/public/stream', ...}, ...}
+tmp_path = PosixPath('/private/var/folders/s9/rbq781b922s1xp3jhmtct8yc0000gn/T/pytest-of-aries/pytest-6/test_guard_cli_process_rejects2')
+field = 'quality.known_gap_invalidates_flow_window'
+
+    @pytest.mark.parametrize("field", REQUIRED)
+    def test_guard_cli_process_rejects_with_full_field_path(raw_config, tmp_path, field):
+        set_field(raw_config, field, False)
+        source = tmp_path / "disabled-guard.yaml"
+        source.write_text(yaml.safe_dump(raw_config))
+        result = subprocess.run(
+            [sys.executable, "-m", "btc_microstructure", "validate-config", str(source)],
+            capture_output=True,
+            text=True,
+            timeout=10,
+        )
+&gt;       assert result.returncode == 1
+E       assert 0 == 1
+E        +  where 0 = CompletedProcess(args=['/Users/aries/Dve/btc_microstructure/.venv/bin/python', '-m', 'btc_microstructure', 'validate-c... "sha256": "5bef1b1920a4d8f3125080ef6e2b698b3724b93543ff0eaf42de886b14fa5880", "status": "CONFIG_VALID"}\n', stderr='').returncode
+
+tests/unit/test_foundation_guards.py:59: AssertionError</failure></testcase><testcase classname="tests.unit.test_foundation_guards" name="test_guard_cli_process_rejects_with_full_field_path[research.report_all_horizons]" time="0.154"><failure message="assert 0 == 1&#10; +  where 0 = CompletedProcess(args=['/Users/aries/Dve/btc_microstructure/.venv/bin/python', '-m', 'btc_microstructure', 'validate-c... &quot;sha256&quot;: &quot;4467cd4e4400d65025965fe0410c455fac6fd50e1fb9cbe517db2281117eabce&quot;, &quot;status&quot;: &quot;CONFIG_VALID&quot;}\n', stderr='').returncode">raw_config = {'acceptance_targets': {'continuous_run_hours': 24, 'core_valid_coverage_fraction': 0.99, 'feature_publish_lag_p99_ms'...t_ws': 'wss://fstream.binance.com/market/stream', 'um_public_ws': 'wss://fstream.binance.com/public/stream', ...}, ...}
+tmp_path = PosixPath('/private/var/folders/s9/rbq781b922s1xp3jhmtct8yc0000gn/T/pytest-of-aries/pytest-6/test_guard_cli_process_rejects3')
+field = 'research.report_all_horizons'
+
+    @pytest.mark.parametrize("field", REQUIRED)
+    def test_guard_cli_process_rejects_with_full_field_path(raw_config, tmp_path, field):
+        set_field(raw_config, field, False)
+        source = tmp_path / "disabled-guard.yaml"
+        source.write_text(yaml.safe_dump(raw_config))
+        result = subprocess.run(
+            [sys.executable, "-m", "btc_microstructure", "validate-config", str(source)],
+            capture_output=True,
+            text=True,
+            timeout=10,
+        )
+&gt;       assert result.returncode == 1
+E       assert 0 == 1
+E        +  where 0 = CompletedProcess(args=['/Users/aries/Dve/btc_microstructure/.venv/bin/python', '-m', 'btc_microstructure', 'validate-c... "sha256": "4467cd4e4400d65025965fe0410c455fac6fd50e1fb9cbe517db2281117eabce", "status": "CONFIG_VALID"}\n', stderr='').returncode
+
+tests/unit/test_foundation_guards.py:59: AssertionError</failure></testcase><testcase classname="tests.unit.test_foundation_guards" name="test_guard_cli_process_rejects_with_full_field_path[research.report_common_event_sample]" time="0.151"><failure message="assert 0 == 1&#10; +  where 0 = CompletedProcess(args=['/Users/aries/Dve/btc_microstructure/.venv/bin/python', '-m', 'btc_microstructure', 'validate-c... &quot;sha256&quot;: &quot;f4fceaa568746885384eca0556fb8c78909ff79551019e48a4bd60f10c9b5bbb&quot;, &quot;status&quot;: &quot;CONFIG_VALID&quot;}\n', stderr='').returncode">raw_config = {'acceptance_targets': {'continuous_run_hours': 24, 'core_valid_coverage_fraction': 0.99, 'feature_publish_lag_p99_ms'...t_ws': 'wss://fstream.binance.com/market/stream', 'um_public_ws': 'wss://fstream.binance.com/public/stream', ...}, ...}
+tmp_path = PosixPath('/private/var/folders/s9/rbq781b922s1xp3jhmtct8yc0000gn/T/pytest-of-aries/pytest-6/test_guard_cli_process_rejects4')
+field = 'research.report_common_event_sample'
+
+    @pytest.mark.parametrize("field", REQUIRED)
+    def test_guard_cli_process_rejects_with_full_field_path(raw_config, tmp_path, field):
+        set_field(raw_config, field, False)
+        source = tmp_path / "disabled-guard.yaml"
+        source.write_text(yaml.safe_dump(raw_config))
+        result = subprocess.run(
+            [sys.executable, "-m", "btc_microstructure", "validate-config", str(source)],
+            capture_output=True,
+            text=True,
+            timeout=10,
+        )
+&gt;       assert result.returncode == 1
+E       assert 0 == 1
+E        +  where 0 = CompletedProcess(args=['/Users/aries/Dve/btc_microstructure/.venv/bin/python', '-m', 'btc_microstructure', 'validate-c... "sha256": "f4fceaa568746885384eca0556fb8c78909ff79551019e48a4bd60f10c9b5bbb", "status": "CONFIG_VALID"}\n', stderr='').returncode
+
+tests/unit/test_foundation_guards.py:59: AssertionError</failure></testcase><testcase classname="tests.unit.test_foundation_guards" name="test_guard_cli_process_rejects_with_full_field_path[states.freeze_thresholds_in_validation_and_test]" time="0.144"><failure message="assert 0 == 1&#10; +  where 0 = CompletedProcess(args=['/Users/aries/Dve/btc_microstructure/.venv/bin/python', '-m', 'btc_microstructure', 'validate-c... &quot;sha256&quot;: &quot;d47c2a49b0ad40e3d5c4cfbf03b70b02fd189e528164d094055f7e5c9e4a9a65&quot;, &quot;status&quot;: &quot;CONFIG_VALID&quot;}\n', stderr='').returncode">raw_config = {'acceptance_targets': {'continuous_run_hours': 24, 'core_valid_coverage_fraction': 0.99, 'feature_publish_lag_p99_ms'...t_ws': 'wss://fstream.binance.com/market/stream', 'um_public_ws': 'wss://fstream.binance.com/public/stream', ...}, ...}
+tmp_path = PosixPath('/private/var/folders/s9/rbq781b922s1xp3jhmtct8yc0000gn/T/pytest-of-aries/pytest-6/test_guard_cli_process_rejects5')
+field = 'states.freeze_thresholds_in_validation_and_test'
+
+    @pytest.mark.parametrize("field", REQUIRED)
+    def test_guard_cli_process_rejects_with_full_field_path(raw_config, tmp_path, field):
+        set_field(raw_config, field, False)
+        source = tmp_path / "disabled-guard.yaml"
+        source.write_text(yaml.safe_dump(raw_config))
+        result = subprocess.run(
+            [sys.executable, "-m", "btc_microstructure", "validate-config", str(source)],
+            capture_output=True,
+            text=True,
+            timeout=10,
+        )
+&gt;       assert result.returncode == 1
+E       assert 0 == 1
+E        +  where 0 = CompletedProcess(args=['/Users/aries/Dve/btc_microstructure/.venv/bin/python', '-m', 'btc_microstructure', 'validate-c... "sha256": "d47c2a49b0ad40e3d5c4cfbf03b70b02fd189e528164d094055f7e5c9e4a9a65", "status": "CONFIG_VALID"}\n', stderr='').returncode
+
+tests/unit/test_foundation_guards.py:59: AssertionError</failure></testcase><testcase classname="tests.unit.test_foundation_guards" name="test_guard_cli_process_rejects_with_full_field_path[research.split.purge_by_actual_label_intervals]" time="0.167"><failure message="assert 0 == 1&#10; +  where 0 = CompletedProcess(args=['/Users/aries/Dve/btc_microstructure/.venv/bin/python', '-m', 'btc_microstructure', 'validate-c... &quot;sha256&quot;: &quot;c0f3fe0824d4e22c5bd5056fff466f9da89120233080b636cdc6e7399325a678&quot;, &quot;status&quot;: &quot;CONFIG_VALID&quot;}\n', stderr='').returncode">raw_config = {'acceptance_targets': {'continuous_run_hours': 24, 'core_valid_coverage_fraction': 0.99, 'feature_publish_lag_p99_ms'...t_ws': 'wss://fstream.binance.com/market/stream', 'um_public_ws': 'wss://fstream.binance.com/public/stream', ...}, ...}
+tmp_path = PosixPath('/private/var/folders/s9/rbq781b922s1xp3jhmtct8yc0000gn/T/pytest-of-aries/pytest-6/test_guard_cli_process_rejects6')
+field = 'research.split.purge_by_actual_label_intervals'
+
+    @pytest.mark.parametrize("field", REQUIRED)
+    def test_guard_cli_process_rejects_with_full_field_path(raw_config, tmp_path, field):
+        set_field(raw_config, field, False)
+        source = tmp_path / "disabled-guard.yaml"
+        source.write_text(yaml.safe_dump(raw_config))
+        result = subprocess.run(
+            [sys.executable, "-m", "btc_microstructure", "validate-config", str(source)],
+            capture_output=True,
+            text=True,
+            timeout=10,
+        )
+&gt;       assert result.returncode == 1
+E       assert 0 == 1
+E        +  where 0 = CompletedProcess(args=['/Users/aries/Dve/btc_microstructure/.venv/bin/python', '-m', 'btc_microstructure', 'validate-c... "sha256": "c0f3fe0824d4e22c5bd5056fff466f9da89120233080b636cdc6e7399325a678", "status": "CONFIG_VALID"}\n', stderr='').returncode
+
+tests/unit/test_foundation_guards.py:59: AssertionError</failure></testcase><testcase classname="tests.unit.test_foundation_guards" name="test_sensitive_ignore_rules_use_git[.env-0]" time="0.046"><failure message="AssertionError: &#10;assert 1 == 0&#10; +  where 1 = CompletedProcess(args=['git', '-C', '/private/var/folders/s9/rbq781b922s1xp3jhmtct8yc0000gn/T/pytest-of-aries/pytest-6...sitive_ignore_rules_us0/ignore-check', 'check-ignore', '--no-index', '-q', '.env'], returncode=1, stdout='', stderr='').returncode">isolated_git = PosixPath('/private/var/folders/s9/rbq781b922s1xp3jhmtct8yc0000gn/T/pytest-of-aries/pytest-6/test_sensitive_ignore_rules_us0/ignore-check')
+path = '.env', expected = 0
+
+    @pytest.mark.parametrize(
+        ("path", "expected"),
+        [
+            (".env", 0),
+            (".env.production", 0),
+            ("nested/.env.private", 0),
+            ("private.key", 0),
+            ("nested/certificate.pem", 0),
+            ("codex-local-logs/session.log", 0),
+            (".venv/x", 0),
+            ("build/x", 0),
+            ("dist/x", 0),
+            ("data/raw.json", 0),
+            (".env.example", 1),
+            ("nested/.env.example", 1),
+            ("config/research.example.yaml", 1),
+        ],
+    )
+    def test_sensitive_ignore_rules_use_git(isolated_git, path, expected):
+        result = subprocess.run(
+            ["git", "-C", str(isolated_git), "check-ignore", "--no-index", "-q", path],
+            capture_output=True,
+            text=True,
+            timeout=10,
+        )
+&gt;       assert result.returncode == expected, result.stderr
+E       AssertionError: 
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['git', '-C', '/private/var/folders/s9/rbq781b922s1xp3jhmtct8yc0000gn/T/pytest-of-aries/pytest-6...sitive_ignore_rules_us0/ignore-check', 'check-ignore', '--no-index', '-q', '.env'], returncode=1, stdout='', stderr='').returncode
+
+tests/unit/test_foundation_guards.py:99: AssertionError</failure></testcase><testcase classname="tests.unit.test_foundation_guards" name="test_sensitive_ignore_rules_use_git[.env.production-0]" time="0.046"><failure message="AssertionError: &#10;assert 1 == 0&#10; +  where 1 = CompletedProcess(args=['git', '-C', '/private/var/folders/s9/rbq781b922s1xp3jhmtct8yc0000gn/T/pytest-of-aries/pytest-6...re_rules_us1/ignore-check', 'check-ignore', '--no-index', '-q', '.env.production'], returncode=1, stdout='', stderr='').returncode">isolated_git = PosixPath('/private/var/folders/s9/rbq781b922s1xp3jhmtct8yc0000gn/T/pytest-of-aries/pytest-6/test_sensitive_ignore_rules_us1/ignore-check')
+path = '.env.production', expected = 0
+
+    @pytest.mark.parametrize(
+        ("path", "expected"),
+        [
+            (".env", 0),
+            (".env.production", 0),
+            ("nested/.env.private", 0),
+            ("private.key", 0),
+            ("nested/certificate.pem", 0),
+            ("codex-local-logs/session.log", 0),
+            (".venv/x", 0),
+            ("build/x", 0),
+            ("dist/x", 0),
+            ("data/raw.json", 0),
+            (".env.example", 1),
+            ("nested/.env.example", 1),
+            ("config/research.example.yaml", 1),
+        ],
+    )
+    def test_sensitive_ignore_rules_use_git(isolated_git, path, expected):
+        result = subprocess.run(
+            ["git", "-C", str(isolated_git), "check-ignore", "--no-index", "-q", path],
+            capture_output=True,
+            text=True,
+            timeout=10,
+        )
+&gt;       assert result.returncode == expected, result.stderr
+E       AssertionError: 
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['git', '-C', '/private/var/folders/s9/rbq781b922s1xp3jhmtct8yc0000gn/T/pytest-of-aries/pytest-6...re_rules_us1/ignore-check', 'check-ignore', '--no-index', '-q', '.env.production'], returncode=1, stdout='', stderr='').returncode
+
+tests/unit/test_foundation_guards.py:99: AssertionError</failure></testcase><testcase classname="tests.unit.test_foundation_guards" name="test_sensitive_ignore_rules_use_git[nested/.env.private-0]" time="0.049"><failure message="AssertionError: &#10;assert 1 == 0&#10; +  where 1 = CompletedProcess(args=['git', '-C', '/private/var/folders/s9/rbq781b922s1xp3jhmtct8yc0000gn/T/pytest-of-aries/pytest-6...ules_us2/ignore-check', 'check-ignore', '--no-index', '-q', 'nested/.env.private'], returncode=1, stdout='', stderr='').returncode">isolated_git = PosixPath('/private/var/folders/s9/rbq781b922s1xp3jhmtct8yc0000gn/T/pytest-of-aries/pytest-6/test_sensitive_ignore_rules_us2/ignore-check')
+path = 'nested/.env.private', expected = 0
+
+    @pytest.mark.parametrize(
+        ("path", "expected"),
+        [
+            (".env", 0),
+            (".env.production", 0),
+            ("nested/.env.private", 0),
+            ("private.key", 0),
+            ("nested/certificate.pem", 0),
+            ("codex-local-logs/session.log", 0),
+            (".venv/x", 0),
+            ("build/x", 0),
+            ("dist/x", 0),
+            ("data/raw.json", 0),
+            (".env.example", 1),
+            ("nested/.env.example", 1),
+            ("config/research.example.yaml", 1),
+        ],
+    )
+    def test_sensitive_ignore_rules_use_git(isolated_git, path, expected):
+        result = subprocess.run(
+            ["git", "-C", str(isolated_git), "check-ignore", "--no-index", "-q", path],
+            capture_output=True,
+            text=True,
+            timeout=10,
+        )
+&gt;       assert result.returncode == expected, result.stderr
+E       AssertionError: 
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['git', '-C', '/private/var/folders/s9/rbq781b922s1xp3jhmtct8yc0000gn/T/pytest-of-aries/pytest-6...ules_us2/ignore-check', 'check-ignore', '--no-index', '-q', 'nested/.env.private'], returncode=1, stdout='', stderr='').returncode
+
+tests/unit/test_foundation_guards.py:99: AssertionError</failure></testcase><testcase classname="tests.unit.test_foundation_guards" name="test_sensitive_ignore_rules_use_git[private.key-0]" time="0.045"><failure message="AssertionError: &#10;assert 1 == 0&#10; +  where 1 = CompletedProcess(args=['git', '-C', '/private/var/folders/s9/rbq781b922s1xp3jhmtct8yc0000gn/T/pytest-of-aries/pytest-6...ignore_rules_us3/ignore-check', 'check-ignore', '--no-index', '-q', 'private.key'], returncode=1, stdout='', stderr='').returncode">isolated_git = PosixPath('/private/var/folders/s9/rbq781b922s1xp3jhmtct8yc0000gn/T/pytest-of-aries/pytest-6/test_sensitive_ignore_rules_us3/ignore-check')
+path = 'private.key', expected = 0
+
+    @pytest.mark.parametrize(
+        ("path", "expected"),
+        [
+            (".env", 0),
+            (".env.production", 0),
+            ("nested/.env.private", 0),
+            ("private.key", 0),
+            ("nested/certificate.pem", 0),
+            ("codex-local-logs/session.log", 0),
+            (".venv/x", 0),
+            ("build/x", 0),
+            ("dist/x", 0),
+            ("data/raw.json", 0),
+            (".env.example", 1),
+            ("nested/.env.example", 1),
+            ("config/research.example.yaml", 1),
+        ],
+    )
+    def test_sensitive_ignore_rules_use_git(isolated_git, path, expected):
+        result = subprocess.run(
+            ["git", "-C", str(isolated_git), "check-ignore", "--no-index", "-q", path],
+            capture_output=True,
+            text=True,
+            timeout=10,
+        )
+&gt;       assert result.returncode == expected, result.stderr
+E       AssertionError: 
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['git', '-C', '/private/var/folders/s9/rbq781b922s1xp3jhmtct8yc0000gn/T/pytest-of-aries/pytest-6...ignore_rules_us3/ignore-check', 'check-ignore', '--no-index', '-q', 'private.key'], returncode=1, stdout='', stderr='').returncode
+
+tests/unit/test_foundation_guards.py:99: AssertionError</failure></testcase><testcase classname="tests.unit.test_foundation_guards" name="test_sensitive_ignore_rules_use_git[nested/certificate.pem-0]" time="0.046"><failure message="AssertionError: &#10;assert 1 == 0&#10; +  where 1 = CompletedProcess(args=['git', '-C', '/private/var/folders/s9/rbq781b922s1xp3jhmtct8yc0000gn/T/pytest-of-aries/pytest-6...s_us4/ignore-check', 'check-ignore', '--no-index', '-q', 'nested/certificate.pem'], returncode=1, stdout='', stderr='').returncode">isolated_git = PosixPath('/private/var/folders/s9/rbq781b922s1xp3jhmtct8yc0000gn/T/pytest-of-aries/pytest-6/test_sensitive_ignore_rules_us4/ignore-check')
+path = 'nested/certificate.pem', expected = 0
+
+    @pytest.mark.parametrize(
+        ("path", "expected"),
+        [
+            (".env", 0),
+            (".env.production", 0),
+            ("nested/.env.private", 0),
+            ("private.key", 0),
+            ("nested/certificate.pem", 0),
+            ("codex-local-logs/session.log", 0),
+            (".venv/x", 0),
+            ("build/x", 0),
+            ("dist/x", 0),
+            ("data/raw.json", 0),
+            (".env.example", 1),
+            ("nested/.env.example", 1),
+            ("config/research.example.yaml", 1),
+        ],
+    )
+    def test_sensitive_ignore_rules_use_git(isolated_git, path, expected):
+        result = subprocess.run(
+            ["git", "-C", str(isolated_git), "check-ignore", "--no-index", "-q", path],
+            capture_output=True,
+            text=True,
+            timeout=10,
+        )
+&gt;       assert result.returncode == expected, result.stderr
+E       AssertionError: 
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['git', '-C', '/private/var/folders/s9/rbq781b922s1xp3jhmtct8yc0000gn/T/pytest-of-aries/pytest-6...s_us4/ignore-check', 'check-ignore', '--no-index', '-q', 'nested/certificate.pem'], returncode=1, stdout='', stderr='').returncode
+
+tests/unit/test_foundation_guards.py:99: AssertionError</failure></testcase><testcase classname="tests.unit.test_foundation_guards" name="test_sensitive_ignore_rules_use_git[codex-local-logs/session.log-0]" time="0.043"><failure message="AssertionError: &#10;assert 1 == 0&#10; +  where 1 = CompletedProcess(args=['git', '-C', '/private/var/folders/s9/rbq781b922s1xp3jhmtct8yc0000gn/T/pytest-of-aries/pytest-6...ignore-check', 'check-ignore', '--no-index', '-q', 'codex-local-logs/session.log'], returncode=1, stdout='', stderr='').returncode">isolated_git = PosixPath('/private/var/folders/s9/rbq781b922s1xp3jhmtct8yc0000gn/T/pytest-of-aries/pytest-6/test_sensitive_ignore_rules_us5/ignore-check')
+path = 'codex-local-logs/session.log', expected = 0
+
+    @pytest.mark.parametrize(
+        ("path", "expected"),
+        [
+            (".env", 0),
+            (".env.production", 0),
+            ("nested/.env.private", 0),
+            ("private.key", 0),
+            ("nested/certificate.pem", 0),
+            ("codex-local-logs/session.log", 0),
+            (".venv/x", 0),
+            ("build/x", 0),
+            ("dist/x", 0),
+            ("data/raw.json", 0),
+            (".env.example", 1),
+            ("nested/.env.example", 1),
+            ("config/research.example.yaml", 1),
+        ],
+    )
+    def test_sensitive_ignore_rules_use_git(isolated_git, path, expected):
+        result = subprocess.run(
+            ["git", "-C", str(isolated_git), "check-ignore", "--no-index", "-q", path],
+            capture_output=True,
+            text=True,
+            timeout=10,
+        )
+&gt;       assert result.returncode == expected, result.stderr
+E       AssertionError: 
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['git', '-C', '/private/var/folders/s9/rbq781b922s1xp3jhmtct8yc0000gn/T/pytest-of-aries/pytest-6...ignore-check', 'check-ignore', '--no-index', '-q', 'codex-local-logs/session.log'], returncode=1, stdout='', stderr='').returncode
+
+tests/unit/test_foundation_guards.py:99: AssertionError</failure></testcase><testcase classname="tests.unit.test_foundation_guards" name="test_sensitive_ignore_rules_use_git[.venv/x-0]" time="0.038" /><testcase classname="tests.unit.test_foundation_guards" name="test_sensitive_ignore_rules_use_git[build/x-0]" time="0.045"><failure message="AssertionError: &#10;assert 1 == 0&#10; +  where 1 = CompletedProcess(args=['git', '-C', '/private/var/folders/s9/rbq781b922s1xp3jhmtct8yc0000gn/T/pytest-of-aries/pytest-6...ive_ignore_rules_us7/ignore-check', 'check-ignore', '--no-index', '-q', 'build/x'], returncode=1, stdout='', stderr='').returncode">isolated_git = PosixPath('/private/var/folders/s9/rbq781b922s1xp3jhmtct8yc0000gn/T/pytest-of-aries/pytest-6/test_sensitive_ignore_rules_us7/ignore-check')
+path = 'build/x', expected = 0
+
+    @pytest.mark.parametrize(
+        ("path", "expected"),
+        [
+            (".env", 0),
+            (".env.production", 0),
+            ("nested/.env.private", 0),
+            ("private.key", 0),
+            ("nested/certificate.pem", 0),
+            ("codex-local-logs/session.log", 0),
+            (".venv/x", 0),
+            ("build/x", 0),
+            ("dist/x", 0),
+            ("data/raw.json", 0),
+            (".env.example", 1),
+            ("nested/.env.example", 1),
+            ("config/research.example.yaml", 1),
+        ],
+    )
+    def test_sensitive_ignore_rules_use_git(isolated_git, path, expected):
+        result = subprocess.run(
+            ["git", "-C", str(isolated_git), "check-ignore", "--no-index", "-q", path],
+            capture_output=True,
+            text=True,
+            timeout=10,
+        )
+&gt;       assert result.returncode == expected, result.stderr
+E       AssertionError: 
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['git', '-C', '/private/var/folders/s9/rbq781b922s1xp3jhmtct8yc0000gn/T/pytest-of-aries/pytest-6...ive_ignore_rules_us7/ignore-check', 'check-ignore', '--no-index', '-q', 'build/x'], returncode=1, stdout='', stderr='').returncode
+
+tests/unit/test_foundation_guards.py:99: AssertionError</failure></testcase><testcase classname="tests.unit.test_foundation_guards" name="test_sensitive_ignore_rules_use_git[dist/x-0]" time="0.049"><failure message="AssertionError: &#10;assert 1 == 0&#10; +  where 1 = CompletedProcess(args=['git', '-C', '/private/var/folders/s9/rbq781b922s1xp3jhmtct8yc0000gn/T/pytest-of-aries/pytest-6...tive_ignore_rules_us8/ignore-check', 'check-ignore', '--no-index', '-q', 'dist/x'], returncode=1, stdout='', stderr='').returncode">isolated_git = PosixPath('/private/var/folders/s9/rbq781b922s1xp3jhmtct8yc0000gn/T/pytest-of-aries/pytest-6/test_sensitive_ignore_rules_us8/ignore-check')
+path = 'dist/x', expected = 0
+
+    @pytest.mark.parametrize(
+        ("path", "expected"),
+        [
+            (".env", 0),
+            (".env.production", 0),
+            ("nested/.env.private", 0),
+            ("private.key", 0),
+            ("nested/certificate.pem", 0),
+            ("codex-local-logs/session.log", 0),
+            (".venv/x", 0),
+            ("build/x", 0),
+            ("dist/x", 0),
+            ("data/raw.json", 0),
+            (".env.example", 1),
+            ("nested/.env.example", 1),
+            ("config/research.example.yaml", 1),
+        ],
+    )
+    def test_sensitive_ignore_rules_use_git(isolated_git, path, expected):
+        result = subprocess.run(
+            ["git", "-C", str(isolated_git), "check-ignore", "--no-index", "-q", path],
+            capture_output=True,
+            text=True,
+            timeout=10,
+        )
+&gt;       assert result.returncode == expected, result.stderr
+E       AssertionError: 
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['git', '-C', '/private/var/folders/s9/rbq781b922s1xp3jhmtct8yc0000gn/T/pytest-of-aries/pytest-6...tive_ignore_rules_us8/ignore-check', 'check-ignore', '--no-index', '-q', 'dist/x'], returncode=1, stdout='', stderr='').returncode
+
+tests/unit/test_foundation_guards.py:99: AssertionError</failure></testcase><testcase classname="tests.unit.test_foundation_guards" name="test_sensitive_ignore_rules_use_git[data/raw.json-0]" time="0.043" /><testcase classname="tests.unit.test_foundation_guards" name="test_sensitive_ignore_rules_use_git[.env.example-1]" time="0.039" /><testcase classname="tests.unit.test_foundation_guards" name="test_sensitive_ignore_rules_use_git[nested/.env.example-1]" time="0.040" /><testcase classname="tests.unit.test_foundation_guards" name="test_sensitive_ignore_rules_use_git[config/research.example.yaml-1]" time="0.044" /><testcase classname="tests.unit.test_foundation_guards" name="test_valid_sample_digest_unchanged" time="0.159" /><testcase classname="tests.unit.test_foundation_guards" name="test_optional_state_guard_only_applies_when_enabled" time="0.006" /><testcase classname="tests.unit.test_foundation_guards" name="test_engineering_defaults_remain_configurable" time="0.006" /></testsuite></testsuites>

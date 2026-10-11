@@ -1,0 +1,14 @@
+Provenance: recovered verbatim from the testing subagent's actual tool outputs in this session; not re-executed or simulated.
+Working directory for both: /Users/aries/Dve/btc_microstructure
+
+Command: python -m pytest tests/unit/test_probe.py -q
+Exit code: 127
+Status: FAIL (wrong interpreter command; later run successfully in project .venv)
+Complete output:
+zsh:1: command not found: python
+
+Command: /Users/aries/.local/bin/python3.12 -m pytest tests/unit/test_probe.py -q
+Exit code: 1
+Status: FAIL (system interpreter lacks pytest; later run successfully in project .venv)
+Complete output:
+/Users/aries/.local/bin/python3.12: No module named pytest

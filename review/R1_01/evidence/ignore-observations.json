@@ -1,0 +1,23 @@
+{
+  "paths": [
+    ".env",
+    ".env.production",
+    "private.key",
+    "certificate.pem",
+    ".venv/file",
+    "data/file",
+    "codex-local-logs/session.log"
+  ],
+  "ignored": [
+    ".venv/file",
+    "data/file"
+  ],
+  "not_ignored": [
+    ".env",
+    ".env.production",
+    "private.key",
+    "certificate.pem",
+    "codex-local-logs/session.log"
+  ],
+  "exit_code": 0
+}

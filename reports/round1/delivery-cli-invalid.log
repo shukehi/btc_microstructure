@@ -1,0 +1,5 @@
+{"name": "cli-invalid", "command": [".venv/bin/python", "-m", "btc_microstructure", "validate-config", "reports/round1/invalid-grid.yaml"], "cwd": "/Users/aries/Dve/btc_microstructure", "started_utc": "2026-10-11T04:07:41.415215+00:00", "exit_code": 1, "expected_exit_code": 1, "status": "PASS", "log": "reports/round1/delivery-cli-invalid.log"}
+--- stdout ---
+
+--- stderr ---
+features.grid_seconds: Input should be greater than 0

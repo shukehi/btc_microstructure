@@ -1,0 +1,5 @@
+{"command": [".venv/bin/ruff", "check", "reports/round1/probe/verify_offline.py", "reports/round1/probe/render_synthetic.py", "reports/round1/package_protocol_probe.py"], "cwd": "/Users/aries/Dve/btc_microstructure", "exit_code": 0, "status": "PASS"}
+--- stdout ---
+All checks passed!
+
+--- stderr ---

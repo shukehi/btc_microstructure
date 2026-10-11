@@ -1,0 +1,62 @@
+{
+  "status": "DOC_VERIFIED",
+  "verified_at_utc": "2026-10-11T04:55:23.989397+00:00",
+  "method": "Official English pages retrieved using web tool; scoped paraphrases only, not full-page copies.",
+  "sources": [
+    {
+      "id": "S01",
+      "url": "https://developers.binance.com/en/docs/products/derivatives-trading-usds-futures/websocket-market-streams/Important-WebSocket-Change-Notice",
+      "facts": [
+        "Aggregate trades use the market route. URL-based combined subscriptions are supported. Legacy migration paragraphs are internally inconsistent; no legacy route is used."
+      ]
+    },
+    {
+      "id": "S02",
+      "url": "https://developers.binance.com/en/docs/catalog/core-trading-derivatives-trading-usd-s-m-futures/api/ws-streams/market",
+      "facts": [
+        "Use /market/stream?streams=btcusdt@aggTrade. Fields e/E/s/a/p/q/f/l/T/m; optional nq and st. Price and quantities are strings; buyer maker is boolean. st=1 denotes UM, st=2 denotes CM. q includes RPI, nq excludes it. Aggregates group same price and taking side over 100ms, excluding insurance fund and ADL trades. No explicit BTC quantity denomination was found in this field description; retain native quantity and UNKNOWN unit."
+      ]
+    },
+    {
+      "id": "S04",
+      "url": "https://developers.binance.com/en/docs/catalog/core-trading-derivatives-trading-usd-s-m-futures/api/rest-api/market-data",
+      "facts": [
+        "GET /fapi/v1/exchangeInfo, no query parameters, documented request weight 1. Read actual rateLimits and BTCUSDT symbol baseAsset/quoteAsset/marginAsset/contractType/status/filters. Use PRICE_FILTER.tickSize and LOT_SIZE.stepSize/minQty, not display precision. Documentation example limits and filter numbers are not live BTCUSDT evidence."
+      ]
+    },
+    {
+      "id": "S08",
+      "url": "https://developers.binance.com/en/docs/products/derivatives-trading-usds-futures/general-info",
+      "facts": [
+        "Time and timestamp fields use milliseconds. Rate limits are shared by IP; response X-MBX-USED-WEIGHT-* headers describe observed usage. Back off on 429; continued violations risk 418. The probe stops without retries on any rejection, rate limit or transport failure."
+      ]
+    },
+    {
+      "id": "S12",
+      "url": "https://developers.binance.com/en/docs/products/derivatives-trading-usds-futures/websocket-market-streams/Connect",
+      "facts": [
+        "Combined messages wrap stream/data. Stream symbols are lowercase. Documented connection lifetime 24h, server ping every 3min, pong required within 10min. Client-to-server message cap 10/s and 1024 streams per connection are documented maxima, not an unlimited receive budget. This short probe enables one stream only."
+      ]
+    },
+    {
+      "id": "CLIENT",
+      "url": "https://docs.aiohttp.org/en/v3.12.15/client_reference.html",
+      "facts": [
+        "ClientTimeout and ClientWSTimeout provide bounded REST and websocket operations; max_msg_size explicitly bounds messages. A trace redirect callback rejects WS redirects. trust_env=False avoids reading environment credentials and netrc; no proxy or network route is changed."
+      ]
+    }
+  ],
+  "differences": [
+    {
+      "issue_id": "DOC-R102-01",
+      "status": "OPEN_NONBLOCKING",
+      "finding": "Legacy compatibility paragraphs disagree; routed market endpoint matches original spec and avoids that ambiguity."
+    },
+    {
+      "issue_id": "UNIT-R102-01",
+      "status": "UNVERIFIED",
+      "finding": "No explicit base-unit statement in aggregate quantity field; no native-to-BTC normalization in this probe."
+    }
+  ],
+  "runtime_verified": false
+}

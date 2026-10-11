@@ -1,0 +1,15 @@
+{
+  "status": "NOT_RUN",
+  "evidence_kind": "LIVE",
+  "recorded_ns": 1791695438287643000,
+  "reason": "explicit --allow-network required",
+  "limits": {
+    "total_seconds": 30.0,
+    "connect_seconds": 5.0,
+    "idle_seconds": 5.0,
+    "max_messages": 20,
+    "max_bytes": 2097152,
+    "max_frame_bytes": 65536
+  },
+  "continuous_collection_enabled": false
+}

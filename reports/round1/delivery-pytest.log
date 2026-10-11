@@ -1,0 +1,7 @@
+{"name": "pytest", "command": [".venv/bin/python", "-m", "pytest", "-q", "--junitxml=reports/round1/delivery-pytest.xml"], "cwd": "/Users/aries/Dve/btc_microstructure", "started_utc": "2026-10-11T04:07:40.413807+00:00", "exit_code": 0, "expected_exit_code": 0, "status": "PASS", "log": "reports/round1/delivery-pytest.log"}
+--- stdout ---
+................................................                         [100%]
+- generated xml file: /Users/aries/Dve/btc_microstructure/reports/round1/delivery-pytest.xml -
+48 passed in 0.67s
+
+--- stderr ---

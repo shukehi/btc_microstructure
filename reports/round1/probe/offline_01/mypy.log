@@ -1,0 +1,5 @@
+{"name": "mypy", "command": [".venv/bin/mypy", "src"], "cwd": "/Users/aries/Dve/btc_microstructure", "started_utc": "2026-10-11T05:03:52.037776+00:00", "exit_code": 0, "expected_exit_code": 0, "status": "PASS", "log": "reports/round1/probe/offline_01/mypy.log"}
+--- stdout ---
+Success: no issues found in 8 source files
+
+--- stderr ---

@@ -1,0 +1,193 @@
+--- R1-01-fixed/src/btc_microstructure/cli.py
++++ R1-02/src/btc_microstructure/cli.py
+@@ -1,6 +1,9 @@
+-"""Only validate-config is implemented. No network access or environment expansion."""
++"""Offline config validation and explicitly enabled bounded protocol inspection."""
+ 
+ import argparse
++import asyncio
++from pathlib import Path
++import time
+ import json
+ import sys
+ from collections.abc import Sequence
+@@ -16,15 +19,86 @@
+     commands = parser.add_subparsers(dest="command", required=True)
+     validate = commands.add_parser("validate-config", help="validate a local YAML file offline")
+     validate.add_argument("path")
++    probe = commands.add_parser("probe", help="bounded BTCUSDT perpetual metadata + aggTrade only")
++    probe.add_argument("path", help="local research config")
++    probe.add_argument("--output", required=True, type=Path, help="new evidence directory")
++    probe.add_argument(
++        "--allow-network", action="store_true", help="explicit opt-in to real public access"
++    )
++    probe.add_argument("--seconds", type=float, default=30.0)
++    probe.add_argument("--messages", type=int, default=20)
++    probe.add_argument("--max-bytes", type=int, default=2097152)
+     args = parser.parse_args(argv)
+     try:
+         config = load_config(args.path)
++        if args.command == "probe":
++            from .probe import ProbeLimits, run_probe, save_probe
++
++            limits = ProbeLimits(
++                total_seconds=args.seconds, max_messages=args.messages, max_bytes=args.max_bytes
++            )
++            if (
++                config.endpoints.um_rest != "https://fapi.binance.com"
++                or config.endpoints.um_market_ws != "wss://fstream.binance.com/market/stream"
++            ):
++                raise ConfigError(
++                    "endpoints.um_rest/um_market_ws: probe only allows documented public Binance routes"
++                )
++            if args.output.exists():
++                raise ConfigError("output: refusing to overwrite previous evidence")
++            if not args.allow_network:
++                args.output.mkdir(parents=True)
++                (args.output / "protocol_probe_report.json").write_text(
++                    json.dumps(
++                        {
++                            "status": "NOT_RUN",
++                            "evidence_kind": "LIVE",
++                            "recorded_ns": time.time_ns(),
++                            "reason": "explicit --allow-network required",
++                            "limits": limits.model_dump(),
++                            "continuous_collection_enabled": False,
++                        },
++                        indent=2,
++                    )
++                    + "\n"
++                )
++                (args.output / "endpoint_budget.json").write_text(
++                    json.dumps(
++                        {
++                            "status": "NOT_RUN",
++                            "evidence_kind": "LIVE",
++                            "scope": "BTCUSDT um_perpetual metadata + aggTrade",
++                            "observed_rate_limits": None,
++                            "probe_limits": limits.model_dump(),
++                            "continuous_collection_enabled": False,
++                        },
++                        indent=2,
++                    )
++                    + "\n"
++                )
++                print("NOT_RUN: explicit --allow-network required")
++                return 2
++            from .probe_transport import AioTransport
++
++            result = asyncio.run(run_probe(AioTransport(), limits, evidence_kind="LIVE"))
++            result["config_sha256"] = config_digest(config)
++            save_probe(result, args.output)
++            print(
++                json.dumps(
++                    {
++                        "status": result["status"],
++                        "reason": result["reason"],
++                        "output": str(args.output),
++                    }
++                )
++            )
++            return 0 if result["status"] == "PASS" else 1
+     except ValidationError as exc:
+         for error in exc.errors(include_input=False, include_url=False, include_context=False):
+             field = ".".join(str(part) for part in error["loc"]) or "config"
+             print(f"{field}: {error['msg']}", file=sys.stderr)
+         return 1
+-    except ConfigError as exc:
++    except (ConfigError, OSError) as exc:
+         print(str(exc), file=sys.stderr)
+         return 1
+     print(
+--- R1-01-fixed/pyproject.toml
++++ R1-02/pyproject.toml
+@@ -7,7 +7,7 @@
+ version = "0.1.0"
+ description = "Offline configuration foundation for BTC microstructure research"
+ requires-python = ">=3.12"
+-dependencies = ["pydantic==2.12.3", "PyYAML==6.0.3"]
++dependencies = ["pydantic==2.12.3", "PyYAML==6.0.3", "aiohttp==3.12.15"]
+ 
+ [project.scripts]
+ btc-microstructure = "btc_microstructure.cli:main"
+--- R1-01-fixed/requirements-dev.lock
++++ R1-02/requirements-dev.lock
+@@ -1,10 +1,18 @@
++aiohappyeyeballs==2.7.1
++aiohttp==3.12.15
++aiosignal==1.4.0
+ annotated-types==0.8.0
++attrs==26.1.0
++frozenlist==1.8.0
++idna==3.20
+ iniconfig==2.3.1
++multidict==6.9.1
+ mypy==1.18.2
+ mypy_extensions==1.1.0
+ packaging==26.3
+ pathspec==1.1.1
+ pluggy==1.6.0
++propcache==0.5.4
+ pydantic==2.12.3
+ pydantic_core==2.41.4
+ Pygments==2.21.0
+@@ -15,3 +23,4 @@
+ types-PyYAML==6.0.12.20250915
+ typing-inspection==0.4.4
+ typing_extensions==4.16.0
++yarl==1.25.1
+--- R1-01-fixed/README.md
++++ R1-02/README.md
+@@ -81,3 +81,52 @@
+ 本任务没有检验快照档位能否覆盖实际价格带，也不把
+ `protocol_probe_completed: true` 当成核验凭据；`oi_unit: UNKNOWN` 保持未知。
+ 本次结果不等于完整 M0 或任何现场接口验收。
++
++### 软件开发进度：R1-02 / DEV-002 首轮子集
++
++新增可注入传输层的有界只读 `probe`，仅检查 BTCUSDT USDⓈ-M 永续元数据和
++聚合成交流，不启用原全量配置中的其他来源。资料核验、人工模拟和真实响应分别记录，
++现场状态以 [R1-02 报告](reports/round1/02_protocol_probe.md) 为准。
++本模块不会采集长期行情、计算特征或更改 `protocol_probe_completed`。
++
++安装新增的精确依赖版本后，以下命令默认不访问网络，输出 NOT_RUN 并退出 2：
++
++```sh
++.venv/bin/python -m pip install -r requirements-dev.lock
++.venv/bin/python -m pip install --no-build-isolation --no-deps -e .
++.venv/bin/python -m btc_microstructure probe config/research.example.yaml --output reports/round1/probe/manual-disabled
++```
++
++仅在明确获准真实访问且平台允许时加 `--allow-network`；输出目录必须不存在，避免覆盖证据：
++
++```sh
++.venv/bin/python -m btc_microstructure probe config/research.example.yaml --allow-network --seconds 20 --messages 20 --max-bytes 2097152 --output fixtures/protocol/manual-r1-02
++```
++
++此命令最多一次 REST GET、一次 WS 连接，不重试、不跟随重定向、不切换备用入口。
++REST 被拒绝或限流后停止，不尝试 WS。只用固定官方 URL，拒绝配置中的自定义 probe 入口。
++默认总时限 30 秒，硬上限 60 秒（含最多 1 秒清理）、连接 5 秒、读空闲 5 秒；
++有效消息上限 20、REST 与 WS 应用数据总预算最多 2 MiB、WS 单消息上限 64 KiB。
++REST 最多额外读 1 字节识别超限，保留样本仍截断于预算并标记 truncated。
++为避免超出总预算，剩余空间不足一条最大 WS 消息时提前停止接收。
++这些是本地工程上限，不是交易所额度；响应头/实际 rateLimits 单独保留，连续采集始终未启用。
++退避重试上限为 0：遇 429 保存 Retry-After 后停止，没有自动恢复或重连。
++
++成功的有界协议样本退出 0；拒绝、超时或协议错误退出 1；未显式启用网络退出 2。
++即使有限样本通过，也不能据此声称连续采集预算、所有来源或数量单位已核验。
++聚合数量只保留原生十进制字符串，`quantity_unit=UNKNOWN`；本次不实现成交标准化。
++输出 `protocol_probe_report.json`、`endpoint_budget.json` 及带哈希的有限原始响应文件。
++`.bin` 是原始公开响应字节；元数据可能包含交易所整张符号表，但只校验 BTCUSDT，不订阅其他品种。
++传输层保持 TLS 校验，使用库默认的 `trust_env=False`，不读取 `.netrc` 或环境认证信息，
++不打印完整环境、认证头、代理信息或底层异常中的敏感细节，不修改系统网络/代理设置。
++
++默认 pytest 仍纯离线：
++
++```sh
++.venv/bin/python -m pytest -q
++.venv/bin/python -m pytest -q tests/unit/test_config.py tests/unit/test_foundation_guards.py
++.venv/bin/python -m pytest -q review/R1_01/checks/test_review_regressions.py
++```
++
++人工协议样例在 `fixtures/synthetic/probe/`；真实执行证据在 `fixtures/protocol/`，不得互相冒充。
++只有显式 CLI 会触发真实网络探测；普通导入、配置校验和默认测试不会连接交易所。

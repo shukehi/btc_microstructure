@@ -1,0 +1,96 @@
+[
+  {
+    "field": "storage.source_payload_preserved",
+    "value": false,
+    "outcome": "ACCEPTED"
+  },
+  {
+    "field": "quality.unknown_as_null",
+    "value": false,
+    "outcome": "ACCEPTED"
+  },
+  {
+    "field": "quality.known_gap_invalidates_flow_window",
+    "value": false,
+    "outcome": "ACCEPTED"
+  },
+  {
+    "field": "quality.require_complete_book_price_band",
+    "value": false,
+    "outcome": "ACCEPTED"
+  },
+  {
+    "field": "quality.clock_uncertain_disables_lead_lag",
+    "value": false,
+    "outcome": "ACCEPTED"
+  },
+  {
+    "field": "states.freeze_thresholds_in_validation_and_test",
+    "value": false,
+    "outcome": "ACCEPTED"
+  },
+  {
+    "field": "states.allow_unknown",
+    "value": false,
+    "outcome": "ACCEPTED"
+  },
+  {
+    "field": "research.report_all_horizons",
+    "value": false,
+    "outcome": "ACCEPTED"
+  },
+  {
+    "field": "research.report_common_event_sample",
+    "value": false,
+    "outcome": "ACCEPTED"
+  },
+  {
+    "field": "research.split.purge_by_actual_label_intervals",
+    "value": false,
+    "outcome": "ACCEPTED"
+  },
+  {
+    "field": "research.horizon_seconds",
+    "value": [
+      86400
+    ],
+    "outcome": "ACCEPTED"
+  },
+  {
+    "field": "research.split.minimum_boundary_buffer_seconds",
+    "value": 1,
+    "outcome": "ACCEPTED"
+  },
+  {
+    "field": "research.inference.block_bootstrap_min_block_seconds",
+    "value": 1,
+    "outcome": "ACCEPTED"
+  },
+  {
+    "field": "features.settled_funding_z_same_interval_only",
+    "value": false,
+    "outcome": "ACCEPTED"
+  },
+  {
+    "field": "features.rolling_std_ddof",
+    "value": 30,
+    "outcome": "ACCEPTED"
+  },
+  {
+    "field": "collector.protocol_probe_required",
+    "value": false,
+    "outcome": "ACCEPTED"
+  },
+  {
+    "field": "streams.um_market",
+    "value": [
+      "not-a-stream"
+    ],
+    "outcome": "ACCEPTED"
+  },
+  {
+    "field": "endpoints.um_rest",
+    "value": "https://127.0.0.1",
+    "outcome": "ACCEPTED"
+  }
+]

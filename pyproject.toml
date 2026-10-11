@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools==80.9.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "btc-microstructure"
+version = "0.1.0"
+description = "Offline configuration foundation for BTC microstructure research"
+requires-python = ">=3.12"
+dependencies = ["pydantic==2.12.3", "PyYAML==6.0.3", "aiohttp==3.12.15"]
+
+[project.scripts]
+btc-microstructure = "btc_microstructure.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests/unit"]
+addopts = "-ra"
+
+[tool.ruff]
+line-length = 100
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+files = ["src"]

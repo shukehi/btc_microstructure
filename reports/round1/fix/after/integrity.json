@@ -1,0 +1,77 @@
+{
+  "status": "PASS",
+  "protected_file_count": 47,
+  "protected_hashes_unchanged": true,
+  "exact_locked_dependencies": {
+    "annotated-types": {
+      "expected": "0.8.0",
+      "actual": "0.8.0"
+    },
+    "iniconfig": {
+      "expected": "2.3.1",
+      "actual": "2.3.1"
+    },
+    "mypy": {
+      "expected": "1.18.2",
+      "actual": "1.18.2"
+    },
+    "mypy_extensions": {
+      "expected": "1.1.0",
+      "actual": "1.1.0"
+    },
+    "packaging": {
+      "expected": "26.3",
+      "actual": "26.3"
+    },
+    "pathspec": {
+      "expected": "1.1.1",
+      "actual": "1.1.1"
+    },
+    "pluggy": {
+      "expected": "1.6.0",
+      "actual": "1.6.0"
+    },
+    "pydantic": {
+      "expected": "2.12.3",
+      "actual": "2.12.3"
+    },
+    "pydantic_core": {
+      "expected": "2.41.4",
+      "actual": "2.41.4"
+    },
+    "Pygments": {
+      "expected": "2.21.0",
+      "actual": "2.21.0"
+    },
+    "pytest": {
+      "expected": "8.4.2",
+      "actual": "8.4.2"
+    },
+    "PyYAML": {
+      "expected": "6.0.3",
+      "actual": "6.0.3"
+    },
+    "ruff": {
+      "expected": "0.14.0",
+      "actual": "0.14.0"
+    },
+    "setuptools": {
+      "expected": "80.9.0",
+      "actual": "80.9.0"
+    },
+    "types-PyYAML": {
+      "expected": "6.0.12.20250915",
+      "actual": "6.0.12.20250915"
+    },
+    "typing-inspection": {
+      "expected": "0.4.4",
+      "actual": "0.4.4"
+    },
+    "typing_extensions": {
+      "expected": "4.16.0",
+      "actual": "4.16.0"
+    }
+  },
+  "guard_cli_passed": 7,
+  "redactions": []
+}

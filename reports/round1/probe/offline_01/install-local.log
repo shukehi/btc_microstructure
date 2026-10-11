@@ -1,0 +1,24 @@
+{"name": "install-local", "command": [".venv/bin/python", "-m", "pip", "install", "--no-build-isolation", "--no-deps", "-e", "."], "cwd": "/Users/aries/Dve/btc_microstructure", "started_utc": "2026-10-11T05:03:43.620350+00:00", "exit_code": 0, "expected_exit_code": 0, "status": "PASS", "log": "reports/round1/probe/offline_01/install-local.log"}
+--- stdout ---
+Obtaining file:///Users/aries/Dve/btc_microstructure
+  Checking if build backend supports build_editable: started
+  Checking if build backend supports build_editable: finished with status 'done'
+  Preparing editable metadata (pyproject.toml): started
+  Preparing editable metadata (pyproject.toml): finished with status 'done'
+Building wheels for collected packages: btc-microstructure
+  Building editable for btc-microstructure (pyproject.toml): started
+  Building editable for btc-microstructure (pyproject.toml): finished with status 'done'
+  Created wheel for btc-microstructure: filename=btc_microstructure-0.1.0-0.editable-py3-none-any.whl size=1699 sha256=4be0eee6a2b7f1ebc990a0856df928d82dc71315c349726226202b6efd9097a8
+  Stored in directory: /private/var/folders/s9/rbq781b922s1xp3jhmtct8yc0000gn/T/pip-ephem-wheel-cache-4tok7pbq/wheels/27/5a/b7/a44e266625b430935fa59ee1cb34e50bebb7ac794bb28215c2
+Successfully built btc-microstructure
+Installing collected packages: btc-microstructure
+  Attempting uninstall: btc-microstructure
+    Found existing installation: btc-microstructure 0.1.0
+    Uninstalling btc-microstructure-0.1.0:
+      Successfully uninstalled btc-microstructure-0.1.0
+Successfully installed btc-microstructure-0.1.0
+
+--- stderr ---
+
+[notice] A new release of pip is available: 25.0.1 -> 26.2.1
+[notice] To update, run: /Users/aries/Dve/btc_microstructure/.venv/bin/python -m pip install --upgrade pip

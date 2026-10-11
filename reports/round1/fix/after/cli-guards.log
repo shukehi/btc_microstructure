@@ -1,0 +1,41 @@
+{"field": "storage.source_payload_preserved", "command": [".venv/bin/python", "-m", "btc_microstructure", "validate-config", "reports/round1/fix/fixtures/storage.source_payload_preserved.yaml"], "cwd": "/Users/aries/Dve/btc_microstructure", "exit_code": 1, "expected_exit_code": 1, "status": "PASS"}
+--- stdout ---
+
+--- stderr ---
+storage.source_payload_preserved: Value error, must be true: required by the v0.1 integrity/research contract
+
+{"field": "quality.unknown_as_null", "command": [".venv/bin/python", "-m", "btc_microstructure", "validate-config", "reports/round1/fix/fixtures/quality.unknown_as_null.yaml"], "cwd": "/Users/aries/Dve/btc_microstructure", "exit_code": 1, "expected_exit_code": 1, "status": "PASS"}
+--- stdout ---
+
+--- stderr ---
+quality.unknown_as_null: Value error, must be true: required by the v0.1 integrity/research contract
+
+{"field": "quality.known_gap_invalidates_flow_window", "command": [".venv/bin/python", "-m", "btc_microstructure", "validate-config", "reports/round1/fix/fixtures/quality.known_gap_invalidates_flow_window.yaml"], "cwd": "/Users/aries/Dve/btc_microstructure", "exit_code": 1, "expected_exit_code": 1, "status": "PASS"}
+--- stdout ---
+
+--- stderr ---
+quality.known_gap_invalidates_flow_window: Value error, must be true: required by the v0.1 integrity/research contract
+
+{"field": "research.report_all_horizons", "command": [".venv/bin/python", "-m", "btc_microstructure", "validate-config", "reports/round1/fix/fixtures/research.report_all_horizons.yaml"], "cwd": "/Users/aries/Dve/btc_microstructure", "exit_code": 1, "expected_exit_code": 1, "status": "PASS"}
+--- stdout ---
+
+--- stderr ---
+research.report_all_horizons: Value error, must be true: required by the v0.1 integrity/research contract
+
+{"field": "research.report_common_event_sample", "command": [".venv/bin/python", "-m", "btc_microstructure", "validate-config", "reports/round1/fix/fixtures/research.report_common_event_sample.yaml"], "cwd": "/Users/aries/Dve/btc_microstructure", "exit_code": 1, "expected_exit_code": 1, "status": "PASS"}
+--- stdout ---
+
+--- stderr ---
+research.report_common_event_sample: Value error, must be true: required by the v0.1 integrity/research contract
+
+{"field": "states.freeze_thresholds_in_validation_and_test", "command": [".venv/bin/python", "-m", "btc_microstructure", "validate-config", "reports/round1/fix/fixtures/states.freeze_thresholds_in_validation_and_test.yaml"], "cwd": "/Users/aries/Dve/btc_microstructure", "exit_code": 1, "expected_exit_code": 1, "status": "PASS"}
+--- stdout ---
+
+--- stderr ---
+states.freeze_thresholds_in_validation_and_test: Value error, must be true: required by the v0.1 integrity/research contract
+
+{"field": "research.split.purge_by_actual_label_intervals", "command": [".venv/bin/python", "-m", "btc_microstructure", "validate-config", "reports/round1/fix/fixtures/research.split.purge_by_actual_label_intervals.yaml"], "cwd": "/Users/aries/Dve/btc_microstructure", "exit_code": 1, "expected_exit_code": 1, "status": "PASS"}
+--- stdout ---
+
+--- stderr ---
+research.split.purge_by_actual_label_intervals: Value error, must be true: required by the v0.1 integrity/research contract

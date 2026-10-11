@@ -1,0 +1,78 @@
+[
+  {
+    "command": [
+      ".venv/bin/python",
+      "-c",
+      "import sys,platform; print(sys.version); print(platform.platform()); print(platform.machine())"
+    ],
+    "cwd": "/Users/aries/Dve/btc_microstructure",
+    "exit_code": 0,
+    "status": "PASS",
+    "started_utc": "2026-10-11T04:30:43.409266+00:00",
+    "log": "reports/round1/fix/before/environment.log"
+  },
+  {
+    "command": [
+      "sw_vers"
+    ],
+    "cwd": "/Users/aries/Dve/btc_microstructure",
+    "exit_code": 0,
+    "status": "PASS",
+    "started_utc": "2026-10-11T04:30:43.558784+00:00",
+    "log": "reports/round1/fix/before/os.log"
+  },
+  {
+    "command": [
+      ".venv/bin/python",
+      "-m",
+      "pip",
+      "list",
+      "--format=json"
+    ],
+    "cwd": "/Users/aries/Dve/btc_microstructure",
+    "exit_code": 0,
+    "status": "PASS",
+    "started_utc": "2026-10-11T04:30:43.572876+00:00",
+    "log": "reports/round1/fix/before/dependencies.log"
+  },
+  {
+    "command": [
+      ".venv/bin/python",
+      "-m",
+      "pytest",
+      "-q",
+      "tests/unit/test_config.py",
+      "--junitxml=reports/round1/fix/before/baseline.xml"
+    ],
+    "cwd": "/Users/aries/Dve/btc_microstructure",
+    "exit_code": 0,
+    "status": "PASS",
+    "started_utc": "2026-10-11T04:30:43.788095+00:00",
+    "log": "reports/round1/fix/before/baseline.log",
+    "tests": {
+      "passed": 48,
+      "failed": 0,
+      "skipped": 0
+    }
+  },
+  {
+    "command": [
+      ".venv/bin/python",
+      "-m",
+      "pytest",
+      "-q",
+      "review/R1_01/checks/test_review_regressions.py",
+      "--junitxml=reports/round1/fix/before/independent.xml"
+    ],
+    "cwd": "/Users/aries/Dve/btc_microstructure",
+    "exit_code": 1,
+    "status": "FAIL",
+    "started_utc": "2026-10-11T04:30:44.865496+00:00",
+    "log": "reports/round1/fix/before/independent.log",
+    "tests": {
+      "passed": 3,
+      "failed": 12,
+      "skipped": 0
+    }
+  }
+]

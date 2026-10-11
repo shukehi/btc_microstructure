@@ -1,0 +1,64 @@
+[
+  {
+    "id": "A01",
+    "command": "SHA-256 archive + receipt; zip CRC; package manifest; protected/source hashes; original handoff byte comparison",
+    "result": "PASS",
+    "evidence": "integrity.json"
+  },
+  {
+    "id": "A02",
+    "command": "PYTHONPATH=src PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python -m pytest -q --junitxml=<audit>/evidence/baseline-py313.xml",
+    "cwd": "<submitted-project>",
+    "exit_code": 0,
+    "tests": {
+      "passed": 48,
+      "failed": 0,
+      "skipped": 0
+    },
+    "evidence": "baseline-py313.log"
+  },
+  {
+    "id": "A03",
+    "command": "uv python install 3.12 --install-dir <audit>/python",
+    "exit_code": 1,
+    "result": "BLOCKED",
+    "evidence": "python312-install.log"
+  },
+  {
+    "id": "A04",
+    "command": "PYTHONPATH=src python <audit>/checks/explore_edges.py",
+    "cwd": "<submitted-project>",
+    "exit_code": 0,
+    "result": "OBSERVATIONS_ONLY",
+    "evidence": "edge-exploration.log"
+  },
+  {
+    "id": "A05",
+    "command": "PYTHONPATH=src PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python -m pytest -q <audit>/checks/test_review_regressions.py --junitxml=<audit>/evidence/review-regressions.xml",
+    "cwd": "<submitted-project>",
+    "exit_code": 1,
+    "tests": {
+      "passed": 3,
+      "failed": 12,
+      "skipped": 0
+    },
+    "result": "FAIL",
+    "evidence": "review-regressions.log"
+  },
+  {
+    "id": "A06",
+    "command": "PYTHONPATH=src python -m btc_microstructure validate-config config/research.example.yaml",
+    "cwd": "<submitted-project>",
+    "exit_code": 0,
+    "result": "PASS",
+    "evidence": "cli-valid.log"
+  },
+  {
+    "id": "A07",
+    "command": "PYTHONPATH=src python -m btc_microstructure validate-config reports/round1/invalid-grid.yaml",
+    "cwd": "<submitted-project>",
+    "exit_code": 1,
+    "result": "PASS: expected rejection",
+    "evidence": "cli-invalid.log"
+  }
+]

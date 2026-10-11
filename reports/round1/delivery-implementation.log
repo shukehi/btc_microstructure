@@ -1,0 +1,14 @@
+{"name": "implementation", "command": ["shasum", "-a", "256", "-c", "reports/round1/implementation.sha256"], "cwd": "/Users/aries/Dve/btc_microstructure", "started_utc": "2026-10-11T04:07:42.279220+00:00", "exit_code": 0, "expected_exit_code": 0, "status": "PASS", "log": "reports/round1/delivery-implementation.log"}
+--- stdout ---
+pyproject.toml: OK
+requirements-dev.lock: OK
+src/btc_microstructure/__init__.py: OK
+src/btc_microstructure/__main__.py: OK
+src/btc_microstructure/capabilities.py: OK
+src/btc_microstructure/cli.py: OK
+src/btc_microstructure/config.py: OK
+src/btc_microstructure/config_models.py: OK
+tests/unit/conftest.py: OK
+tests/unit/test_config.py: OK
+
+--- stderr ---

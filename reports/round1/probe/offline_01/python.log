@@ -1,0 +1,5 @@
+{"name": "python", "command": [".venv/bin/python", "--version"], "cwd": "/Users/aries/Dve/btc_microstructure", "started_utc": "2026-10-11T05:03:43.388714+00:00", "exit_code": 0, "expected_exit_code": 0, "status": "PASS", "log": "reports/round1/probe/offline_01/python.log"}
+--- stdout ---
+Python 3.12.13
+
+--- stderr ---

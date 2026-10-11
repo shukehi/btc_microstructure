@@ -1,0 +1,3 @@
+src/btc_microstructure/config.py:26: error: Call to untyped function "construct_object" in typed context  [no-untyped-call]
+src/btc_microstructure/config.py:30: error: Call to untyped function "construct_object" in typed context  [no-untyped-call]
+Found 2 errors in 1 file (checked 6 source files)

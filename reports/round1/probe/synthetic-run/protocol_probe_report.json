@@ -1,0 +1,120 @@
+{
+  "schema_version": "probe-0.1",
+  "evidence_kind": "SYNTHETIC",
+  "started_ns": 1791695063554249000,
+  "limits": {
+    "total_seconds": 2.0,
+    "connect_seconds": 5.0,
+    "idle_seconds": 5.0,
+    "max_messages": 2,
+    "max_bytes": 4096,
+    "max_frame_bytes": 512
+  },
+  "status": "PASS",
+  "rest": {
+    "status": "PASS",
+    "method": "GET",
+    "url": "https://fapi.binance.com/fapi/v1/exchangeInfo",
+    "params": {},
+    "request_started_ns": 1791695063554431000,
+    "http_status": 200,
+    "rate_headers": {
+      "x-mbx-used-weight-1m": "1"
+    },
+    "response_received_ns": 1791695063554644000,
+    "truncated": false,
+    "sample": "rest-response.bin",
+    "sha256": "b2fc8ed8b9cc066d370b4574b252a67ece1f36c188c3f1c4a9b93a76112ef4f4"
+  },
+  "ws": {
+    "status": "PASS",
+    "url": "wss://fstream.binance.com/market/stream?streams=btcusdt@aggTrade",
+    "subscription": "URL combined stream",
+    "messages": [
+      {
+        "received_ns": 1791695063555089000,
+        "truncated": false,
+        "inspection": {
+          "agg_trade_id": 900000001,
+          "event_time": 1700000000001,
+          "trade_time": 1700000000000,
+          "source_time_unit": "ms",
+          "price_native": "12345.67000000",
+          "quantity_native": "0.12345678",
+          "normal_quantity_native": "0.02345678",
+          "quantity_unit": "UNKNOWN",
+          "buyer_is_maker": true,
+          "symbol_type_raw": 1,
+          "unknown_fields": [],
+          "unknown_wrapper_fields": [
+            "synthetic_note"
+          ]
+        },
+        "sample": "ws-000.bin",
+        "sha256": "ee5723800de33ea72cee75f7c1f655d7ec361c196a3d320023fdfe7478b92820"
+      },
+      {
+        "received_ns": 1791695063555162000,
+        "truncated": false,
+        "inspection": {
+          "agg_trade_id": 900000001,
+          "event_time": 1700000000001,
+          "trade_time": 1700000000000,
+          "source_time_unit": "ms",
+          "price_native": "12345.67000000",
+          "quantity_native": "0.12345678",
+          "normal_quantity_native": "0.02345678",
+          "quantity_unit": "UNKNOWN",
+          "buyer_is_maker": true,
+          "symbol_type_raw": 1,
+          "unknown_fields": [],
+          "unknown_wrapper_fields": [
+            "synthetic_note"
+          ]
+        },
+        "sample": "ws-001.bin",
+        "sha256": "ee5723800de33ea72cee75f7c1f655d7ec361c196a3d320023fdfe7478b92820"
+      }
+    ],
+    "frames_seen": 2,
+    "request_started_ns": 1791695063554869000,
+    "http_status": 101,
+    "rate_headers": {},
+    "response_received_ns": 1791695063554878000
+  },
+  "bytes_received": 1498,
+  "retry_count": 0,
+  "backoff_cap_seconds": 0,
+  "continuous_collection_enabled": false,
+  "metadata": {
+    "symbol": "BTCUSDT",
+    "baseAsset": "BTC",
+    "quoteAsset": "USDT",
+    "marginAsset": "USDT",
+    "contractType": "PERPETUAL",
+    "status": "TRADING",
+    "quantity_unit": "UNKNOWN",
+    "tickSize": "0.10",
+    "stepSize": "0.001",
+    "minQty": "0.001",
+    "rateLimits": [
+      {
+        "rateLimitType": "REQUEST_WEIGHT",
+        "interval": "MINUTE",
+        "intervalNum": 1,
+        "limit": 2400
+      },
+      {
+        "rateLimitType": "ORDERS",
+        "interval": "MINUTE",
+        "intervalNum": 1,
+        "limit": 1200
+      }
+    ]
+  },
+  "reason": "bounded protocol sample only; quantity unit and continuous budget unverified",
+  "cleanup": "PASS",
+  "ended_ns": 1791695063555184000,
+  "elapsed_seconds": 0.0007675420492887497,
+  "source": "Hand-authored fixtures/synthetic/probe; not an exchange response"
+}

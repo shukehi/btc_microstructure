@@ -1,0 +1,99 @@
+[
+  {
+    "name": "pytest",
+    "command": [
+      "/Users/aries/Dve/btc_microstructure/.venv/bin/python",
+      "-m",
+      "pytest",
+      "-q",
+      "--junitxml=reports/round1/pytest.xml"
+    ],
+    "cwd": "/Users/aries/Dve/btc_microstructure",
+    "exit_code": 0,
+    "log": "reports/round1/pytest.log"
+  },
+  {
+    "name": "ruff",
+    "command": [
+      ".venv/bin/ruff",
+      "check",
+      "src",
+      "tests"
+    ],
+    "cwd": "/Users/aries/Dve/btc_microstructure",
+    "exit_code": 0,
+    "log": "reports/round1/ruff.log"
+  },
+  {
+    "name": "format",
+    "command": [
+      ".venv/bin/ruff",
+      "format",
+      "--check",
+      "src",
+      "tests"
+    ],
+    "cwd": "/Users/aries/Dve/btc_microstructure",
+    "exit_code": 0,
+    "log": "reports/round1/format.log"
+  },
+  {
+    "name": "mypy",
+    "command": [
+      ".venv/bin/mypy",
+      "src"
+    ],
+    "cwd": "/Users/aries/Dve/btc_microstructure",
+    "exit_code": 0,
+    "log": "reports/round1/mypy.log"
+  },
+  {
+    "name": "pip-check",
+    "command": [
+      "/Users/aries/Dve/btc_microstructure/.venv/bin/python",
+      "-m",
+      "pip",
+      "check"
+    ],
+    "cwd": "/Users/aries/Dve/btc_microstructure",
+    "exit_code": 0,
+    "log": "reports/round1/pip-check.log"
+  },
+  {
+    "name": "cli-module",
+    "command": [
+      "/Users/aries/Dve/btc_microstructure/.venv/bin/python",
+      "-m",
+      "btc_microstructure",
+      "validate-config",
+      "config/research.example.yaml"
+    ],
+    "cwd": "/Users/aries/Dve/btc_microstructure",
+    "exit_code": 0,
+    "log": "reports/round1/cli-module.log"
+  },
+  {
+    "name": "cli-script",
+    "command": [
+      ".venv/bin/btc-microstructure",
+      "validate-config",
+      "config/research.example.yaml"
+    ],
+    "cwd": "/Users/aries/Dve/btc_microstructure",
+    "exit_code": 0,
+    "log": "reports/round1/cli-script.log"
+  },
+  {
+    "name": "preservation",
+    "command": [
+      "shasum",
+      "-a",
+      "256",
+      "-c",
+      "reports/round1/preserved.sha256"
+    ],
+    "cwd": "/Users/aries/Dve/btc_microstructure",
+    "exit_code": 0,
+    "log": "reports/round1/preservation.log"
+  }
+]

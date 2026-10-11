@@ -1,0 +1,118 @@
+--- reports/round1/fix/before/.gitignore.txt
++++ .gitignore
+@@ -1,10 +1,33 @@
+-.venv/
++# Python and local environments
+ __pycache__/
+ *.py[cod]
+-*.egg-info/
++.venv/
++venv/
+ .pytest_cache/
+ .mypy_cache/
+ .ruff_cache/
++.coverage
++htmlcov/
++*.egg-info/
++build/
++dist/
++
++# Runtime data, logs and local secrets
++/data/
++/logs/
++.env
++.env.*
++!.env.example
++*.pem
++*.key
++/codex-local-logs/
++
++# OS/editor local artifacts
+ .DS_Store
++Thumbs.db
++.idea/
++.vscode/
++
++# Retain nested runtime-directory exclusions from the foundation implementation
+ data/
+ logs/
+--- reports/round1/fix/before/config_models.py.txt
++++ src/btc_microstructure/config_models.py
+@@ -7,6 +7,7 @@
+ 
+ from pydantic import (
+     BaseModel,
++    AfterValidator,
+     BeforeValidator,
+     ConfigDict,
+     Field,
+@@ -47,6 +48,16 @@
+ 
+ ExactNonNegative = Annotated[Decimal, BeforeValidator(exact_decimal), Field(ge=0)]
+ ExactPositive = Annotated[Decimal, BeforeValidator(exact_decimal), Field(gt=0)]
++
++
++def require_true(value: bool) -> bool:
++    if not value:
++        raise ValueError("must be true: required by the v0.1 integrity/research contract")
++    return value
++
++
++# Use strict bool first: Literal[True] alone would also accept integer 1.
++RequiredTrue = Annotated[bool, AfterValidator(require_true)]
+ 
+ 
+ class Model(BaseModel):
+@@ -188,7 +199,7 @@
+     disk_warning_gib: Positive
+     disk_stop_gib: Positive
+     delete_raw_automatically: bool
+-    source_payload_preserved: bool
++    source_payload_preserved: RequiredTrue
+ 
+     @model_validator(mode="after")
+     def disk_order(self) -> Self:
+@@ -236,8 +247,8 @@
+     max_oi_poll_age_ms: PositiveInt
+     max_oi_source_observation_age_ms: PositiveInt
+     max_cross_market_quote_skew_ms: PositiveInt
+-    unknown_as_null: bool
+-    known_gap_invalidates_flow_window: bool
++    unknown_as_null: RequiredTrue
++    known_gap_invalidates_flow_window: RequiredTrue
+     require_complete_book_price_band: bool
+     require_complete_path_for_mfe_mae: bool
+     clock_uncertain_disables_lead_lag: bool
+@@ -262,6 +273,12 @@
+     event_cooldown_seconds: PositiveInt
+     allow_unknown: bool
+ 
++    @field_validator("freeze_thresholds_in_validation_and_test")
++    @classmethod
++    def freeze_enabled_state_thresholds(cls, value: bool, info: ValidationInfo) -> bool:
++        # A disabled optional state module has no fitted thresholds to freeze.
++        return require_true(value) if info.data.get("enabled") is True else value
++
+ 
+ class Split(Model):
+     method: Literal["walk_forward"]
+@@ -269,7 +286,7 @@
+     validation_days: PositiveInt
+     test_days: PositiveInt
+     step_days: PositiveInt
+-    purge_by_actual_label_intervals: bool
++    purge_by_actual_label_intervals: RequiredTrue
+     minimum_boundary_buffer_seconds: PositiveInt
+     shuffle: bool
+ 
+@@ -296,8 +313,8 @@
+     return_definition: Literal["log_return_bps"]
+     quote_alignment: Literal["backward_asof_with_max_age"]
+     mfe_mae_grid_seconds: PositiveInt
+-    report_all_horizons: bool
+-    report_common_event_sample: bool
++    report_all_horizons: RequiredTrue
++    report_common_event_sample: RequiredTrue
+     split: Split
+     inference: Inference
+ 

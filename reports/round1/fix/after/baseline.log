@@ -1,0 +1,7 @@
+{"command": [".venv/bin/python", "-m", "pytest", "-q", "tests/unit/test_config.py", "--junitxml=reports/round1/fix/after/baseline.xml"], "cwd": "/Users/aries/Dve/btc_microstructure", "exit_code": 0, "status": "PASS", "started_utc": "2026-10-11T04:31:41.965730+00:00", "log": "reports/round1/fix/after/baseline.log", "tests": {"passed": 48, "failed": 0, "skipped": 0}}
+--- stdout ---
+................................................                         [100%]
+- generated xml file: /Users/aries/Dve/btc_microstructure/reports/round1/fix/after/baseline.xml -
+48 passed in 0.70s
+
+--- stderr ---
