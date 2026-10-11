@@ -1,0 +1,407 @@
+Python 3.12 offline checks	Set up job	﻿2026-10-11T06:26:42.9976637Z Current runner version: '2.337.0'
+Python 3.12 offline checks	Set up job	2026-10-11T06:26:42.9995288Z ##[group]Runner Image Provisioner
+Python 3.12 offline checks	Set up job	2026-10-11T06:26:42.9996003Z Hosted Compute Agent
+Python 3.12 offline checks	Set up job	2026-10-11T06:26:42.9996373Z Version: 20261002.596
+Python 3.12 offline checks	Set up job	2026-10-11T06:26:42.9996751Z Commit: c3d12f3313a95f25162a1503be624f3b0617f8c0
+Python 3.12 offline checks	Set up job	2026-10-11T06:26:42.9997246Z Build Date: 2026-10-02T22:28:27Z
+Python 3.12 offline checks	Set up job	2026-10-11T06:26:42.9997654Z Worker ID: {e79b95b2-0ec8-474e-a0d1-ae9dc99f8105}
+Python 3.12 offline checks	Set up job	2026-10-11T06:26:42.9998058Z Region: centralus
+Python 3.12 offline checks	Set up job	2026-10-11T06:26:42.9998492Z Cloud: Azure
+Python 3.12 offline checks	Set up job	2026-10-11T06:26:42.9998817Z ##[endgroup]
+Python 3.12 offline checks	Set up job	2026-10-11T06:26:42.9999634Z ##[group]Operating System
+Python 3.12 offline checks	Set up job	2026-10-11T06:26:43.0000013Z Ubuntu
+Python 3.12 offline checks	Set up job	2026-10-11T06:26:43.0000377Z 24.04.5
+Python 3.12 offline checks	Set up job	2026-10-11T06:26:43.0000752Z LTS
+Python 3.12 offline checks	Set up job	2026-10-11T06:26:43.0001068Z ##[endgroup]
+Python 3.12 offline checks	Set up job	2026-10-11T06:26:43.0001592Z ##[group]Runner Image
+Python 3.12 offline checks	Set up job	2026-10-11T06:26:43.0002044Z Image: ubuntu-24.04
+Python 3.12 offline checks	Set up job	2026-10-11T06:26:43.0002422Z Version: 20261004.327.1
+Python 3.12 offline checks	Set up job	2026-10-11T06:26:43.0003169Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20261004.327/images/ubuntu/Ubuntu2404-Readme.md
+Python 3.12 offline checks	Set up job	2026-10-11T06:26:43.0004236Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20261004.327
+Python 3.12 offline checks	Set up job	2026-10-11T06:26:43.0004806Z ##[endgroup]
+Python 3.12 offline checks	Set up job	2026-10-11T06:26:43.0005536Z ##[group]GITHUB_TOKEN Permissions
+Python 3.12 offline checks	Set up job	2026-10-11T06:26:43.0006715Z Contents: read
+Python 3.12 offline checks	Set up job	2026-10-11T06:26:43.0007061Z Metadata: read
+Python 3.12 offline checks	Set up job	2026-10-11T06:26:43.0007490Z ##[endgroup]
+Python 3.12 offline checks	Set up job	2026-10-11T06:26:43.0008793Z Secret source: Actions
+Python 3.12 offline checks	Set up job	2026-10-11T06:26:43.0009491Z Cache mode: write
+Python 3.12 offline checks	Set up job	2026-10-11T06:26:43.0009925Z Prepare workflow directory
+Python 3.12 offline checks	Set up job	2026-10-11T06:26:43.0274887Z Prepare all required actions
+Python 3.12 offline checks	Set up job	2026-10-11T06:26:43.0306050Z Getting action download info
+Python 3.12 offline checks	Set up job	2026-10-11T06:26:43.2450417Z Download action repository 'actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1' (SHA:3d3c42e5aac5ba805825da76410c181273ba90b1)
+Python 3.12 offline checks	Set up job	2026-10-11T06:26:43.3253528Z Download action repository 'actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97' (SHA:5fda3b95a4ea91299a34e894583c3862153e4b97)
+Python 3.12 offline checks	Set up job	2026-10-11T06:26:43.4349407Z Download action repository 'actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9' (SHA:cf430e030ddbb5b0abf93d22962f4752f3646cd9)
+Python 3.12 offline checks	Set up job	2026-10-11T06:26:43.8923193Z Complete job name: Python 3.12 offline checks
+Python 3.12 offline checks	Check out repository	﻿2026-10-11T06:26:43.9388335Z ##[group]Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:43.9388911Z with:
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:43.9389178Z   persist-credentials: false
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:43.9389500Z   repository: shukehi/btc_microstructure
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:43.9391841Z   token: ***
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:43.9392097Z   ssh-strict: true
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:43.9392357Z   ssh-user: git
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:43.9392643Z   clean: true
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:43.9392911Z   sparse-checkout-cone-mode: true
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:43.9393220Z   fetch-depth: 1
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:43.9393479Z   fetch-tags: false
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:43.9393743Z   show-progress: true
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:43.9394011Z   lfs: false
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:43.9394256Z   submodules: false
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:43.9394547Z   set-safe-directory: true
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:43.9394874Z   allow-unsafe-pr-checkout: false
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:43.9395257Z env:
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:43.9395508Z   PIP_DISABLE_PIP_VERSION_CHECK: 1
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:43.9395815Z   PIP_NO_INPUT: 1
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:43.9396101Z   PIP_INDEX_URL: https://pypi.org/simple
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:43.9396456Z   PIP_EXTRA_INDEX_URL: 
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:43.9396726Z ##[endgroup]
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.0055986Z Syncing repository: shukehi/btc_microstructure
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.0057967Z ##[group]Getting Git version info
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.0058620Z Working directory is '/home/runner/work/btc_microstructure/btc_microstructure'
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.0059283Z [command]/usr/bin/git version
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.0127952Z git version 2.55.0
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.0146350Z ##[endgroup]
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.0156194Z Temporarily overriding HOME='/home/runner/work/_temp/09a9317e-00d9-40d4-ae47-3fec44bb0e72' before making global git config changes
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.0157761Z Adding repository directory to the temporary git global config as a safe directory
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.0163572Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/btc_microstructure/btc_microstructure
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.0210279Z Deleting the contents of '/home/runner/work/btc_microstructure/btc_microstructure'
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.0214059Z ##[group]Determining repository object format
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.0215447Z ##[endgroup]
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.0216105Z ##[group]Initializing the repository
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.0227088Z [command]/usr/bin/git init /home/runner/work/btc_microstructure/btc_microstructure
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.0341018Z hint: Using 'master' as the name for the initial branch. This default branch name
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.0342304Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.0347077Z hint: to use in all of your new repositories, which will suppress this warning,
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.0348133Z hint: call:
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.0348637Z hint:
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.0349212Z hint: 	git config --global init.defaultBranch <name>
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.0349917Z hint:
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.0350531Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.0351665Z hint: 'development'. The just-created branch can be renamed via this command:
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.0352507Z hint:
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.0352976Z hint: 	git branch -m <name>
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.0353542Z hint:
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.0354205Z hint: Disable this message with "git config set advice.defaultBranchName false"
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.0355478Z Initialized empty Git repository in /home/runner/work/btc_microstructure/btc_microstructure/.git/
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.0357774Z [command]/usr/bin/git remote add origin https://github.com/shukehi/btc_microstructure
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.0414197Z ##[endgroup]
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.0415024Z ##[group]Disabling automatic garbage collection
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.0415833Z [command]/usr/bin/git config --local gc.auto 0
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.0452424Z ##[endgroup]
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.0453357Z ##[group]Setting up auth
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.0454009Z Removing SSH command configuration
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.0458343Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.0513277Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.0811126Z Removing HTTP extra header
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.0815956Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.0844123Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.1015717Z Removing includeIf entries pointing to credentials config files
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.1020283Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.1048184Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.1221753Z [command]/usr/bin/git config --file /home/runner/work/_temp/git-credentials-63e81f23-fb51-4907-9585-aa0a080aba14.config http.https://github.com/.extraheader AUTHORIZATION: basic ***
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.1252893Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/btc_microstructure/btc_microstructure/.git.path /home/runner/work/_temp/git-credentials-63e81f23-fb51-4907-9585-aa0a080aba14.config
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.1281924Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/btc_microstructure/btc_microstructure/.git/worktrees/*.path /home/runner/work/_temp/git-credentials-63e81f23-fb51-4907-9585-aa0a080aba14.config
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.1313164Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git.path /github/runner_temp/git-credentials-63e81f23-fb51-4907-9585-aa0a080aba14.config
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.1342762Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git/worktrees/*.path /github/runner_temp/git-credentials-63e81f23-fb51-4907-9585-aa0a080aba14.config
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.1368095Z ##[endgroup]
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.1368554Z ##[group]Fetching the repository
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.1372459Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +01b120dda04d18cb8080845995615248f16863d2:refs/remotes/pull/2/merge
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.6223563Z From https://github.com/shukehi/btc_microstructure
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.6224965Z  * [new ref]         01b120dda04d18cb8080845995615248f16863d2 -> pull/2/merge
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.6227409Z ##[endgroup]
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.6228316Z ##[group]Determining the checkout info
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.6229355Z ##[endgroup]
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.6231746Z [command]/usr/bin/git sparse-checkout disable
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.6278900Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.6307103Z ##[group]Checking out the ref
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.6309392Z [command]/usr/bin/git checkout --progress --force refs/remotes/pull/2/merge
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.6456810Z Note: switching to 'refs/remotes/pull/2/merge'.
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.6457673Z 
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.6458265Z You are in 'detached HEAD' state. You can look around, make experimental
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.6459502Z changes and commit them, and you can discard any commits you make in this
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.6460720Z state without impacting any branches by switching back to a branch.
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.6461560Z 
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.6462052Z If you want to create a new branch to retain commits you create, you may
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.6463504Z do so (now or later) by using -c with the switch command. Example:
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.6464355Z 
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.6464745Z   git switch -c <new-branch-name>
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.6465360Z 
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.6465790Z Or undo this operation with:
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.6466525Z 
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.6467007Z   git switch -
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.6467614Z 
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.6468505Z Turn off this advice by setting config variable advice.detachedHead to false
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.6469893Z 
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.6471703Z HEAD is now at 01b120d Merge 1e10b17358614d27ff6db011ba40954453fd743d into 6b73205424d4f49eb41a29c327bc75ce3f55b2b2
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.6475825Z ##[endgroup]
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.6503568Z [command]/usr/bin/git log -1 --format=%H
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.6527240Z 01b120dda04d18cb8080845995615248f16863d2
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.6537473Z ##[group]Removing auth
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.6538371Z Removing SSH command configuration
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.6539650Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.6570150Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.6743794Z Removing HTTP extra header
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.6746132Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.6774808Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.6945874Z Removing includeIf entries pointing to credentials config files
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.6947611Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.6974217Z includeif.gitdir:/home/runner/work/btc_microstructure/btc_microstructure/.git.path
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.6976303Z includeif.gitdir:/home/runner/work/btc_microstructure/btc_microstructure/.git/worktrees/*.path
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.6977816Z includeif.gitdir:/github/workspace/.git.path
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.6978916Z includeif.gitdir:/github/workspace/.git/worktrees/*.path
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.6982163Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/btc_microstructure/btc_microstructure/.git.path
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.7002419Z /home/runner/work/_temp/git-credentials-63e81f23-fb51-4907-9585-aa0a080aba14.config
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.7009723Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/btc_microstructure/btc_microstructure/.git.path \/home\/runner\/work\/_temp\/git\-credentials\-63e81f23\-fb51\-4907\-9585\-aa0a080aba14\.config
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.7038840Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/btc_microstructure/btc_microstructure/.git/worktrees/*.path
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.7065233Z /home/runner/work/_temp/git-credentials-63e81f23-fb51-4907-9585-aa0a080aba14.config
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.7071220Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/btc_microstructure/btc_microstructure/.git/worktrees/*.path \/home\/runner\/work\/_temp\/git\-credentials\-63e81f23\-fb51\-4907\-9585\-aa0a080aba14\.config
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.7099690Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git.path
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.7122719Z /github/runner_temp/git-credentials-63e81f23-fb51-4907-9585-aa0a080aba14.config
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.7129496Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git.path \/github\/runner_temp\/git\-credentials\-63e81f23\-fb51\-4907\-9585\-aa0a080aba14\.config
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.7159229Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git/worktrees/*.path
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.7182570Z /github/runner_temp/git-credentials-63e81f23-fb51-4907-9585-aa0a080aba14.config
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.7216281Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git/worktrees/*.path \/github\/runner_temp\/git\-credentials\-63e81f23\-fb51\-4907\-9585\-aa0a080aba14\.config
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.7251630Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.7425054Z Removing credentials config '/home/runner/work/_temp/git-credentials-63e81f23-fb51-4907-9585-aa0a080aba14.config'
+Python 3.12 offline checks	Check out repository	2026-10-11T06:26:44.7430484Z ##[endgroup]
+Python 3.12 offline checks	Set up Python 3.12	﻿2026-10-11T06:26:44.7675048Z ##[group]Run actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+Python 3.12 offline checks	Set up Python 3.12	2026-10-11T06:26:44.7676048Z with:
+Python 3.12 offline checks	Set up Python 3.12	2026-10-11T06:26:44.7676575Z   python-version: 3.12
+Python 3.12 offline checks	Set up Python 3.12	2026-10-11T06:26:44.7677172Z   check-latest: false
+Python 3.12 offline checks	Set up Python 3.12	2026-10-11T06:26:44.7682406Z   token: ***
+Python 3.12 offline checks	Set up Python 3.12	2026-10-11T06:26:44.7682972Z   update-environment: true
+Python 3.12 offline checks	Set up Python 3.12	2026-10-11T06:26:44.7683630Z   allow-prereleases: false
+Python 3.12 offline checks	Set up Python 3.12	2026-10-11T06:26:44.7684257Z   freethreaded: false
+Python 3.12 offline checks	Set up Python 3.12	2026-10-11T06:26:44.7684828Z env:
+Python 3.12 offline checks	Set up Python 3.12	2026-10-11T06:26:44.7685362Z   PIP_DISABLE_PIP_VERSION_CHECK: 1
+Python 3.12 offline checks	Set up Python 3.12	2026-10-11T06:26:44.7686039Z   PIP_NO_INPUT: 1
+Python 3.12 offline checks	Set up Python 3.12	2026-10-11T06:26:44.7686654Z   PIP_INDEX_URL: https://pypi.org/simple
+Python 3.12 offline checks	Set up Python 3.12	2026-10-11T06:26:44.7687388Z   PIP_EXTRA_INDEX_URL: 
+Python 3.12 offline checks	Set up Python 3.12	2026-10-11T06:26:44.7687976Z ##[endgroup]
+Python 3.12 offline checks	Set up Python 3.12	2026-10-11T06:26:44.8459911Z ##[group]Installed versions
+Python 3.12 offline checks	Set up Python 3.12	2026-10-11T06:26:44.8518690Z Successfully set up CPython (3.12.15)
+Python 3.12 offline checks	Set up Python 3.12	2026-10-11T06:26:44.8519821Z ##[endgroup]
+Python 3.12 offline checks	Install locked dependencies	﻿2026-10-11T06:26:44.8709958Z ##[group]Run mkdir -p ci-results
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:44.8711263Z ^[[36;1mmkdir -p ci-results^[[0m
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:44.8712804Z ^[[36;1mpython --version 2>&1 | tee ci-results/python.log^[[0m
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:44.8714098Z ^[[36;1mpython -m venv .venv^[[0m
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:44.8715644Z ^[[36;1m.venv/bin/python -m pip install -r requirements-dev.lock 2>&1 | tee ci-results/install.log^[[0m
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:44.8717378Z ^[[36;1m.venv/bin/python -m pip install --no-build-isolation --no-deps -e . 2>&1 | tee ci-results/install-project.log^[[0m
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:44.9088402Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:44.9089265Z env:
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:44.9089797Z   PIP_DISABLE_PIP_VERSION_CHECK: 1
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:44.9090458Z   PIP_NO_INPUT: 1
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:44.9091064Z   PIP_INDEX_URL: https://pypi.org/simple
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:44.9092070Z   PIP_EXTRA_INDEX_URL: 
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:44.9092781Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.15/x64
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:44.9093816Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib/pkgconfig
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:44.9094907Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:44.9095863Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:44.9096818Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:44.9097788Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:44.9098605Z ##[endgroup]
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:44.9323318Z Python 3.12.15
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:46.9938256Z Collecting aiohappyeyeballs==2.7.1 (from -r requirements-dev.lock (line 1))
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:47.0680813Z   Downloading aiohappyeyeballs-2.7.1-py3-none-any.whl.metadata (5.9 kB)
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:47.3833217Z Collecting aiohttp==3.12.15 (from -r requirements-dev.lock (line 2))
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:47.3977091Z   Downloading aiohttp-3.12.15-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (7.7 kB)
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:47.4147670Z Collecting aiosignal==1.4.0 (from -r requirements-dev.lock (line 3))
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:47.4276015Z   Downloading aiosignal-1.4.0-py3-none-any.whl.metadata (3.7 kB)
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:47.4425318Z Collecting annotated-types==0.8.0 (from -r requirements-dev.lock (line 4))
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:47.4549545Z   Downloading annotated_types-0.8.0-py3-none-any.whl.metadata (15 kB)
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:47.4742279Z Collecting attrs==26.1.0 (from -r requirements-dev.lock (line 5))
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:47.4867152Z   Downloading attrs-26.1.0-py3-none-any.whl.metadata (8.8 kB)
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:47.5250326Z Collecting frozenlist==1.8.0 (from -r requirements-dev.lock (line 6))
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:47.5376290Z   Downloading frozenlist-1.8.0-cp312-cp312-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl.metadata (20 kB)
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:47.5570954Z Collecting idna==3.20 (from -r requirements-dev.lock (line 7))
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:47.5697051Z   Downloading idna-3.20-py3-none-any.whl.metadata (7.2 kB)
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:47.6037190Z Collecting iniconfig==2.3.1 (from -r requirements-dev.lock (line 8))
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:47.6161164Z   Downloading iniconfig-2.3.1-py3-none-any.whl.metadata (2.8 kB)
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:47.7521426Z Collecting multidict==6.9.1 (from -r requirements-dev.lock (line 9))
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:47.7649831Z   Downloading multidict-6.9.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (5.3 kB)
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:47.8226578Z Collecting mypy==1.18.2 (from -r requirements-dev.lock (line 10))
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:47.8351984Z   Downloading mypy-1.18.2-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (2.2 kB)
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:47.8501250Z Collecting mypy_extensions==1.1.0 (from -r requirements-dev.lock (line 11))
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:47.8625139Z   Downloading mypy_extensions-1.1.0-py3-none-any.whl.metadata (1.1 kB)
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:47.8792628Z Collecting packaging==26.3 (from -r requirements-dev.lock (line 12))
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:47.8916517Z   Downloading packaging-26.3-py3-none-any.whl.metadata (3.5 kB)
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:47.9066740Z Collecting pathspec==1.1.1 (from -r requirements-dev.lock (line 13))
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:47.9190618Z   Downloading pathspec-1.1.1-py3-none-any.whl.metadata (14 kB)
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:47.9483793Z Collecting pluggy==1.6.0 (from -r requirements-dev.lock (line 14))
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:47.9607289Z   Downloading pluggy-1.6.0-py3-none-any.whl.metadata (4.8 kB)
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:48.0021285Z Collecting propcache==0.5.4 (from -r requirements-dev.lock (line 15))
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:48.0148311Z   Downloading propcache-0.5.4-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (25 kB)
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:48.0763228Z Collecting pydantic==2.12.3 (from -r requirements-dev.lock (line 16))
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:48.0889199Z   Downloading pydantic-2.12.3-py3-none-any.whl.metadata (87 kB)
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:48.4501031Z Collecting pydantic_core==2.41.4 (from -r requirements-dev.lock (line 17))
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:48.4630858Z   Downloading pydantic_core-2.41.4-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (7.3 kB)
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:48.4819698Z Collecting Pygments==2.21.0 (from -r requirements-dev.lock (line 18))
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:48.4945123Z   Downloading pygments-2.21.0-py3-none-any.whl.metadata (2.5 kB)
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:48.5222087Z Collecting pytest==8.4.2 (from -r requirements-dev.lock (line 19))
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:48.5346799Z   Downloading pytest-8.4.2-py3-none-any.whl.metadata (7.7 kB)
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:48.5598847Z Collecting PyYAML==6.0.3 (from -r requirements-dev.lock (line 20))
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:48.5723314Z   Downloading pyyaml-6.0.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (2.4 kB)
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:48.7676761Z Collecting ruff==0.14.0 (from -r requirements-dev.lock (line 21))
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:48.7806189Z   Downloading ruff-0.14.0-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (25 kB)
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:48.8451986Z Collecting setuptools==80.9.0 (from -r requirements-dev.lock (line 22))
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:48.8577433Z   Downloading setuptools-80.9.0-py3-none-any.whl.metadata (6.6 kB)
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:48.8796246Z Collecting types-PyYAML==6.0.12.20250915 (from -r requirements-dev.lock (line 23))
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:48.8922294Z   Downloading types_pyyaml-6.0.12.20250915-py3-none-any.whl.metadata (1.7 kB)
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:48.9060759Z Collecting typing-inspection==0.4.4 (from -r requirements-dev.lock (line 24))
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:48.9184561Z   Downloading typing_inspection-0.4.4-py3-none-any.whl.metadata (2.6 kB)
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:48.9354048Z Collecting typing_extensions==4.16.0 (from -r requirements-dev.lock (line 25))
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:48.9478128Z   Downloading typing_extensions-4.16.0-py3-none-any.whl.metadata (3.3 kB)
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:49.0743051Z Collecting yarl==1.25.1 (from -r requirements-dev.lock (line 26))
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:49.0870289Z   Downloading yarl-1.25.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (111 kB)
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:49.1575812Z Downloading aiohappyeyeballs-2.7.1-py3-none-any.whl (15 kB)
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:49.1823310Z Downloading aiohttp-3.12.15-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (1.7 MB)
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:49.2420848Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.7/1.7 MB 32.1 MB/s eta 0:00:00
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:49.2545320Z Downloading aiosignal-1.4.0-py3-none-any.whl (7.5 kB)
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:49.2682940Z Downloading annotated_types-0.8.0-py3-none-any.whl (13 kB)
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:49.2916944Z Downloading attrs-26.1.0-py3-none-any.whl (67 kB)
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:49.3055312Z Downloading frozenlist-1.8.0-cp312-cp312-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl (242 kB)
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:49.3204117Z Downloading idna-3.20-py3-none-any.whl (69 kB)
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:49.3343032Z Downloading iniconfig-2.3.1-py3-none-any.whl (7.6 kB)
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:49.3480158Z Downloading multidict-6.9.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (336 kB)
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:49.3633273Z Downloading mypy-1.18.2-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (13.3 MB)
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:49.5101255Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 13.3/13.3 MB 90.4 MB/s eta 0:00:00
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:49.5225587Z Downloading mypy_extensions-1.1.0-py3-none-any.whl (5.0 kB)
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:49.5365856Z Downloading packaging-26.3-py3-none-any.whl (129 kB)
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:49.5506898Z Downloading pathspec-1.1.1-py3-none-any.whl (57 kB)
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:49.5646884Z Downloading pluggy-1.6.0-py3-none-any.whl (20 kB)
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:49.5786712Z Downloading propcache-0.5.4-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (250 kB)
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:49.5930956Z Downloading pydantic-2.12.3-py3-none-any.whl (462 kB)
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:49.6079522Z Downloading pydantic_core-2.41.4-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (2.1 MB)
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:49.6331884Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.1/2.1 MB 77.0 MB/s eta 0:00:00
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:49.6456550Z Downloading pygments-2.21.0-py3-none-any.whl (1.3 MB)
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:49.6506121Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.3/1.3 MB 274.6 MB/s eta 0:00:00
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:49.6630124Z Downloading pytest-8.4.2-py3-none-any.whl (365 kB)
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:49.6776049Z Downloading pyyaml-6.0.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (807 kB)
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:49.6817773Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 807.9/807.9 kB 222.8 MB/s eta 0:00:00
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:49.6960985Z Downloading ruff-0.14.0-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (13.4 MB)
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:49.8037207Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 13.4/13.4 MB 124.4 MB/s eta 0:00:00
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:49.8162959Z Downloading setuptools-80.9.0-py3-none-any.whl (1.2 MB)
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:49.8211336Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.2/1.2 MB 271.5 MB/s eta 0:00:00
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:49.8339104Z Downloading types_pyyaml-6.0.12.20250915-py3-none-any.whl (20 kB)
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:49.8588092Z Downloading typing_inspection-0.4.4-py3-none-any.whl (14 kB)
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:49.8725988Z Downloading typing_extensions-4.16.0-py3-none-any.whl (45 kB)
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:49.8865282Z Downloading yarl-1.25.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (117 kB)
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:49.9542976Z Installing collected packages: typing_extensions, types-PyYAML, setuptools, ruff, PyYAML, Pygments, propcache, pluggy, pathspec, packaging, mypy_extensions, multidict, iniconfig, idna, frozenlist, attrs, annotated-types, aiohappyeyeballs, yarl, typing-inspection, pytest, pydantic_core, mypy, aiosignal, pydantic, aiohttp
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:52.7092079Z Successfully installed PyYAML-6.0.3 Pygments-2.21.0 aiohappyeyeballs-2.7.1 aiohttp-3.12.15 aiosignal-1.4.0 annotated-types-0.8.0 attrs-26.1.0 frozenlist-1.8.0 idna-3.20 iniconfig-2.3.1 multidict-6.9.1 mypy-1.18.2 mypy_extensions-1.1.0 packaging-26.3 pathspec-1.1.1 pluggy-1.6.0 propcache-0.5.4 pydantic-2.12.3 pydantic_core-2.41.4 pytest-8.4.2 ruff-0.14.0 setuptools-80.9.0 types-PyYAML-6.0.12.20250915 typing-inspection-0.4.4 typing_extensions-4.16.0 yarl-1.25.1
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:53.1254161Z Obtaining file:///home/runner/work/btc_microstructure/btc_microstructure
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:53.1266379Z   Checking if build backend supports build_editable: started
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:53.2336544Z   Checking if build backend supports build_editable: finished with status 'done'
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:53.2343245Z   Preparing editable metadata (pyproject.toml): started
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:53.3643885Z   Preparing editable metadata (pyproject.toml): finished with status 'done'
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:53.3684676Z Building wheels for collected packages: btc-microstructure
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:53.3690031Z   Building editable for btc-microstructure (pyproject.toml): started
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:53.5146559Z   Building editable for btc-microstructure (pyproject.toml): finished with status 'done'
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:53.5150999Z   Created wheel for btc-microstructure: filename=btc_microstructure-0.1.0-0.editable-py3-none-any.whl size=1700 sha256=22cfd68b4ad6deca39287fa19fb54da0b0262facc83dd7467381d4c4461b8217
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:53.5152137Z   Stored in directory: /tmp/pip-ephem-wheel-cache-jbxh5r7m/wheels/dc/ad/d8/068ebe97793a9e053842715f270928f8d290663d8de3d19560
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:53.5166625Z Successfully built btc-microstructure
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:53.5168439Z Installing collected packages: btc-microstructure
+Python 3.12 offline checks	Install locked dependencies	2026-10-11T06:26:53.5385004Z Successfully installed btc-microstructure-0.1.0
+Python 3.12 offline checks	Run all checks without external network	﻿2026-10-11T06:26:53.5743757Z ##[group]Run # A fresh network namespace has no host interfaces/default route.
+Python 3.12 offline checks	Run all checks without external network	2026-10-11T06:26:53.5744097Z ^[[36;1m# A fresh network namespace has no host interfaces/default route.^[[0m
+Python 3.12 offline checks	Run all checks without external network	2026-10-11T06:26:53.5744365Z ^[[36;1m# Drop back to the runner user; do not alter the runner host network.^[[0m
+Python 3.12 offline checks	Run all checks without external network	2026-10-11T06:26:53.5744596Z ^[[36;1mhost_network="$(readlink /proc/self/ns/net)"^[[0m
+Python 3.12 offline checks	Run all checks without external network	2026-10-11T06:26:53.5744920Z ^[[36;1msudo unshare --net --fork --kill-child -- \^[[0m
+Python 3.12 offline checks	Run all checks without external network	2026-10-11T06:26:53.5745104Z ^[[36;1m  runuser -u "$(id -un)" -- \^[[0m
+Python 3.12 offline checks	Run all checks without external network	2026-10-11T06:26:53.5745264Z ^[[36;1m  setpriv --no-new-privs -- \^[[0m
+Python 3.12 offline checks	Run all checks without external network	2026-10-11T06:26:53.5745439Z ^[[36;1m  env CI_HOST_NET_NAMESPACE="$host_network" \^[[0m
+Python 3.12 offline checks	Run all checks without external network	2026-10-11T06:26:53.5745696Z ^[[36;1m  /bin/bash .github/scripts/ci_checks.sh 2>&1 | tee ci-results/offline-checks.log^[[0m
+Python 3.12 offline checks	Run all checks without external network	2026-10-11T06:26:53.5798083Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+Python 3.12 offline checks	Run all checks without external network	2026-10-11T06:26:53.5798269Z env:
+Python 3.12 offline checks	Run all checks without external network	2026-10-11T06:26:53.5798389Z   PIP_DISABLE_PIP_VERSION_CHECK: 1
+Python 3.12 offline checks	Run all checks without external network	2026-10-11T06:26:53.5798558Z   PIP_NO_INPUT: 1
+Python 3.12 offline checks	Run all checks without external network	2026-10-11T06:26:53.5798724Z   PIP_INDEX_URL: https://pypi.org/simple
+Python 3.12 offline checks	Run all checks without external network	2026-10-11T06:26:53.5798880Z   PIP_EXTRA_INDEX_URL: 
+Python 3.12 offline checks	Run all checks without external network	2026-10-11T06:26:53.5799048Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.15/x64
+Python 3.12 offline checks	Run all checks without external network	2026-10-11T06:26:53.5799282Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib/pkgconfig
+Python 3.12 offline checks	Run all checks without external network	2026-10-11T06:26:53.5799519Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+Python 3.12 offline checks	Run all checks without external network	2026-10-11T06:26:53.5799741Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+Python 3.12 offline checks	Run all checks without external network	2026-10-11T06:26:53.5799954Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+Python 3.12 offline checks	Run all checks without external network	2026-10-11T06:26:53.5800170Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib
+Python 3.12 offline checks	Run all checks without external network	2026-10-11T06:26:53.5800349Z ##[endgroup]
+Python 3.12 offline checks	Run all checks without external network	2026-10-11T06:26:53.7516838Z PASS: project checks use a separate network namespace
+Python 3.12 offline checks	Run all checks without external network	2026-10-11T06:26:53.7517681Z ##[group]pytest
+Python 3.12 offline checks	Run all checks without external network	2026-10-11T06:26:55.0867540Z ........................................................................ [ 43%]
+Python 3.12 offline checks	Run all checks without external network	2026-10-11T06:26:56.3815241Z ........................................................................ [ 86%]
+Python 3.12 offline checks	Run all checks without external network	2026-10-11T06:26:57.5147825Z ......................                                                   [100%]
+Python 3.12 offline checks	Run all checks without external network	2026-10-11T06:26:57.5148447Z - generated xml file: /home/runner/work/btc_microstructure/btc_microstructure/ci-results/pytest.xml -
+Python 3.12 offline checks	Run all checks without external network	2026-10-11T06:26:57.5148911Z 166 passed in 3.55s
+Python 3.12 offline checks	Run all checks without external network	2026-10-11T06:26:57.5540034Z Exit code: 0
+Python 3.12 offline checks	Run all checks without external network	2026-10-11T06:26:57.5540948Z ##[endgroup]
+Python 3.12 offline checks	Run all checks without external network	2026-10-11T06:26:57.5541339Z ##[group]ruff-check
+Python 3.12 offline checks	Run all checks without external network	2026-10-11T06:26:57.5609793Z All checks passed!
+Python 3.12 offline checks	Run all checks without external network	2026-10-11T06:26:57.5616529Z Exit code: 0
+Python 3.12 offline checks	Run all checks without external network	2026-10-11T06:26:57.5617080Z ##[endgroup]
+Python 3.12 offline checks	Run all checks without external network	2026-10-11T06:26:57.5617639Z ##[group]ruff-format
+Python 3.12 offline checks	Run all checks without external network	2026-10-11T06:26:57.6122707Z 13 files already formatted
+Python 3.12 offline checks	Run all checks without external network	2026-10-11T06:26:57.6128704Z Exit code: 0
+Python 3.12 offline checks	Run all checks without external network	2026-10-11T06:26:57.6129250Z ##[endgroup]
+Python 3.12 offline checks	Run all checks without external network	2026-10-11T06:26:57.6131959Z ##[group]mypy
+Python 3.12 offline checks	Run all checks without external network	2026-10-11T06:27:00.1355514Z Success: no issues found in 8 source files
+Python 3.12 offline checks	Run all checks without external network	2026-10-11T06:27:00.1458154Z Exit code: 0
+Python 3.12 offline checks	Run all checks without external network	2026-10-11T06:27:00.1458781Z ##[endgroup]
+Python 3.12 offline checks	Run all checks without external network	2026-10-11T06:27:00.1461900Z ##[group]pip-check
+Python 3.12 offline checks	Run all checks without external network	2026-10-11T06:27:00.3065217Z No broken requirements found.
+Python 3.12 offline checks	Run all checks without external network	2026-10-11T06:27:00.3279926Z Exit code: 0
+Python 3.12 offline checks	Run all checks without external network	2026-10-11T06:27:00.3280606Z ##[endgroup]
+Python 3.12 offline checks	Run all checks without external network	2026-10-11T06:27:00.3284053Z ##[group]validate-config
+Python 3.12 offline checks	Run all checks without external network	2026-10-11T06:27:00.4490573Z {"runtime_capabilities": {"book_band_coverage": "UNVERIFIED", "event_time_per_source_support": "UNVERIFIED", "instrument_metadata": "UNVERIFIED", "oi_absolute_unit_evidence": "UNVERIFIED", "protocol_routes_and_budget": "UNVERIFIED"}, "sha256": "b037004b544ca834855821374bd65520a535b509c0b952d9c3f37a97a30d3b43", "status": "CONFIG_VALID"}
+Python 3.12 offline checks	Run all checks without external network	2026-10-11T06:27:00.4671827Z Exit code: 0
+Python 3.12 offline checks	Run all checks without external network	2026-10-11T06:27:00.4672413Z ##[endgroup]
+Python 3.12 offline checks	Retain actual check logs	﻿2026-10-11T06:27:00.5731228Z ##[group]Run actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+Python 3.12 offline checks	Retain actual check logs	2026-10-11T06:27:00.5731683Z with:
+Python 3.12 offline checks	Retain actual check logs	2026-10-11T06:27:00.5731807Z   name: ci-logs-38118075146-1
+Python 3.12 offline checks	Retain actual check logs	2026-10-11T06:27:00.5731983Z   path: ci-results/*.log
+Python 3.12 offline checks	Retain actual check logs	ci-results/*.xml
+Python 3.12 offline checks	Retain actual check logs	ci-results/*.tsv
+Python 3.12 offline checks	Retain actual check logs	
+Python 3.12 offline checks	Retain actual check logs	2026-10-11T06:27:00.5732178Z   if-no-files-found: warn
+Python 3.12 offline checks	Retain actual check logs	2026-10-11T06:27:00.5732310Z   retention-days: 14
+Python 3.12 offline checks	Retain actual check logs	2026-10-11T06:27:00.5732433Z   compression-level: 6
+Python 3.12 offline checks	Retain actual check logs	2026-10-11T06:27:00.5732557Z   overwrite: false
+Python 3.12 offline checks	Retain actual check logs	2026-10-11T06:27:00.5732683Z   include-hidden-files: false
+Python 3.12 offline checks	Retain actual check logs	2026-10-11T06:27:00.5732815Z   archive: true
+Python 3.12 offline checks	Retain actual check logs	2026-10-11T06:27:00.5732924Z env:
+Python 3.12 offline checks	Retain actual check logs	2026-10-11T06:27:00.5733042Z   PIP_DISABLE_PIP_VERSION_CHECK: 1
+Python 3.12 offline checks	Retain actual check logs	2026-10-11T06:27:00.5733304Z   PIP_NO_INPUT: 1
+Python 3.12 offline checks	Retain actual check logs	2026-10-11T06:27:00.5733452Z   PIP_INDEX_URL: https://pypi.org/simple
+Python 3.12 offline checks	Retain actual check logs	2026-10-11T06:27:00.5733610Z   PIP_EXTRA_INDEX_URL: 
+Python 3.12 offline checks	Retain actual check logs	2026-10-11T06:27:00.5733774Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.15/x64
+Python 3.12 offline checks	Retain actual check logs	2026-10-11T06:27:00.5734004Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib/pkgconfig
+Python 3.12 offline checks	Retain actual check logs	2026-10-11T06:27:00.5734255Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+Python 3.12 offline checks	Retain actual check logs	2026-10-11T06:27:00.5734466Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+Python 3.12 offline checks	Retain actual check logs	2026-10-11T06:27:00.5734676Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.15/x64
+Python 3.12 offline checks	Retain actual check logs	2026-10-11T06:27:00.5734886Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.15/x64/lib
+Python 3.12 offline checks	Retain actual check logs	2026-10-11T06:27:00.5735064Z ##[endgroup]
+Python 3.12 offline checks	Retain actual check logs	2026-10-11T06:27:00.6682765Z With the provided path, there will be 12 files uploaded
+Python 3.12 offline checks	Retain actual check logs	2026-10-11T06:27:00.6683263Z Artifact name is valid!
+Python 3.12 offline checks	Retain actual check logs	2026-10-11T06:27:00.6683484Z Root directory input is valid!
+Python 3.12 offline checks	Retain actual check logs	2026-10-11T06:27:00.9339807Z Uploading artifact: ci-logs-38118075146-1.zip
+Python 3.12 offline checks	Retain actual check logs	2026-10-11T06:27:00.9392457Z Beginning upload of artifact content to blob storage
+Python 3.12 offline checks	Retain actual check logs	2026-10-11T06:27:01.1267991Z Uploaded bytes 7186
+Python 3.12 offline checks	Retain actual check logs	2026-10-11T06:27:01.1654653Z Finished uploading artifact content to blob storage!
+Python 3.12 offline checks	Retain actual check logs	2026-10-11T06:27:01.1655285Z SHA256 digest of uploaded artifact is 53d34cb80ea23c670455817b20240408f32f6453ffb31fdaa1f2037855ce1b2e
+Python 3.12 offline checks	Retain actual check logs	2026-10-11T06:27:01.1655620Z Finalizing artifact upload
+Python 3.12 offline checks	Retain actual check logs	2026-10-11T06:27:01.4322485Z Artifact ci-logs-38118075146-1 successfully finalized. Artifact ID 11694377326
+Python 3.12 offline checks	Retain actual check logs	2026-10-11T06:27:01.4323133Z Artifact ci-logs-38118075146-1 has been successfully uploaded! Final size is 7186 bytes. Artifact ID is 11694377326
+Python 3.12 offline checks	Retain actual check logs	2026-10-11T06:27:01.4324672Z Artifact download URL: https://github.com/shukehi/btc_microstructure/actions/runs/38118075146/artifacts/11694377326
+Python 3.12 offline checks	Post Set up Python 3.12	﻿2026-10-11T06:27:01.4919664Z Post job cleanup.
+Python 3.12 offline checks	Post Check out repository	﻿2026-10-11T06:27:01.5754867Z Post job cleanup.
+Python 3.12 offline checks	Post Check out repository	2026-10-11T06:27:01.6303325Z [command]/usr/bin/git version
+Python 3.12 offline checks	Post Check out repository	2026-10-11T06:27:01.6337021Z git version 2.55.0
+Python 3.12 offline checks	Post Check out repository	2026-10-11T06:27:01.6360179Z Temporarily overriding HOME='/home/runner/work/_temp/9f0f4472-a5d0-481d-9d04-95c2100e6614' before making global git config changes
+Python 3.12 offline checks	Post Check out repository	2026-10-11T06:27:01.6360922Z Adding repository directory to the temporary git global config as a safe directory
+Python 3.12 offline checks	Post Check out repository	2026-10-11T06:27:01.6363553Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/btc_microstructure/btc_microstructure
+Python 3.12 offline checks	Post Check out repository	2026-10-11T06:27:01.6389607Z Removing SSH command configuration
+Python 3.12 offline checks	Post Check out repository	2026-10-11T06:27:01.6394189Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+Python 3.12 offline checks	Post Check out repository	2026-10-11T06:27:01.6440051Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+Python 3.12 offline checks	Post Check out repository	2026-10-11T06:27:01.6648732Z Removing HTTP extra header
+Python 3.12 offline checks	Post Check out repository	2026-10-11T06:27:01.6654076Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+Python 3.12 offline checks	Post Check out repository	2026-10-11T06:27:01.6700200Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+Python 3.12 offline checks	Post Check out repository	2026-10-11T06:27:01.6931319Z Removing includeIf entries pointing to credentials config files
+Python 3.12 offline checks	Post Check out repository	2026-10-11T06:27:01.6942852Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+Python 3.12 offline checks	Post Check out repository	2026-10-11T06:27:01.6969926Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+Python 3.12 offline checks	Complete job	﻿2026-10-11T06:27:01.7289322Z Cleaning up orphan processes
