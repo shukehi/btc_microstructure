@@ -1,0 +1,9 @@
+Collecting pyarrow==20.0.0
+  Downloading pyarrow-20.0.0-cp312-cp312-macosx_12_0_arm64.whl.metadata (3.3 kB)
+Downloading pyarrow-20.0.0-cp312-cp312-macosx_12_0_arm64.whl (30.8 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 30.8/30.8 MB 2.0 MB/s eta 0:00:00
+Installing collected packages: pyarrow
+Successfully installed pyarrow-20.0.0
+
+[notice] A new release of pip is available: 25.0.1 -> 26.2.1
+[notice] To update, run: /Users/aries/Dve/btc_microstructure/.venv/bin/python -m pip install --upgrade pip

@@ -67,5 +67,6 @@ jobs:
             ci-results/*.log
             ci-results/*.xml
             ci-results/*.tsv
+            ci-results/offline-smoke/
           if-no-files-found: warn
           retention-days: 14

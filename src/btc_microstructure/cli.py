@@ -19,6 +19,24 @@ def main(argv: Sequence[str] | None = None) -> int:
     commands = parser.add_subparsers(dest="command", required=True)
     validate = commands.add_parser("validate-config", help="validate a local YAML file offline")
     validate.add_argument("path")
+    validate_offline = commands.add_parser(
+        "validate-offline", help="validate the strict R1-03 synthetic offline config"
+    )
+    validate_offline.add_argument("path")
+    collect = commands.add_parser("collect", help="R1-03 synthetic offline collection only")
+    collect.add_argument("path", help="strict offline config")
+    collect.add_argument("--mode", choices=["synthetic"], required=True)
+    collect.add_argument("--output", required=True, type=Path)
+    replay = commands.add_parser("replay", help="deterministically replay an R1-03 offline run")
+    replay.add_argument("path", help="strict offline config")
+    replay.add_argument("--input", required=True, type=Path)
+    replay.add_argument("--output", required=True, type=Path)
+    build_features_command = commands.add_parser(
+        "build-features", help="rebuild R1-03 derived tables from committed raw/control logs"
+    )
+    build_features_command.add_argument("path", help="strict offline config")
+    build_features_command.add_argument("--input", required=True, type=Path)
+    build_features_command.add_argument("--output", required=True, type=Path)
     probe = commands.add_parser("probe", help="bounded BTCUSDT perpetual metadata + aggTrade only")
     probe.add_argument("path", help="local research config")
     probe.add_argument("--output", required=True, type=Path, help="new evidence directory")
@@ -30,6 +48,31 @@ def main(argv: Sequence[str] | None = None) -> int:
     probe.add_argument("--max-bytes", type=int, default=2097152)
     args = parser.parse_args(argv)
     try:
+        if args.command in {"validate-offline", "collect", "replay", "build-features"}:
+            from .offline import OfflineConfig, build_features, replay_run, run_synthetic
+
+            offline_config = OfflineConfig.load(args.path)
+            if args.command == "validate-offline":
+                print(
+                    json.dumps(
+                        {
+                            "status": "OFFLINE_CONFIG_VALID",
+                            "sha256": offline_config.digest(),
+                            "input_mode": "synthetic",
+                            "network_access": "DISABLED",
+                        },
+                        sort_keys=True,
+                    )
+                )
+                return 0
+            if args.command == "collect":
+                result = run_synthetic(offline_config, args.output)
+            elif args.command == "replay":
+                result = replay_run(offline_config, args.input, args.output)
+            else:
+                result = build_features(offline_config, args.input, args.output)
+            print(json.dumps(result, sort_keys=True))
+            return 0 if result["status"] == "PASS" else 1
         config = load_config(args.path)
         if args.command == "probe":
             from .probe import ProbeLimits, run_probe, save_probe

@@ -1,0 +1,149 @@
+.F.F.F......                                                             [100%]
+=================================== FAILURES ===================================
+_____________ test_malformed_json_raw_is_quarantined_and_persisted _____________
+
+tmp_path = PosixPath('/private/var/folders/s9/rbq781b922s1xp3jhmtct8yc0000gn/T/pytest-of-aries/pytest-89/test_malformed_json_raw_is_qua0')
+
+    def test_malformed_json_raw_is_quarantined_and_persisted(tmp_path) -> None:
+        data = fixture(
+            [
+                {"kind": "SESSION_OPEN", "session_id": "syn-a", "ingest_sequence": 1, "ts_receive_ns": 1},
+                raw_event(seq=2, receive_ns=31 * NS, agg_id=1, payload_value="{"),
+            ],
+            simple_schedule(),
+        )
+        config = load_config(tmp_path, data)
+    
+        run_synthetic(config, tmp_path / "run")
+    
+        store = Store(tmp_path / "run")
+        raw_rows = store.read_rows()
+        quarantine = store.read_table("quarantine")
+        features = store.read_table("features")
+>       assert raw_rows[1]["payload"] == "{"
+               ^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'payload'
+
+tests/unit/test_offline_scenarios.py:185: KeyError
+___ test_restarted_core_from_store_deduplicates_duplicate_id_across_restart ____
+
+tmp_path = PosixPath('/private/var/folders/s9/rbq781b922s1xp3jhmtct8yc0000gn/T/pytest-of-aries/pytest-89/test_restarted_core_from_store0')
+
+    def test_restarted_core_from_store_deduplicates_duplicate_id_across_restart(tmp_path) -> None:
+        first = fixture(
+            [
+                {"kind": "SESSION_OPEN", "session_id": "syn-a", "ingest_sequence": 1, "ts_receive_ns": 1},
+                raw_event(seq=2, receive_ns=31 * NS, agg_id=9, quantity="0.10"),
+            ],
+            None,
+        )
+        config = load_config(tmp_path, first)
+        run_synthetic(config, tmp_path / "first")
+        recovered_rows = Store(tmp_path / "first").read_rows()
+        recovered = Core(config.core_config(), config.metadata)
+        for row in recovered_rows:
+            recovered.process(row)
+        recovered.process(
+            {
+                "kind": "SESSION_CLOSE",
+                "session_id": "syn-a",
+                "ingest_sequence": 3,
+                "ts_receive_ns": 32 * NS,
+            }
+        )
+        recovered.process(
+            {"kind": "GAP_CLOSE", "session_id": "syn-a", "ingest_sequence": 4, "ts_receive_ns": 33 * NS}
+        )
+        recovered.process(
+            {"kind": "SESSION_OPEN", "session_id": "syn-b", "ingest_sequence": 5, "ts_receive_ns": 34 * NS}
+        )
+        row = raw_event(seq=6, receive_ns=35 * NS, agg_id=9, quantity="0.10", session_id="syn-b")
+        row.update(
+            {
+                "schema_version": recovered_rows[1]["schema_version"],
+                "adapter_version": recovered_rows[1]["adapter_version"],
+                "venue": recovered_rows[1]["venue"],
+                "market_type": recovered_rows[1]["market_type"],
+                "instrument_id": recovered_rows[1]["instrument_id"],
+                "source_stream": recovered_rows[1]["source_stream"],
+                "source_origin": "live_ws",
+                "metadata_version": config.metadata["metadata_version"],
+                "evidence_kind": "SYNTHETIC",
+                "quality_flags": [],
+            }
+        )
+>       recovered.process(row)
+
+tests/unit/test_offline_scenarios.py:245: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/btc_microstructure/offline_core.py:89: in process
+    self._raw(row)
+src/btc_microstructure/offline_core.py:125: in _raw
+    trade = self._normalize(row)
+            ^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <btc_microstructure.offline_core.Core object at 0x108d1cd40>
+row = {'adapter_version': 'um-agg-synthetic.1', 'evidence_kind': 'SYNTHETIC', 'ingest_sequence': 6, 'instrument_id': 'binance:um_perpetual:BTCUSDT', ...}
+
+    def _normalize(self, row: dict[str, Any]) -> dict[str, Any]:
+        for field, expected in (
+            ("venue", "binance"),
+            ("market_type", "um_perpetual"),
+            ("source_stream", "um_agg_trade"),
+        ):
+            if row.get(field, expected) != expected:
+                raise ProbeError(f"{field}: unsupported source")
+>       raw = object_json(row["payload"].encode())
+                          ^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'dict' object has no attribute 'encode'
+
+src/btc_microstructure/offline_core.py:163: AttributeError
+_ test_future_horizon_change_uses_same_raw_and_same_feature_values_with_new_hash _
+
+tmp_path = PosixPath('/private/var/folders/s9/rbq781b922s1xp3jhmtct8yc0000gn/T/pytest-of-aries/pytest-89/test_future_horizon_change_use0')
+
+    def test_future_horizon_change_uses_same_raw_and_same_feature_values_with_new_hash(tmp_path) -> None:
+        data = fixture(
+            [
+                {"kind": "SESSION_OPEN", "session_id": "syn-a", "ingest_sequence": 1, "ts_receive_ns": 1},
+                raw_event(seq=2, receive_ns=31 * NS, agg_id=1, quantity="0.10"),
+            ],
+            simple_schedule(),
+        )
+>       first = load_config(tmp_path / "first", data, horizon_seconds=[30])
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/unit/test_offline_scenarios.py:287: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/unit/test_offline_scenarios.py:127: in load_config
+    return OfflineConfig.load(config_path(tmp_path, fixture_payload, **kwargs))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/unit/test_offline_scenarios.py:84: in config_path
+    fixture_file.write_text(json.dumps(fixture_payload, sort_keys=True), encoding="utf-8")
+../../.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib/python3.12/pathlib.py:1047: in write_text
+    with self.open(mode='w', encoding=encoding, errors=errors, newline=newline) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/private/var/folders/s9/rbq781b922s1xp3jhmtct8yc0000gn/T/pytest-of-aries/pytest-89/test_future_horizon_change_use0/first/fixture.json')
+mode = 'w', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/private/var/folders/s9/rbq781b922s1xp3jhmtct8yc0000gn/T/pytest-of-aries/pytest-89/test_future_horizon_change_use0/first/fixture.json'
+
+../../.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib/python3.12/pathlib.py:1013: FileNotFoundError
+=========================== short test summary info ============================
+FAILED tests/unit/test_offline_scenarios.py::test_malformed_json_raw_is_quarantined_and_persisted
+FAILED tests/unit/test_offline_scenarios.py::test_restarted_core_from_store_deduplicates_duplicate_id_across_restart
+FAILED tests/unit/test_offline_scenarios.py::test_future_horizon_change_uses_same_raw_and_same_feature_values_with_new_hash
+3 failed, 9 passed in 0.63s

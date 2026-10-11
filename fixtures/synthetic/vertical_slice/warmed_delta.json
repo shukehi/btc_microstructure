@@ -1,0 +1,18 @@
+{
+  "fixture_kind": "synthetic_offline_vertical_slice",
+  "description": "Artificial BTCUSDT USDⓈ-M aggregate-trade envelope for R1-03 offline tests only; not a live Binance sample.",
+  "feature_schedule": {
+    "start_ns": 1000000000,
+    "end_ns": 35000000000,
+    "grid_ns": 1000000000,
+    "publish_delay_ns": 1000000
+  },
+  "events": [
+    {"kind": "SESSION_OPEN", "session_id": "syn-a", "ingest_sequence": 1, "ts_receive_ns": 1},
+    {"kind": "RAW", "session_id": "syn-a", "ingest_sequence": 2, "raw_ref": "fixture:1", "ts_receive_ns": 30100000000, "source_time_unit": "ms", "payload": {"e": "aggTrade", "E": 30100, "T": 30090, "s": "BTCUSDT", "a": 1, "p": "100.0", "q": "0.30", "nq": "0.25", "f": 10, "l": 12, "m": false}},
+    {"kind": "RAW", "session_id": "syn-a", "ingest_sequence": 3, "raw_ref": "fixture:2", "ts_receive_ns": 30200000000, "source_time_unit": "ms", "payload": {"e": "aggTrade", "E": 30200, "T": 30190, "s": "BTCUSDT", "a": 2, "p": "100.0", "q": "0.20", "f": 13, "l": 13, "m": false}},
+    {"kind": "RAW", "session_id": "syn-a", "ingest_sequence": 4, "raw_ref": "fixture:3", "ts_receive_ns": 30300000000, "source_time_unit": "ms", "payload": {"e": "aggTrade", "E": 30300, "T": 30290, "s": "BTCUSDT", "a": 3, "p": "100.0", "q": "0.10", "f": 14, "l": 14, "m": true}},
+    {"kind": "RAW", "session_id": "syn-a", "ingest_sequence": 5, "raw_ref": "fixture:4-duplicate", "ts_receive_ns": 30400000000, "source_time_unit": "ms", "payload": {"e": "aggTrade", "E": 30200, "T": 30190, "s": "BTCUSDT", "a": 2, "p": "100.0", "q": "0.20", "f": 13, "l": 13, "m": false}},
+    {"kind": "SESSION_CLOSE", "session_id": "syn-a", "ingest_sequence": 6, "ts_receive_ns": 35002000000}
+  ]
+}

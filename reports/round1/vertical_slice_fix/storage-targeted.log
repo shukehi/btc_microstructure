@@ -1,0 +1,28 @@
+......F.                                                                 [100%]
+=================================== FAILURES ===================================
+______ test_schedule_preserves_explicit_ingest_order_for_equal_timestamps ______
+
+tmp_path = PosixPath('/private/var/folders/s9/rbq781b922s1xp3jhmtct8yc0000gn/T/pytest-of-aries/pytest-119/test_schedule_preserves_explic0')
+
+    def test_schedule_preserves_explicit_ingest_order_for_equal_timestamps(tmp_path):
+        path = tmp_path / 'fixture.json'
+        opening = {'kind': 'SESSION_OPEN', 'session_id': 's',
+                   'ingest_sequence': 1, 'ts_receive_ns': 1}
+        schedule = {'start_ns': 6 * NS, 'end_ns': 6 * NS, 'publish_delay_ns': 1}
+        ordered = [opening, raw(2, '0.10'), raw(3, '0.20')]
+        path.write_text(json.dumps({'events': ordered, 'feature_schedule': schedule}))
+        expected = fixture_rows(config_for(path))
+        # Only serialization order changes. Declared sequence/time/content do not.
+        path.write_text(json.dumps({'events': [ordered[0], ordered[2], ordered[1]],
+                                    'feature_schedule': schedule}))
+        actual = fixture_rows(config_for(path))
+>       assert [r['raw_ref'] for r in actual if r['kind'] == 'RAW'] == ['raw:2', 'raw:3']
+E       AssertionError: assert ['raw:3', 'raw:2'] == ['raw:2', 'raw:3']
+E         
+E         At index 0 diff: 'raw:3' != 'raw:2'
+E         Use -v to get more diff
+
+review/R1_03/checks/test_r1_03_review.py:129: AssertionError
+=========================== short test summary info ============================
+FAILED review/R1_03/checks/test_r1_03_review.py::test_schedule_preserves_explicit_ingest_order_for_equal_timestamps
+1 failed, 7 passed in 0.26s

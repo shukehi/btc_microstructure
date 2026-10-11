@@ -1,0 +1,6 @@
+{
+  "original_sha256": "426f5fea051b1196c77166fcc4b9e4921974b4d204e7067f631e9b98f469271d",
+  "formatted_sha256": "22989b7a22acdb939dd34d6dde92b366b59c4312f75d2dac10394a49404cfcad",
+  "equivalent_ast_except_unused_Path_import": true,
+  "assertions_changed": false
+}

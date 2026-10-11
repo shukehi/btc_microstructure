@@ -31,3 +31,9 @@ Thumbs.db
 # Retain nested runtime-directory exclusions from the foundation implementation
 data/
 logs/
+
+# R1-03 generated offline runs (evidence summaries/logs are committed separately)
+/ci-results/
+/reports/round1/vertical_slice/smoke-*/
+/reports/round1/vertical_slice/replay-*/
+/reports/round1/vertical_slice/run/

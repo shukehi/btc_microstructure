@@ -1,0 +1,73 @@
+..F..............F                                                       [100%]
+=================================== FAILURES ===================================
+________ test_quarantines_invalid_payload_and_marks_window_unavailable _________
+
+    def test_quarantines_invalid_payload_and_marks_window_unavailable() -> None:
+        engine = core()
+        open_session(engine, now=0)
+        bad = raw_trade(seq=2, receive_ns=31 * NS)
+        bad["payload"] = '{"e":"aggTrade","s":"BTCUSDT","a":1,"p":"100.00","q":0.30}'
+        engine.process(bad)
+        cutoff(engine, seq=3, now=61 * NS, cutoff_ns=61 * NS, high=2)
+        publish(engine, seq=4, available_ns=62 * NS, cutoff_ns=61 * NS)
+    
+        assert engine.quarantine[0]["payload"] == bad["payload"]
+>       assert engine.quarantine[0]["quality_flags"] == ["INVALID_MESSAGE"]
+E       AssertionError: assert ['SOURCE_SCHEMA_CHANGED'] == ['INVALID_MESSAGE']
+E         
+E         At index 0 diff: 'SOURCE_SCHEMA_CHANGED' != 'INVALID_MESSAGE'
+E         Use -v to get more diff
+
+tests/unit/test_offline_core.py:156: AssertionError
+__________ test_rejects_publication_before_cutoff_or_dependency_time ___________
+
+    def test_rejects_publication_before_cutoff_or_dependency_time() -> None:
+        engine = core()
+        open_session(engine, now=0)
+        engine.process(raw_trade(seq=2, receive_ns=31 * NS))
+        cutoff(engine, seq=3, now=61 * NS, cutoff_ns=61 * NS, high=2)
+    
+        with pytest.raises(ValueError, match="invalid historical publication"):
+>           publish(engine, seq=4, available_ns=60 * NS, cutoff_ns=61 * NS)
+
+tests/unit/test_offline_core.py:365: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/unit/test_offline_core.py:102: in publish
+    engine.process(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <btc_microstructure.offline_core.Core object at 0x1079abe90>
+row = {'cutoff_ns': 61000000000, 'feature_available_ns': 60000000000, 'ingest_sequence': 4, 'kind': 'FEATURE_PUBLISHED', ...}
+
+    def process(self, row: dict[str, Any]) -> None:
+        row = deepcopy(row)
+        seq = integer(row.get("ingest_sequence"), "ingest_sequence")
+        now = integer(row.get("ts_receive_ns"), "ts_receive_ns")
+        if seq <= self.cursor:
+            raise ValueError("ingest_sequence: must strictly increase")
+        if self.last_time is not None and now < self.last_time:
+            self.fatal = True
+>           raise ValueError("CLOCK_UNCERTAIN: receive clock regressed")
+E           ValueError: CLOCK_UNCERTAIN: receive clock regressed
+
+src/btc_microstructure/offline_core.py:60: ValueError
+
+During handling of the above exception, another exception occurred:
+
+    def test_rejects_publication_before_cutoff_or_dependency_time() -> None:
+        engine = core()
+        open_session(engine, now=0)
+        engine.process(raw_trade(seq=2, receive_ns=31 * NS))
+        cutoff(engine, seq=3, now=61 * NS, cutoff_ns=61 * NS, high=2)
+    
+>       with pytest.raises(ValueError, match="invalid historical publication"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Regex pattern did not match.
+E        Regex: 'invalid historical publication'
+E        Input: 'CLOCK_UNCERTAIN: receive clock regressed'
+
+tests/unit/test_offline_core.py:364: AssertionError
+=========================== short test summary info ============================
+FAILED tests/unit/test_offline_core.py::test_quarantines_invalid_payload_and_marks_window_unavailable
+FAILED tests/unit/test_offline_core.py::test_rejects_publication_before_cutoff_or_dependency_time
+2 failed, 16 passed in 0.13s

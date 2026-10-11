@@ -7,7 +7,7 @@ name = "btc-microstructure"
 version = "0.1.0"
 description = "Offline configuration foundation for BTC microstructure research"
 requires-python = ">=3.12"
-dependencies = ["pydantic==2.12.3", "PyYAML==6.0.3", "aiohttp==3.12.15"]
+dependencies = ["pydantic==2.12.3", "PyYAML==6.0.3", "aiohttp==3.12.15", "pyarrow==20.0.0"]
 
 [project.scripts]
 btc-microstructure = "btc_microstructure.cli:main"
@@ -16,7 +16,7 @@ btc-microstructure = "btc_microstructure.cli:main"
 where = ["src"]
 
 [tool.pytest.ini_options]
-testpaths = ["tests/unit"]
+testpaths = ["tests"]
 addopts = "-ra"
 
 [tool.ruff]
@@ -26,3 +26,7 @@ line-length = 100
 python_version = "3.12"
 strict = true
 files = ["src"]
+
+[[tool.mypy.overrides]]
+module = ["pyarrow", "pyarrow.*"]
+ignore_missing_imports = true

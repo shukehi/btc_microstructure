@@ -130,3 +130,37 @@ REST 最多额外读 1 字节识别超限，保留样本仍截断于预算并标
 
 人工协议样例在 `fixtures/synthetic/probe/`；真实执行证据在 `fixtures/protocol/`，不得互相冒充。
 只有显式 CLI 会触发真实网络探测；普通导入、配置校验和默认测试不会连接交易所。
+
+## R1-03：离线聚合成交最小流程
+
+本轮只支持显式 `synthetic` 的永续聚合成交流。人工 BTC 单位、接收时间和发布时间仅验证计算与重放，不代表 Binance 现场观测。真实 REST 仍保留历史 BLOCKED，WS/持续采集/24h 均 NOT_RUN，真实数量单位与持续预算尚未核验；不是完整 M0/M1/M2 验收。
+
+Python 3.12 下仍按现有 `requirements-dev.lock` 安装；仅增加 `pyarrow==20.0.0`，aiohttp 保持 3.12.15。原完整研究配置及其摘要语义保持。
+
+以下命令已经实际执行，输出目录须为新目录；相对配置路径相对于配置文件所在目录，命令行 `--output` 相对于当前目录：
+
+```sh
+.venv/bin/python -m btc_microstructure validate-config config/research.example.yaml
+.venv/bin/python -m btc_microstructure validate-offline config/offline.synthetic.yaml
+.venv/bin/python -m btc_microstructure collect config/offline.synthetic.yaml --mode synthetic --output data/r1-03-demo
+.venv/bin/python -m btc_microstructure replay config/offline.synthetic.yaml --input data/r1-03-demo --output data/r1-03-replay-1
+.venv/bin/python -m btc_microstructure replay config/offline.synthetic.yaml --input data/r1-03-demo --output data/r1-03-replay-2
+.venv/bin/python -m btc_microstructure build-features config/offline.synthetic.yaml --input data/r1-03-demo --output data/r1-03-build
+.venv/bin/python -m pytest -q
+.venv/bin/python -m pytest -q review/R1_01/checks/test_review_regressions.py
+.venv/bin/python -m pytest -q review/R1_02/checks/test_r1_02_regressions.py
+```
+
+一次命令验收 CLI、两次重放、build-features 和 Parquet 读回（给出新目录）：
+
+```sh
+.venv/bin/python .github/scripts/offline_smoke.py --output data/r1-03-smoke
+```
+
+首轮默认1秒输出网格，配置分别控制5/30秒回看窗口和未来研究期限；未来期限仅保存/校验，不计算收益。人工样例在31秒截止得到 B=0.50、S=0.10、V=0.60、Delta=0.40、TI=2/3、N_agg=3；重复接收保留在 raw，不重复贡献数量。每个截止/窗口都保存质量，预热、缺口和未知单位是 null，健康空窗量才可为0。
+
+日志采用带版本的 raw/control JSONL 分段，派生表位于 `tables/`（ZSTD Parquet）；`manifests/` 提供SHA-256、行数、时间范围和可信游标。严重写盘/容量故障明确失败；恢复仅信任连续校验成功的提交，不删除唯一raw。损坏提交隔离后禁止直接续写，须审查证据并另建运行。离线重放从可信raw重建跨会话去重状态；不提供真实连接或自动补回服务。
+
+重放保留 `FEATURE_CUTOFF` 高水位和 `FEATURE_PUBLISHED` 历史时点。缺发布记录则时间为null且标为未验证发布重放，不用本机新墙钟补造。代码/依赖/配置/fixture版本由运行元数据关联；逻辑摘要比较标准化、隔离、特征的数值、序号、质量和时间，不比较Parquet物理字节。
+
+默认测试禁网；GitHub Actions required job仍为 `Python 3.12 offline checks`，在独立Linux网络命名空间执行三组测试、静态检查、原配置/首轮配置和端到端检查，保留真实退出码、JUnit及人工运行artifact。交付详情见 [R1-03 报告](reports/round1/03_vertical_slice.md)。

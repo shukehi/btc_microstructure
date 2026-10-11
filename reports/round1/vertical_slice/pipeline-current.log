@@ -1,0 +1,33 @@
+...F.................                                                    [100%]
+=================================== FAILURES ===================================
+___ test_build_features_recomputes_from_raw_when_derived_tables_are_missing ____
+
+tmp_path = PosixPath('/private/var/folders/s9/rbq781b922s1xp3jhmtct8yc0000gn/T/pytest-of-aries/pytest-97/test_build_features_recomputes0')
+
+    def test_build_features_recomputes_from_raw_when_derived_tables_are_missing(tmp_path):
+        config_path = write_offline_config(tmp_path, **{"limits.min_free_bytes": 0})
+        run_dir = tmp_path / "run"
+        raw_only = tmp_path / "raw-only"
+        build_dir = tmp_path / "build"
+    
+        assert main(["collect", str(config_path), "--mode", "synthetic", "--output", str(run_dir)]) == 0
+        raw_only.mkdir()
+        for child in ("raw", "manifests", "errors"):
+            source = run_dir / child
+            if source.exists():
+                shutil.copytree(source, raw_only / child)
+    
+>       assert (
+            main(["build-features", str(config_path), "--input", str(raw_only), "--output", str(build_dir)])
+            == 0
+        )
+E       AssertionError: assert 1 == 0
+E        +  where 1 = main(['build-features', '/private/var/folders/s9/rbq781b922s1xp3jhmtct8yc0000gn/T/pytest-of-aries/pytest-97/test_build_feat...ivate/var/folders/s9/rbq781b922s1xp3jhmtct8yc0000gn/T/pytest-of-aries/pytest-97/test_build_features_recomputes0/build'])
+
+tests/unit/test_offline_pipeline.py:121: AssertionError
+----------------------------- Captured stdout call -----------------------------
+{"feature_rows": 70, "limitations": {"continuous_collection": "NOT_RUN", "quantity_unit_for_live": "UNKNOWN_UNVERIFIED", "real_binance_rest": "BLOCKED_HISTORICAL", "real_binance_ws": "NOT_RUN"}, "normalized_rows": 3, "offline_config_sha256": "ad3c4fb1988245add255fa2cd2977f90783cfd981300aba3264c23b5b4440559", "output_root": "/private/var/folders/s9/rbq781b922s1xp3jhmtct8yc0000gn/T/pytest-of-aries/pytest-97/test_build_features_recomputes0/run", "quarantine_rows": 1, "run_id": "r1-03-synthetic-offline", "status": "PASS"}
+{"build_elapsed_ns": 75183208, "build_logical_sha256": "d71d2bdfb17d0317ce60a723c73f6db301af6d7b4f29929bb385478fb7113c91", "feature_available_time_source": "FEATURE_PUBLISHED_LOG", "feature_rows": 70, "input_root": "/private/var/folders/s9/rbq781b922s1xp3jhmtct8yc0000gn/T/pytest-of-aries/pytest-97/test_build_features_recomputes0/raw-only", "limitations": {"continuous_collection": "NOT_RUN", "quantity_unit_for_live": "UNKNOWN_UNVERIFIED", "real_binance_rest": "BLOCKED_HISTORICAL", "real_binance_ws": "NOT_RUN"}, "normalized_rows": 3, "offline_config_sha256": "ad3c4fb1988245add255fa2cd2977f90783cfd981300aba3264c23b5b4440559", "output_root": "/private/var/folders/s9/rbq781b922s1xp3jhmtct8yc0000gn/T/pytest-of-aries/pytest-97/test_build_features_recomputes0/build", "quarantine_rows": 1, "recovery_events": [{"error_type": "StorageError", "event_type": "UNCERTAIN_GAP", "manifest_path": "manifests/manifest-table-features-000003.json", "reason": "UNTRUSTED_MANIFEST"}, {"error_type": "StorageError", "event_type": "UNCERTAIN_GAP", "manifest_path": "manifests/manifest-table-normalized_trades-000001.json", "reason": "AFTER_UNTRUSTED_COMMIT"}, {"error_type": "StorageError", "event_type": "UNCERTAIN_GAP", "manifest_path": "manifests/manifest-table-quarantine-000002.json", "reason": "AFTER_UNTRUSTED_COMMIT"}], "run_id": "r1-03-synthetic-offline", "status": "FAIL"}
+=========================== short test summary info ============================
+FAILED tests/unit/test_offline_pipeline.py::test_build_features_recomputes_from_raw_when_derived_tables_are_missing
+1 failed, 20 passed in 1.95s

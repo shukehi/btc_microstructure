@@ -1,0 +1,35 @@
+[
+  {
+    "command": [
+      ".venv/bin/python",
+      "-m",
+      "pytest",
+      "-q",
+      "review/R1_03/checks/test_r1_03_review.py",
+      "--junitxml=reports/round1/vertical_slice_fix/before/review.xml"
+    ],
+    "cwd": "/Users/aries/Dve/btc_microstructure",
+    "exit_code": 1,
+    "passed": 3,
+    "failed": 5,
+    "skipped": 0
+  },
+  {
+    "command": [
+      "env",
+      "PYTHONPATH=data/r103-original/src",
+      ".venv/bin/python",
+      "-m",
+      "pytest",
+      "-q",
+      "tests/unit/test_r103_recovery.py::test_failed_raw_tail_propagates_through_repeated_raw_only_parquet_builds",
+      "--junitxml=reports/round1/vertical_slice_fix/before/raw-build.xml"
+    ],
+    "cwd": "/Users/aries/Dve/btc_microstructure",
+    "exit_code": 1,
+    "passed": 0,
+    "failed": 1,
+    "skipped": 0,
+    "code_source": "isolated src copied verbatim from Git03ce9c7, after original review reproduction; old storage import path recorded in e2e-source.log"
+  }
+]
