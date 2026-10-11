@@ -1,0 +1,6 @@
+pytest	0
+ruff-check	0
+ruff-format	0
+mypy	0
+pip-check	0
+validate-config	0
