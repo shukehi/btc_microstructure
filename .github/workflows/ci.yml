@@ -1,0 +1,71 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  offline-checks:
+    name: Python 3.12 offline checks
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    defaults:
+      run:
+        shell: bash
+    env:
+      PIP_DISABLE_PIP_VERSION_CHECK: "1"
+      PIP_NO_INPUT: "1"
+      PIP_INDEX_URL: https://pypi.org/simple
+      PIP_EXTRA_INDEX_URL: ""
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+
+      - name: Install locked dependencies
+        run: |
+          mkdir -p ci-results
+          python --version 2>&1 | tee ci-results/python.log
+          python -m venv .venv
+          .venv/bin/python -m pip install -r requirements-dev.lock 2>&1 | tee ci-results/install.log
+          .venv/bin/python -m pip install --no-build-isolation --no-deps -e . 2>&1 | tee ci-results/install-project.log
+
+      - name: Run all checks without external network
+        run: |
+          # A fresh network namespace has no host interfaces/default route.
+          # Drop back to the runner user; do not alter the runner host network.
+          host_network="$(readlink /proc/self/ns/net)"
+          sudo unshare --net --fork --kill-child -- \
+            runuser -u "$(id -un)" -- \
+            setpriv --no-new-privs -- \
+            env CI_HOST_NET_NAMESPACE="$host_network" \
+            /bin/bash .github/scripts/ci_checks.sh 2>&1 | tee ci-results/offline-checks.log
+
+      - name: Retain actual check logs
+        if: ${{ always() }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: ci-logs-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ci-results/*.log
+            ci-results/*.xml
+            ci-results/*.tsv
+          if-no-files-found: warn
+          retention-days: 14

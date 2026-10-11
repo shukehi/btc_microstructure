@@ -1,0 +1,28 @@
+::group::pytest
+........................................................................ [ 43%]
+........................................................................ [ 86%]
+......................                                                   [100%]
+- generated xml file: /Users/aries/Dve/btc_microstructure/ci-results/pytest.xml -
+166 passed in 3.80s
+Exit code: 0
+::endgroup::
+::group::ruff-check
+All checks passed!
+Exit code: 0
+::endgroup::
+::group::ruff-format
+13 files already formatted
+Exit code: 0
+::endgroup::
+::group::mypy
+Success: no issues found in 8 source files
+Exit code: 0
+::endgroup::
+::group::pip-check
+No broken requirements found.
+Exit code: 0
+::endgroup::
+::group::validate-config
+{"runtime_capabilities": {"book_band_coverage": "UNVERIFIED", "event_time_per_source_support": "UNVERIFIED", "instrument_metadata": "UNVERIFIED", "oi_absolute_unit_evidence": "UNVERIFIED", "protocol_routes_and_budget": "UNVERIFIED"}, "sha256": "b037004b544ca834855821374bd65520a535b509c0b952d9c3f37a97a30d3b43", "status": "CONFIG_VALID"}
+Exit code: 0
+::endgroup::

@@ -1,0 +1,13 @@
+Obtaining file:///home/runner/work/btc_microstructure/btc_microstructure
+  Checking if build backend supports build_editable: started
+  Checking if build backend supports build_editable: finished with status 'done'
+  Preparing editable metadata (pyproject.toml): started
+  Preparing editable metadata (pyproject.toml): finished with status 'done'
+Building wheels for collected packages: btc-microstructure
+  Building editable for btc-microstructure (pyproject.toml): started
+  Building editable for btc-microstructure (pyproject.toml): finished with status 'done'
+  Created wheel for btc-microstructure: filename=btc_microstructure-0.1.0-0.editable-py3-none-any.whl size=1700 sha256=22cfd68b4ad6deca39287fa19fb54da0b0262facc83dd7467381d4c4461b8217
+  Stored in directory: /tmp/pip-ephem-wheel-cache-jbxh5r7m/wheels/dc/ad/d8/068ebe97793a9e053842715f270928f8d290663d8de3d19560
+Successfully built btc-microstructure
+Installing collected packages: btc-microstructure
+Successfully installed btc-microstructure-0.1.0
