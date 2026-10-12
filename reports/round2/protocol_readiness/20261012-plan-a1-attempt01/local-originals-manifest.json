@@ -1,0 +1,24 @@
+{
+  "original_output": "<repo>/data/r201-preflight/data/r201-probe/20261012-plan-a1-attempt01",
+  "original_invocation": "<repo>/data/r201-preflight/data/r201-probe/20261012-plan-a1-invocation",
+  "files": {
+    "protocol_probe_report.json": {
+      "bytes": 1649,
+      "sha256": "901c14db26988cc48f7f47b2699eab394f8b14b8480506e8dc517a678f869575"
+    },
+    "rest-response.bin": {
+      "bytes": 425307,
+      "sha256": "281d7af97bc5215fda9907426663a0e3fb31513d4eb1c4738460c680474b7988"
+    },
+    "endpoint_budget.json": {
+      "bytes": 883,
+      "sha256": "887db8c88aaab44647e58f404fdefc0d9af38a935a4cc9340e1c03cf6dc531b2"
+    }
+  },
+  "publication": {
+    "protocol_probe_report.json": "byte-identical copy",
+    "endpoint_budget.json": "byte-identical copy",
+    "rest-response.bin": "local-only bounded incomplete public-metadata prefix; no raw response uploaded",
+    "invocation.redacted.json": "cwd redacted, user AGENTS digest omitted; not byte-identical to private invocation"
+  }
+}

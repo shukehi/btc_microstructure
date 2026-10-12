@@ -1,0 +1,31 @@
+{
+  "plan": "R2-01-A1",
+  "plan_comment": 6118805616,
+  "review_comment": 6119249208,
+  "authorized_target": "current local Mac",
+  "code_sha": "46f348ccc24bf544e3efb7d60168198ab8181ecf",
+  "cwd": "<repo>/data/r201-preflight",
+  "environment_override": {
+    "PYTHONPATH": "src"
+  },
+  "argv": [
+    "../r104-followup/.venv/bin/python",
+    "-m",
+    "btc_microstructure",
+    "probe",
+    "config/research.example.yaml",
+    "--allow-network",
+    "--seconds",
+    "30",
+    "--messages",
+    "20",
+    "--max-bytes",
+    "2097152",
+    "--output",
+    "data/r201-probe/20261012-plan-a1-attempt01"
+  ],
+  "started_utc": "2026-10-12T06:55:20.997219+00:00",
+  "ended_utc": "2026-10-12T06:55:26.273003+00:00",
+  "exit_code": 1,
+  "original_AGENTS_preserved": true
+}
