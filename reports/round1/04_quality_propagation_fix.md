@@ -91,4 +91,15 @@ CI保留原十一项并增加独立R1-04及原Parquet断言两组，共十三项
 
 真实REST历史BLOCKED；WS/有界真实演练/24h NOT_RUN；真实数量单位UNKNOWN、持续预算UNVERIFIED。无新真实数据、协议核验、交易或收益结论；未填满物理磁盘、未改系统时钟/网络。只运行当前修复与必要回归，不开始下一任务。
 
-修复PR最新SHA及对应Actions在创建运行后记录；本报告随后归档源码提交的远程回执，最终报告head与最新运行以PR正文/交付答复为准。
+修复PR和源码提交Actions见下节；本报告随后归档源码提交的远程回执，最终报告head与最新运行以PR正文/交付答复为准。
+
+## 修复PR及远程验收
+
+- 独立修复 [PR #10](https://github.com/shukehi/btc_microstructure/pull/10)，base main，Closes #8、Refs #6及报告PR7。PR7仍OPEN、head063da7a未改变，业务代码没有提交到报告PR。Issue6仍由后续独立收尾决定，未在本任务关闭。
+- 修复源码提交：`68d0eae17468d5ddf59d601aed05a3e850ce8202`；随后仅归档远程证据，最终head/对应运行见PR正文和交付答复。
+- [Actions38194103810](https://github.com/shukehi/btc_microstructure/actions/runs/38194103810)，pull_request，精确head=上述源码提交，**SUCCESS**；required job `Python 3.12 offline checks` SUCCESS。实际Linux/Python3.12.15。
+- 五份JUnit实际294/15/9/8/4均0fail/error/skip；results.tsv十三项退出0。新独立R1-04有单独JUnit，原Parquet反例在CI实际退出0，源码/shape的null断言由默认管道测试实际执行。网络命名空间校验及CLI/Parquet smoke均PASS。
+- 小型实际日志/JUnit/results.tsv保存在 `quality_propagation_fix/ci-38194103810/`；run/job/API/artifact回执另存。整个before失败记录与历史PR7结论原样保留。
+- artifact `ci-logs-38194103810-1`，ID11722508441，338131字节，SHA-256 `189bdc1a4f730847f8c42f22e27fb9e5f0aca7fd637c27ac41a8e28f9a313a23`。实际下载ZIP哈希与GitHub一致、CRC通过，回执artifact-validation.json；14天保留。不提交整个工程ZIP。
+
+所有验收只针对R104-01定向离线实现。修复PR保持OPEN、auto-merge关闭，不自动合并；交付后停止，等待独立复核，R1-04整体PARTIAL及真实能力门槛仍保留。
