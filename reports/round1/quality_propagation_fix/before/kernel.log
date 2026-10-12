@@ -1,0 +1,27 @@
+..FF                                                                     [100%]
+=================================== FAILURES ===================================
+_____________________ test_raw_gap_survives_normalization ______________________
+
+    def test_raw_gap_survives_normalization():
+        core = run_case(flagged=True)
+        raw = next(r for r in core.history if r['kind']=='RAW')
+        assert raw['quality_flags'] == ['GAP_KNOWN']
+>       assert 'GAP_KNOWN' in core.normalized[0]['quality_flags']
+E       AssertionError: assert 'GAP_KNOWN' in []
+
+review/R1_04/checks/test_r104_quality_review.py:72: AssertionError
+_____________________ test_raw_gap_invalidates_flow_window _____________________
+
+    def test_raw_gap_invalidates_flow_window():
+        core = run_case(flagged=True)
+        feature = core.features[0]
+>       assert feature['trade_delta_base'] is None, feature
+E       AssertionError: {'agg_message_count': 3, 'buy_volume_base': Decimal('0.50'), 'dataset_revision': 'synthetic-original', 'dependency_available_ns': 31000000000, ...}
+E       assert Decimal('0.40') is None
+
+review/R1_04/checks/test_r104_quality_review.py:78: AssertionError
+- generated xml file: /Users/aries/Dve/btc_microstructure/reports/round1/quality_propagation_fix/before/kernel.xml -
+=========================== short test summary info ============================
+FAILED review/R1_04/checks/test_r104_quality_review.py::test_raw_gap_survives_normalization
+FAILED review/R1_04/checks/test_r104_quality_review.py::test_raw_gap_invalidates_flow_window
+2 failed, 2 passed in 0.16s

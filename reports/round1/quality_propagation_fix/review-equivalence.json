@@ -1,0 +1,5 @@
+{
+  "same_ast": true,
+  "assertions_changed": false,
+  "change": "Ruff formatting only"
+}
