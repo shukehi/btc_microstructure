@@ -1,0 +1,24 @@
+[
+  {
+    "argv": [
+      ".venv/bin/python",
+      "-m",
+      "pytest",
+      "-q",
+      "review/R1_04/checks/test_r104_quality_review.py",
+      "--junitxml=reports/round1/quality_propagation_fix/before/kernel.xml"
+    ],
+    "cwd": "/Users/aries/Dve/btc_microstructure",
+    "exit_code": 1
+  },
+  {
+    "argv": [
+      ".venv/bin/python",
+      "review/R1_04/original/reproduce_gap_flag.py",
+      "--output-parent",
+      "data/r104-quality-before"
+    ],
+    "cwd": "/Users/aries/Dve/btc_microstructure",
+    "exit_code": 1
+  }
+]

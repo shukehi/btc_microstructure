@@ -1,0 +1,13 @@
+pytest	0
+pytest-independent-r1-01	0
+pytest-independent-r1-02	0
+pytest-independent-r1-03	0
+pytest-independent-r1-04	0
+r104-original-parquet	0
+ruff-check	0
+ruff-format	0
+mypy	0
+pip-check	0
+validate-config	0
+validate-offline	0
+offline-e2e	0

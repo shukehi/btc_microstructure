@@ -164,3 +164,23 @@ Python 3.12 下仍按现有 `requirements-dev.lock` 安装；仅增加 `pyarrow=
 重放保留 `FEATURE_CUTOFF` 高水位和 `FEATURE_PUBLISHED` 历史时点。缺发布记录则时间为null且标为未验证发布重放，不用本机新墙钟补造。代码/依赖/配置/fixture版本由运行元数据关联；逻辑摘要比较标准化、隔离、特征的数值、序号、质量和时间，不比较Parquet物理字节。
 
 默认测试禁网；GitHub Actions required job仍为 `Python 3.12 offline checks`，在独立Linux网络命名空间执行三组测试、静态检查、原配置/首轮配置和端到端检查，保留真实退出码、JUnit及人工运行artifact。交付详情见 [R1-03 报告](reports/round1/03_vertical_slice.md)。
+
+## R104-01：原始质量传播修复
+
+标准化版本 `trades.2-quality`、成交特征版本 `delta.2-quality` 修复上游质量传播。raw schema/adapter仍为 `r1-03.1` / `um-agg-synthetic.1`；原始payload及flags不改写。缺省flags的旧人工包装兼容为空列表，显式null、错误类型或未知值隔离为SOURCE_SCHEMA_CHANGED，原值保留为审计JSON。
+
+GAP_KNOWN使受影响窗口的流量和TI为null；SOURCE_SAMPLED等提示保留但不使成交流失效。`data_valid`给出行级成交有效性，运行summary另列valid/invalid行数和质量计数；进程status=PASS不代表所有数据健康，warmup行仍会明确无效。
+
+相同经济键重发不再贡献成交量，新的质量证据以收据序号/观察时点另存。已发布快照不改写；只在高水位内且截至该截止已观察（同刻由高水位决定）、原经济接收点或新质量收据点落入窗口时影响当前窗口。没有起止证据不推断缺口区间，实际区间继续由GAP_OPEN/CLOSE描述。
+
+旧 `delta.1` 派生表保留原样，不能用新版本冒充旧实时重放比较。使用原运行的同一配置，以 `build-features` 从可信旧raw/control到**新目录**重算；新manifest记录新版本与build_from，未知版本仍拒绝。命令合同与前节相同，不原地升级旧结果。
+
+定向离线验证（原反例脚本会创建新的人工输出目录）：
+
+```sh
+.venv/bin/python -m pytest -q review/R1_04/checks/test_r104_quality_review.py
+.venv/bin/python -m pytest -q tests/unit/test_quality_propagation.py tests/unit/test_quality_pipeline.py
+.venv/bin/python review/R1_04/original/reproduce_gap_flag.py --output-parent data/r104-quality-manual
+```
+
+新独立4案例和原Parquet反例断言均已纳入CI；原十一项检查、默认套件及R1-01/02/03保持。此次仅关闭R104-01的定向实现范围，R1-04整体覆盖仍PARTIAL；真实REST/WS、单位、预算、24h及研究能力状态不升级。

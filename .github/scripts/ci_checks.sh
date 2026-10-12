@@ -38,8 +38,10 @@ run_check pytest .venv/bin/python -m pytest -q --junitxml=ci-results/pytest.xml
 run_check pytest-independent-r1-01 .venv/bin/python -m pytest -q review/R1_01/checks/test_review_regressions.py --junitxml=ci-results/pytest-independent-r1-01.xml
 run_check pytest-independent-r1-02 .venv/bin/python -m pytest -q review/R1_02/checks/test_r1_02_regressions.py --junitxml=ci-results/pytest-independent-r1-02.xml
 run_check pytest-independent-r1-03 .venv/bin/python -m pytest -q review/R1_03/checks/test_r1_03_review.py --junitxml=ci-results/pytest-independent-r1-03.xml
-run_check ruff-check .venv/bin/ruff check src tests .github/scripts/offline_smoke.py review/R1_03/checks/test_r1_03_review.py
-run_check ruff-format .venv/bin/ruff format --check src tests .github/scripts/offline_smoke.py review/R1_03/checks/test_r1_03_review.py
+run_check pytest-independent-r1-04 .venv/bin/python -m pytest -q review/R1_04/checks/test_r104_quality_review.py --junitxml=ci-results/pytest-independent-r1-04.xml
+run_check r104-original-parquet .venv/bin/python review/R1_04/original/reproduce_gap_flag.py --output-parent ci-results/r104-original
+run_check ruff-check .venv/bin/ruff check src tests .github/scripts/offline_smoke.py review/R1_03/checks/test_r1_03_review.py review/R1_04/checks/test_r104_quality_review.py
+run_check ruff-format .venv/bin/ruff format --check src tests .github/scripts/offline_smoke.py review/R1_03/checks/test_r1_03_review.py review/R1_04/checks/test_r104_quality_review.py
 run_check mypy .venv/bin/mypy src .github/scripts/offline_smoke.py
 run_check pip-check .venv/bin/python -m pip check
 run_check validate-config .venv/bin/python -m btc_microstructure validate-config config/research.example.yaml
