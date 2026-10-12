@@ -1,0 +1,524 @@
+{
+  "schema_version": "probe-0.2",
+  "evidence_kind": "LIVE",
+  "started_ns": 1791848007991704000,
+  "limits": {
+    "total_seconds": 30.0,
+    "connect_seconds": 5.0,
+    "rest_total_seconds": 15.0,
+    "idle_seconds": 5.0,
+    "max_messages": 20,
+    "max_bytes": 2097152,
+    "max_frame_bytes": 65536
+  },
+  "configured_timeouts": {
+    "total_seconds": 30.0,
+    "connect_seconds": 5.0,
+    "rest_total_seconds": 15.0,
+    "rest_total_mode": "EXPLICIT",
+    "idle_seconds": 5.0,
+    "cleanup_seconds": 1.0
+  },
+  "effective_timeouts": {
+    "work_seconds": 29.0,
+    "work_deadline_source": "TOTAL_MINUS_CLEANUP_RESERVE",
+    "rest_total_seconds": 15.0,
+    "rest_total_mode": "EXPLICIT",
+    "rest_total_cap_source": "REST_TOTAL",
+    "ws_connect_seconds": 5.0,
+    "ws_connect_cap_source": "CONNECT",
+    "ws_receive_seconds": 5.0,
+    "ws_receive_cap_source": "IDLE"
+  },
+  "status": "PASS",
+  "rest": {
+    "status": "PASS",
+    "method": "GET",
+    "url": "https://fapi.binance.com/fapi/v1/exchangeInfo",
+    "params": {},
+    "timeout_diagnostics": {
+      "phase": "NOT_STARTED",
+      "source": "NOT_EXPIRED"
+    },
+    "request_started_ns": 1791848007991974000,
+    "http_status": 200,
+    "rate_headers": {
+      "x-mbx-used-weight-1m": "1"
+    },
+    "response_received_ns": 1791848014863713000,
+    "headers_received_ns": 1791848012635892000,
+    "body_bytes_observed": 1152517,
+    "body_complete": true,
+    "body_read_state": "COMPLETE",
+    "truncated": false,
+    "sample": "rest-response.bin",
+    "sha256": "d5ae0e3682f28512d34ec9ab20131a964df6c76118b8a29e12a76e7b57cbd610"
+  },
+  "ws": {
+    "status": "PASS",
+    "url": "wss://fstream.binance.com/market/stream?streams=btcusdt@aggTrade",
+    "subscription": "URL combined stream",
+    "messages": [
+      {
+        "received_ns": 1791848018032042000,
+        "truncated": false,
+        "inspection": {
+          "agg_trade_id": 3482658121,
+          "event_time": 1791848017649,
+          "trade_time": 1791848017499,
+          "source_time_unit": "ms",
+          "price_native": "81885.90",
+          "quantity_native": "0.070",
+          "normal_quantity_native": "0.070",
+          "quantity_unit": "UNKNOWN",
+          "buyer_is_maker": true,
+          "symbol_type_raw": 1,
+          "unknown_fields": [],
+          "unknown_wrapper_fields": []
+        },
+        "sample": "ws-000.bin",
+        "sha256": "7d94c1ccf88d5c1cf4c7fc5d64178a942dcbe2ff3f1d2d5df0c95197c9ba4065"
+      },
+      {
+        "received_ns": 1791848018185380000,
+        "truncated": false,
+        "inspection": {
+          "agg_trade_id": 3482658122,
+          "event_time": 1791848017802,
+          "trade_time": 1791848017654,
+          "source_time_unit": "ms",
+          "price_native": "81885.90",
+          "quantity_native": "0.037",
+          "normal_quantity_native": "0.037",
+          "quantity_unit": "UNKNOWN",
+          "buyer_is_maker": true,
+          "symbol_type_raw": 1,
+          "unknown_fields": [],
+          "unknown_wrapper_fields": []
+        },
+        "sample": "ws-001.bin",
+        "sha256": "f2fdc204d4ebabd573722ab98f5449ccb234c3e2eb74519e151e37fcb33b1c0f"
+      },
+      {
+        "received_ns": 1791848018185610000,
+        "truncated": false,
+        "inspection": {
+          "agg_trade_id": 3482658123,
+          "event_time": 1791848017802,
+          "trade_time": 1791848017801,
+          "source_time_unit": "ms",
+          "price_native": "81885.80",
+          "quantity_native": "0.350",
+          "normal_quantity_native": "0.350",
+          "quantity_unit": "UNKNOWN",
+          "buyer_is_maker": true,
+          "symbol_type_raw": 1,
+          "unknown_fields": [],
+          "unknown_wrapper_fields": []
+        },
+        "sample": "ws-002.bin",
+        "sha256": "fbcf91922025101e9c5d8e515a3e9d2f89806f0440d29d1b9c0ce0bf7de6fb2c"
+      },
+      {
+        "received_ns": 1791848018288321000,
+        "truncated": false,
+        "inspection": {
+          "agg_trade_id": 3482658124,
+          "event_time": 1791848017906,
+          "trade_time": 1791848017801,
+          "source_time_unit": "ms",
+          "price_native": "81885.70",
+          "quantity_native": "0.001",
+          "normal_quantity_native": "0.001",
+          "quantity_unit": "UNKNOWN",
+          "buyer_is_maker": true,
+          "symbol_type_raw": 1,
+          "unknown_fields": [],
+          "unknown_wrapper_fields": []
+        },
+        "sample": "ws-003.bin",
+        "sha256": "2c555d19805407b7deeff36d71af899bda72d52f1bc284df19a96f6bb10d6a6a"
+      },
+      {
+        "received_ns": 1791848018332424000,
+        "truncated": false,
+        "inspection": {
+          "agg_trade_id": 3482658125,
+          "event_time": 1791848017947,
+          "trade_time": 1791848017906,
+          "source_time_unit": "ms",
+          "price_native": "81885.60",
+          "quantity_native": "0.102",
+          "normal_quantity_native": "0.102",
+          "quantity_unit": "UNKNOWN",
+          "buyer_is_maker": true,
+          "symbol_type_raw": 1,
+          "unknown_fields": [],
+          "unknown_wrapper_fields": []
+        },
+        "sample": "ws-004.bin",
+        "sha256": "65d0461656952577f71bc9f2d1a0bb9498314c8512bb54127953e9af9d57e547"
+      },
+      {
+        "received_ns": 1791848018381196000,
+        "truncated": false,
+        "inspection": {
+          "agg_trade_id": 3482658126,
+          "event_time": 1791848018003,
+          "trade_time": 1791848017947,
+          "source_time_unit": "ms",
+          "price_native": "81885.60",
+          "quantity_native": "0.001",
+          "normal_quantity_native": "0.001",
+          "quantity_unit": "UNKNOWN",
+          "buyer_is_maker": false,
+          "symbol_type_raw": 1,
+          "unknown_fields": [],
+          "unknown_wrapper_fields": []
+        },
+        "sample": "ws-005.bin",
+        "sha256": "536b9b1f41818dd62ef096f947b647176be4cbfba4083e2c8c244e92d3f1a962"
+      },
+      {
+        "received_ns": 1791848018381567000,
+        "truncated": false,
+        "inspection": {
+          "agg_trade_id": 3482658127,
+          "event_time": 1791848018003,
+          "trade_time": 1791848018003,
+          "source_time_unit": "ms",
+          "price_native": "81885.50",
+          "quantity_native": "0.005",
+          "normal_quantity_native": "0.005",
+          "quantity_unit": "UNKNOWN",
+          "buyer_is_maker": true,
+          "symbol_type_raw": 1,
+          "unknown_fields": [],
+          "unknown_wrapper_fields": []
+        },
+        "sample": "ws-006.bin",
+        "sha256": "63b5f5369eabadadb51312513ffcf28685e0282c87f6e424c5c26f95b55e7c24"
+      },
+      {
+        "received_ns": 1791848018381640000,
+        "truncated": false,
+        "inspection": {
+          "agg_trade_id": 3482658128,
+          "event_time": 1791848018003,
+          "trade_time": 1791848018003,
+          "source_time_unit": "ms",
+          "price_native": "81885.40",
+          "quantity_native": "0.001",
+          "normal_quantity_native": "0.001",
+          "quantity_unit": "UNKNOWN",
+          "buyer_is_maker": true,
+          "symbol_type_raw": 1,
+          "unknown_fields": [],
+          "unknown_wrapper_fields": []
+        },
+        "sample": "ws-007.bin",
+        "sha256": "030590aa6a6fe63fa0112aec65f991d7fb59702b3f54011e5542bae549e60a36"
+      },
+      {
+        "received_ns": 1791848018489046000,
+        "truncated": false,
+        "inspection": {
+          "agg_trade_id": 3482658129,
+          "event_time": 1791848018114,
+          "trade_time": 1791848018003,
+          "source_time_unit": "ms",
+          "price_native": "81885.30",
+          "quantity_native": "0.021",
+          "normal_quantity_native": "0.021",
+          "quantity_unit": "UNKNOWN",
+          "buyer_is_maker": true,
+          "symbol_type_raw": 1,
+          "unknown_fields": [],
+          "unknown_wrapper_fields": []
+        },
+        "sample": "ws-008.bin",
+        "sha256": "6d1acb2255a7999df90a4f0790c6d8a0725596afea2c4a0f52c528c5137cf52c"
+      },
+      {
+        "received_ns": 1791848018489212000,
+        "truncated": false,
+        "inspection": {
+          "agg_trade_id": 3482658130,
+          "event_time": 1791848018114,
+          "trade_time": 1791848018113,
+          "source_time_unit": "ms",
+          "price_native": "81885.30",
+          "quantity_native": "0.061",
+          "normal_quantity_native": "0.061",
+          "quantity_unit": "UNKNOWN",
+          "buyer_is_maker": true,
+          "symbol_type_raw": 1,
+          "unknown_fields": [],
+          "unknown_wrapper_fields": []
+        },
+        "sample": "ws-009.bin",
+        "sha256": "5ed207f5e56140f075012a0d5b3b1028e4d4b29c7181ae3ba175319fa937b8c1"
+      },
+      {
+        "received_ns": 1791848018534020000,
+        "truncated": false,
+        "inspection": {
+          "agg_trade_id": 3482658131,
+          "event_time": 1791848018158,
+          "trade_time": 1791848018114,
+          "source_time_unit": "ms",
+          "price_native": "81885.20",
+          "quantity_native": "0.004",
+          "normal_quantity_native": "0.004",
+          "quantity_unit": "UNKNOWN",
+          "buyer_is_maker": true,
+          "symbol_type_raw": 1,
+          "unknown_fields": [],
+          "unknown_wrapper_fields": []
+        },
+        "sample": "ws-010.bin",
+        "sha256": "b752b1d507f9cf9b21ba4ebb1f7bbf59b71d7a54c216397d54607e1d21a0a554"
+      },
+      {
+        "received_ns": 1791848018585624000,
+        "truncated": false,
+        "inspection": {
+          "agg_trade_id": 3482658132,
+          "event_time": 1791848018203,
+          "trade_time": 1791848018158,
+          "source_time_unit": "ms",
+          "price_native": "81885.10",
+          "quantity_native": "0.008",
+          "normal_quantity_native": "0.008",
+          "quantity_unit": "UNKNOWN",
+          "buyer_is_maker": true,
+          "symbol_type_raw": 1,
+          "unknown_fields": [],
+          "unknown_wrapper_fields": []
+        },
+        "sample": "ws-011.bin",
+        "sha256": "03bb3ac7d245b28dba00f925a51fe3b0c18f0efa485b2c1707630286912f81b5"
+      },
+      {
+        "received_ns": 1791848018694232000,
+        "truncated": false,
+        "inspection": {
+          "agg_trade_id": 3482658133,
+          "event_time": 1791848018322,
+          "trade_time": 1791848018203,
+          "source_time_unit": "ms",
+          "price_native": "81885.00",
+          "quantity_native": "0.047",
+          "normal_quantity_native": "0.047",
+          "quantity_unit": "UNKNOWN",
+          "buyer_is_maker": true,
+          "symbol_type_raw": 1,
+          "unknown_fields": [],
+          "unknown_wrapper_fields": []
+        },
+        "sample": "ws-012.bin",
+        "sha256": "0e9decc48c43edf049d3ec7df4dfc2c2e3558c5abaffce9daa31ab8bb669b13c"
+      },
+      {
+        "received_ns": 1791848018694295000,
+        "truncated": false,
+        "inspection": {
+          "agg_trade_id": 3482658134,
+          "event_time": 1791848018322,
+          "trade_time": 1791848018321,
+          "source_time_unit": "ms",
+          "price_native": "81885.00",
+          "quantity_native": "0.079",
+          "normal_quantity_native": "0.079",
+          "quantity_unit": "UNKNOWN",
+          "buyer_is_maker": true,
+          "symbol_type_raw": 1,
+          "unknown_fields": [],
+          "unknown_wrapper_fields": []
+        },
+        "sample": "ws-013.bin",
+        "sha256": "59b0baee041466db01d09e8c7f5a9764d40c2e1c86bb526414d6c75c1c900cb2"
+      },
+      {
+        "received_ns": 1791848018736474000,
+        "truncated": false,
+        "inspection": {
+          "agg_trade_id": 3482658135,
+          "event_time": 1791848018365,
+          "trade_time": 1791848018321,
+          "source_time_unit": "ms",
+          "price_native": "81884.90",
+          "quantity_native": "0.002",
+          "normal_quantity_native": "0.002",
+          "quantity_unit": "UNKNOWN",
+          "buyer_is_maker": true,
+          "symbol_type_raw": 1,
+          "unknown_fields": [],
+          "unknown_wrapper_fields": []
+        },
+        "sample": "ws-014.bin",
+        "sha256": "3a5efe2259a2de9ecdfc5fe1a3615456e4fc4e86f9bc25d383cc39a836f1a8ac"
+      },
+      {
+        "received_ns": 1791848018755313000,
+        "truncated": false,
+        "inspection": {
+          "agg_trade_id": 3482658136,
+          "event_time": 1791848018379,
+          "trade_time": 1791848018365,
+          "source_time_unit": "ms",
+          "price_native": "81884.80",
+          "quantity_native": "0.001",
+          "normal_quantity_native": "0.001",
+          "quantity_unit": "UNKNOWN",
+          "buyer_is_maker": true,
+          "symbol_type_raw": 1,
+          "unknown_fields": [],
+          "unknown_wrapper_fields": []
+        },
+        "sample": "ws-015.bin",
+        "sha256": "ae67bbc05527a3dc4df037fd64be112bf0f06a88924d37f62e31f6a7ca576c5d"
+      },
+      {
+        "received_ns": 1791848018781089000,
+        "truncated": false,
+        "inspection": {
+          "agg_trade_id": 3482658137,
+          "event_time": 1791848018404,
+          "trade_time": 1791848018379,
+          "source_time_unit": "ms",
+          "price_native": "81884.90",
+          "quantity_native": "0.005",
+          "normal_quantity_native": "0.005",
+          "quantity_unit": "UNKNOWN",
+          "buyer_is_maker": false,
+          "symbol_type_raw": 1,
+          "unknown_fields": [],
+          "unknown_wrapper_fields": []
+        },
+        "sample": "ws-016.bin",
+        "sha256": "1dcafca31df6d9a070c301cae291fb2f5fbff6c6e59d08f15ff6920fb4fa7ff0"
+      },
+      {
+        "received_ns": 1791848018781137000,
+        "truncated": false,
+        "inspection": {
+          "agg_trade_id": 3482658138,
+          "event_time": 1791848018404,
+          "trade_time": 1791848018403,
+          "source_time_unit": "ms",
+          "price_native": "81884.80",
+          "quantity_native": "0.004",
+          "normal_quantity_native": "0.004",
+          "quantity_unit": "UNKNOWN",
+          "buyer_is_maker": true,
+          "symbol_type_raw": 1,
+          "unknown_fields": [],
+          "unknown_wrapper_fields": []
+        },
+        "sample": "ws-017.bin",
+        "sha256": "ffe7246072a71936cf62eb434b8ffcfa8029d7cf617f516be05cbda19b31e539"
+      },
+      {
+        "received_ns": 1791848018781160000,
+        "truncated": false,
+        "inspection": {
+          "agg_trade_id": 3482658139,
+          "event_time": 1791848018404,
+          "trade_time": 1791848018403,
+          "source_time_unit": "ms",
+          "price_native": "81884.70",
+          "quantity_native": "0.002",
+          "normal_quantity_native": "0.002",
+          "quantity_unit": "UNKNOWN",
+          "buyer_is_maker": true,
+          "symbol_type_raw": 1,
+          "unknown_fields": [],
+          "unknown_wrapper_fields": []
+        },
+        "sample": "ws-018.bin",
+        "sha256": "8554b047a84bb10b72fc6edafff47f3de1dd1b48e4d42b9262060592b0faf587"
+      },
+      {
+        "received_ns": 1791848018890376000,
+        "truncated": false,
+        "inspection": {
+          "agg_trade_id": 3482658140,
+          "event_time": 1791848018503,
+          "trade_time": 1791848018403,
+          "source_time_unit": "ms",
+          "price_native": "81884.60",
+          "quantity_native": "0.011",
+          "normal_quantity_native": "0.011",
+          "quantity_unit": "UNKNOWN",
+          "buyer_is_maker": true,
+          "symbol_type_raw": 1,
+          "unknown_fields": [],
+          "unknown_wrapper_fields": []
+        },
+        "sample": "ws-019.bin",
+        "sha256": "9728574a65a68df8c9b687e7863f44ea2a10c1c81ec06acb174d8cd503496fae"
+      }
+    ],
+    "frames_seen": 20,
+    "timeout_diagnostics": {
+      "phase": "NOT_STARTED",
+      "source": "NOT_EXPIRED"
+    },
+    "request_started_ns": 1791848014881067000,
+    "http_status": 101,
+    "rate_headers": {},
+    "response_received_ns": 1791848017952630000
+  },
+  "bytes_received": 1156599,
+  "logical_calls": {
+    "rest": 1,
+    "ws": 1
+  },
+  "transport_attempts": {
+    "rest": 1,
+    "ws": 1
+  },
+  "retry_count": 0,
+  "backoff_cap_seconds": 0,
+  "continuous_collection_enabled": false,
+  "metadata": {
+    "symbol": "BTCUSDT",
+    "baseAsset": "BTC",
+    "quoteAsset": "USDT",
+    "marginAsset": "USDT",
+    "contractType": "PERPETUAL",
+    "status": "TRADING",
+    "quantity_unit": "UNKNOWN",
+    "tickSize": "0.10",
+    "stepSize": "0.001",
+    "minQty": "0.001",
+    "rateLimits": [
+      {
+        "rateLimitType": "REQUEST_WEIGHT",
+        "interval": "MINUTE",
+        "intervalNum": 1,
+        "limit": 2400
+      },
+      {
+        "rateLimitType": "ORDERS",
+        "interval": "MINUTE",
+        "intervalNum": 1,
+        "limit": 1200
+      },
+      {
+        "rateLimitType": "ORDERS",
+        "interval": "SECOND",
+        "intervalNum": 10,
+        "limit": 300
+      }
+    ]
+  },
+  "reason": "bounded protocol sample only; quantity unit and continuous budget unverified",
+  "retry_count_scope": "APPLICATION_AND_REQUEST_HANDLER",
+  "blocked_retry_count": 0,
+  "cleanup": "PASS",
+  "ended_ns": 1791848019485982000,
+  "elapsed_seconds": 11.494633791968226,
+  "config_sha256": "b037004b544ca834855821374bd65520a535b509c0b952d9c3f37a97a30d3b43"
+}
