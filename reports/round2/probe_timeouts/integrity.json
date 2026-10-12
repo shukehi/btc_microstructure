@@ -1,0 +1,25 @@
+{
+  "baseline": "fd4fbd73fc6a7c0c2a4cff77ba97492dfdc56525",
+  "protected_paths": [
+    "AGENTS.md",
+    "docs",
+    "config",
+    "requirements-dev.lock",
+    "pyproject.toml",
+    ".github",
+    "review",
+    "fixtures",
+    "src/btc_microstructure/offline.py",
+    "src/btc_microstructure/offline_core.py",
+    "src/btc_microstructure/offline_storage.py",
+    "reports/round1",
+    "reports/round2/01_protocol_readiness.md",
+    "reports/round2/protocol_readiness"
+  ],
+  "protected_diff_exit": 0,
+  "original_tests_modified": false,
+  "user_AGENTS_bytes_unchanged": true,
+  "original_workspace_status": " M AGENTS.md\n",
+  "historical_live_local_prefix_unchanged": true,
+  "final_tested_source_matches": true
+}

@@ -1,0 +1,135 @@
+{
+  "schema_version": "probe-0.2",
+  "evidence_kind": "SYNTHETIC",
+  "started_ns": 1791793524677481000,
+  "limits": {
+    "total_seconds": 30.0,
+    "connect_seconds": 5.0,
+    "rest_total_seconds": 15.0,
+    "idle_seconds": 5.0,
+    "max_messages": 1,
+    "max_bytes": 2097152,
+    "max_frame_bytes": 65536
+  },
+  "configured_timeouts": {
+    "total_seconds": 30.0,
+    "connect_seconds": 5.0,
+    "rest_total_seconds": 15.0,
+    "rest_total_mode": "EXPLICIT",
+    "idle_seconds": 5.0,
+    "cleanup_seconds": 1.0
+  },
+  "effective_timeouts": {
+    "work_seconds": 29.0,
+    "work_deadline_source": "TOTAL_MINUS_CLEANUP_RESERVE",
+    "rest_total_seconds": 15.0,
+    "rest_total_mode": "EXPLICIT",
+    "rest_total_cap_source": "REST_TOTAL",
+    "ws_connect_seconds": 5.0,
+    "ws_connect_cap_source": "CONNECT",
+    "ws_receive_seconds": 5.0,
+    "ws_receive_cap_source": "IDLE"
+  },
+  "status": "PASS",
+  "rest": {
+    "status": "PASS",
+    "method": "GET",
+    "url": "https://fapi.binance.com/fapi/v1/exchangeInfo",
+    "params": {},
+    "timeout_diagnostics": {
+      "phase": "NOT_STARTED",
+      "source": "NOT_EXPIRED"
+    },
+    "request_started_ns": 1791793524677712000,
+    "http_status": 200,
+    "rate_headers": {
+      "x-mbx-used-weight-1m": "1"
+    },
+    "response_received_ns": 1791793524677772000,
+    "body_bytes_observed": 782,
+    "body_complete": true,
+    "body_read_state": "COMPLETE",
+    "truncated": false,
+    "sample": "rest-response.bin",
+    "sha256": "b2fc8ed8b9cc066d370b4574b252a67ece1f36c188c3f1c4a9b93a76112ef4f4"
+  },
+  "ws": {
+    "status": "PASS",
+    "url": "wss://fstream.binance.com/market/stream?streams=btcusdt@aggTrade",
+    "subscription": "URL combined stream",
+    "messages": [
+      {
+        "received_ns": 1791793524677894000,
+        "truncated": false,
+        "inspection": {
+          "agg_trade_id": 900000001,
+          "event_time": 1700000000001,
+          "trade_time": 1700000000000,
+          "source_time_unit": "ms",
+          "price_native": "12345.67000000",
+          "quantity_native": "0.12345678",
+          "normal_quantity_native": "0.02345678",
+          "quantity_unit": "UNKNOWN",
+          "buyer_is_maker": true,
+          "symbol_type_raw": 1,
+          "unknown_fields": [],
+          "unknown_wrapper_fields": [
+            "synthetic_note"
+          ]
+        },
+        "sample": "ws-000.bin",
+        "sha256": "ee5723800de33ea72cee75f7c1f655d7ec361c196a3d320023fdfe7478b92820"
+      }
+    ],
+    "frames_seen": 1,
+    "timeout_diagnostics": {
+      "phase": "NOT_STARTED",
+      "source": "NOT_EXPIRED"
+    },
+    "request_started_ns": 1791793524677830000,
+    "http_status": 101,
+    "rate_headers": {},
+    "response_received_ns": 1791793524677843000
+  },
+  "bytes_received": 1140,
+  "logical_calls": {
+    "rest": 1,
+    "ws": 1
+  },
+  "transport_attempts": null,
+  "retry_count": 0,
+  "backoff_cap_seconds": 0,
+  "continuous_collection_enabled": false,
+  "metadata": {
+    "symbol": "BTCUSDT",
+    "baseAsset": "BTC",
+    "quoteAsset": "USDT",
+    "marginAsset": "USDT",
+    "contractType": "PERPETUAL",
+    "status": "TRADING",
+    "quantity_unit": "UNKNOWN",
+    "tickSize": "0.10",
+    "stepSize": "0.001",
+    "minQty": "0.001",
+    "rateLimits": [
+      {
+        "rateLimitType": "REQUEST_WEIGHT",
+        "interval": "MINUTE",
+        "intervalNum": 1,
+        "limit": 2400
+      },
+      {
+        "rateLimitType": "ORDERS",
+        "interval": "MINUTE",
+        "intervalNum": 1,
+        "limit": 1200
+      }
+    ]
+  },
+  "reason": "bounded protocol sample only; quantity unit and continuous budget unverified",
+  "retry_count_scope": "APPLICATION_ONLY_TRANSPORT_UNOBSERVED",
+  "blocked_retry_count": null,
+  "cleanup": "PASS",
+  "ended_ns": 1791793524677944000,
+  "elapsed_seconds": 0.00046608306001871824
+}

@@ -1,0 +1,20 @@
+{
+  "baseline": "fd4fbd73fc6a7c0c2a4cff77ba97492dfdc56525",
+  "source_sha256_from_git": {
+    "src/btc_microstructure/probe.py": "909263477ddb98823ae4cb4d1ccb413b290a6f25e9600d902956706fa423924c",
+    "src/btc_microstructure/probe_transport.py": "e52ede3e9c10b579bc2bda651901423705e09204500c2fa850541a787af827f8",
+    "src/btc_microstructure/cli.py": "4aa3e1df388da02bb2771e0abb4071c151d95be1aab474a3cdce7b84ca18537b"
+  },
+  "user_AGENTS_sha256": "97774315d2c048fecc4d14f55f017612756441bf55387499ac70b91f14e3bf8a",
+  "command": [
+    "env",
+    "PYTHONPATH=src",
+    ".venv/bin/python",
+    "reports/round2/probe_timeouts/old_timeout_control.py"
+  ],
+  "cwd": "<task-checkout>",
+  "exit_code": 0,
+  "evidence_kind": "SYNTHETIC",
+  "python": "3.12.13",
+  "aiohttp": "3.12.15"
+}

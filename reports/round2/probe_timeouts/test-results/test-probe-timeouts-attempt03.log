@@ -1,0 +1,121 @@
+..........F.....FF.....                                                  [100%]
+=================================== FAILURES ===================================
+______ test_aio_transport_rest_total_timeout_retains_prefix_and_blocks_ws ______
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x10b6554c0>
+
+    def test_aio_transport_rest_total_timeout_retains_prefix_and_blocks_ws(
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        prefix = b'{"symbols":['
+        response = ChunkResponse(ChunkContent([prefix, b'"slow"'], delay=0.035))
+        session = CaptureSession()
+        session.response = response
+        monkeypatch.setattr(aiohttp, "ClientSession", lambda **options: session)
+
+        report = asyncio.run(
+            run_probe(
+                AioTransport(),
+                ProbeLimits(
+                    total_seconds=2.0,
+                    connect_seconds=0.02,
+                    rest_total_seconds=0.055,
+                    idle_seconds=0.2,
+                    max_bytes=2048,
+                ),
+            )
+        )
+
+        assert report["status"] == "BLOCKED"
+        assert report["rest"]["status"] == "BLOCKED"
+        assert report["ws"]["status"] == "NOT_RUN"
+        assert report["rest"]["http_status"] == 200
+        assert report["rest"]["body_hex"] == prefix.hex()
+        assert report["rest"]["body_complete"] is False
+        diagnostic = report["rest"]["timeout_diagnostics"]
+        assert diagnostic["source"] == "REST_TOTAL"
+>       assert diagnostic["phase"] in {"REST_BODY", "REST_READ_BODY"}
+E       AssertionError: assert 'REST_HEADERS_OR_BODY' in {'REST_BODY', 'REST_READ_BODY'}
+
+tests/unit/test_probe_timeouts.py:359: AssertionError
+________ test_aio_transport_ws_connect_timeout_reports_typed_diagnostic ________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x10b6691f0>
+
+    def test_aio_transport_ws_connect_timeout_reports_typed_diagnostic(
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        class ConnectTimeoutSession(CaptureSession):
+            async def ws_connect(self, url: str, **kwargs: object) -> object:
+                self.calls.append(("WS", url, kwargs))
+                raise aiohttp.ConnectionTimeoutError("SYNTHETIC_WS_CONNECT_TIMEOUT")
+
+        session = ConnectTimeoutSession()
+        monkeypatch.setattr(aiohttp, "ClientSession", lambda **options: session)
+
+        report = asyncio.run(
+            run_probe(
+                AioTransport(),
+                ProbeLimits(
+                    total_seconds=2.0,
+                    connect_seconds=0.2,
+                    rest_total_seconds=0.2,
+                    max_messages=1,
+                ),
+            )
+        )
+
+        assert report["status"] == "BLOCKED"
+        assert report["rest"]["status"] == "PASS"
+        assert report["ws"]["status"] == "BLOCKED"
+>       assert report["reason"] == "TIMEOUT; no retry"
+E       AssertionError: assert 'WS_NETWORK_ERROR' == 'TIMEOUT; no retry'
+E
+E         - TIMEOUT; no retry
+E         + WS_NETWORK_ERROR
+
+tests/unit/test_probe_timeouts.py:530: AssertionError
+________ test_aio_transport_ws_receive_timeout_reports_typed_diagnostic ________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x10b66b410>
+
+    def test_aio_transport_ws_receive_timeout_reports_typed_diagnostic(
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        class TimeoutSocket(TextSocket):
+            async def receive(self) -> object:
+                raise aiohttp.SocketTimeoutError("SYNTHETIC_WS_RECEIVE_TIMEOUT")
+
+        session = CaptureSession()
+        session.socket = TimeoutSocket()
+        monkeypatch.setattr(aiohttp, "ClientSession", lambda **options: session)
+
+        report = asyncio.run(
+            run_probe(
+                AioTransport(),
+                ProbeLimits(
+                    total_seconds=2.0,
+                    connect_seconds=0.2,
+                    rest_total_seconds=0.2,
+                    idle_seconds=0.2,
+                    max_messages=1,
+                ),
+            )
+        )
+
+        assert report["status"] == "BLOCKED"
+        assert report["rest"]["status"] == "PASS"
+        assert report["ws"]["status"] == "BLOCKED"
+>       assert report["reason"] == "TIMEOUT; no retry"
+E       AssertionError: assert 'WS_RECEIVE_ERROR' == 'TIMEOUT; no retry'
+E
+E         - TIMEOUT; no retry
+E         + WS_RECEIVE_ERROR
+
+tests/unit/test_probe_timeouts.py:565: AssertionError
+- generated xml file: <task-checkout>/reports/round2/probe_timeouts/test-results/test-probe-timeouts-attempt03.xml -
+=========================== short test summary info ============================
+FAILED tests/unit/test_probe_timeouts.py::test_aio_transport_rest_total_timeout_retains_prefix_and_blocks_ws
+FAILED tests/unit/test_probe_timeouts.py::test_aio_transport_ws_connect_timeout_reports_typed_diagnostic
+FAILED tests/unit/test_probe_timeouts.py::test_aio_transport_ws_receive_timeout_reports_typed_diagnostic
+3 failed, 20 passed in 4.58s

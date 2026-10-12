@@ -1,0 +1,32 @@
+{
+  "pytest-independent-r1-04.xml": {
+    "tests": 4,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "pytest-independent-r1-01.xml": {
+    "tests": 15,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "pytest-independent-r1-03.xml": {
+    "tests": 8,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "pytest-independent-r1-02.xml": {
+    "tests": 9,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "pytest.xml": {
+    "tests": 315,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  }
+}

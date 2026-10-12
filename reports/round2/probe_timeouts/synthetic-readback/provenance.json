@@ -1,0 +1,8 @@
+{
+  "evidence_kind": "SYNTHETIC",
+  "inputs": "existing fixtures/synthetic/probe and new unit fake chunk/session helpers",
+  "candidate_config": "30/5/15/5 uses injected immediate transport, not measured 15s network success",
+  "blocked_sample": "actual AioTransport.metadata reader and orchestrator, fake ClientSession; middleware handler not entered",
+  "live_requests": 0,
+  "saved_records_and_sample_hashes_verified": true
+}

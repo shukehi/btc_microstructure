@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="3" skipped="0" tests="23" time="4.580" timestamp="2026-10-12T03:22:03.967776-05:00" hostname="AriesdeMacBook-Pro.local"><testcase classname="tests.unit.test_probe_timeouts" name="test_probe_limits_keep_old_default_and_reject_invalid_rest_total_values" time="0.001" /><testcase classname="tests.unit.test_probe_timeouts" name="test_cli_rest_total_seconds_reaches_limits_before_transport" time="0.011" /><testcase classname="tests.unit.test_probe_timeouts" name="test_cli_rejects_invalid_rest_total_seconds_before_transport[0]" time="0.006" /><testcase classname="tests.unit.test_probe_timeouts" name="test_cli_rejects_invalid_rest_total_seconds_before_transport[21]" time="0.007" /><testcase classname="tests.unit.test_probe_timeouts" name="test_cli_rejects_invalid_rest_total_seconds_before_transport[nan]" time="0.006" /><testcase classname="tests.unit.test_probe_timeouts" name="test_cli_rejects_invalid_rest_total_seconds_before_transport[inf]" time="0.007" /><testcase classname="tests.unit.test_probe_timeouts" name="test_run_probe_uses_rest_total_for_metadata_without_changing_legacy_default" time="0.104" /><testcase classname="tests.unit.test_probe_timeouts" name="test_report_records_candidate_timeout_mapping" time="0.001" /><testcase classname="tests.unit.test_probe_timeouts" name="test_aio_transport_slow_complete_rest_body_can_pass_with_explicit_rest_total" time="0.052" /><testcase classname="tests.unit.test_probe_timeouts" name="test_aio_transport_uses_rest_request_timeout_without_leaking_it_to_ws" time="0.001" /><testcase classname="tests.unit.test_probe_timeouts" name="test_aio_transport_rest_total_timeout_retains_prefix_and_blocks_ws" time="0.057"><failure message="AssertionError: assert 'REST_HEADERS_OR_BODY' in {'REST_BODY', 'REST_READ_BODY'}">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x10b6554c0&gt;
+
+    def test_aio_transport_rest_total_timeout_retains_prefix_and_blocks_ws(
+        monkeypatch: pytest.MonkeyPatch,
+    ) -&gt; None:
+        prefix = b'{"symbols":['
+        response = ChunkResponse(ChunkContent([prefix, b'"slow"'], delay=0.035))
+        session = CaptureSession()
+        session.response = response
+        monkeypatch.setattr(aiohttp, "ClientSession", lambda **options: session)
+
+        report = asyncio.run(
+            run_probe(
+                AioTransport(),
+                ProbeLimits(
+                    total_seconds=2.0,
+                    connect_seconds=0.02,
+                    rest_total_seconds=0.055,
+                    idle_seconds=0.2,
+                    max_bytes=2048,
+                ),
+            )
+        )
+
+        assert report["status"] == "BLOCKED"
+        assert report["rest"]["status"] == "BLOCKED"
+        assert report["ws"]["status"] == "NOT_RUN"
+        assert report["rest"]["http_status"] == 200
+        assert report["rest"]["body_hex"] == prefix.hex()
+        assert report["rest"]["body_complete"] is False
+        diagnostic = report["rest"]["timeout_diagnostics"]
+        assert diagnostic["source"] == "REST_TOTAL"
+&gt;       assert diagnostic["phase"] in {"REST_BODY", "REST_READ_BODY"}
+E       AssertionError: assert 'REST_HEADERS_OR_BODY' in {'REST_BODY', 'REST_READ_BODY'}
+
+tests/unit/test_probe_timeouts.py:359: AssertionError</failure></testcase><testcase classname="tests.unit.test_probe_timeouts" name="test_aio_transport_records_socket_read_timeout_as_body_phase" time="0.001" /><testcase classname="tests.unit.test_probe_timeouts" name="test_aio_transport_records_connection_timeout_before_headers" time="0.001" /><testcase classname="tests.unit.test_probe_timeouts" name="test_aio_transport_records_header_wait_socket_timeout_before_body" time="0.001" /><testcase classname="tests.unit.test_probe_timeouts" name="test_unattributed_transport_timeout_keeps_unknown_source" time="0.000" /><testcase classname="tests.unit.test_probe_timeouts" name="test_ws_handshake_timeout_reports_connect_phase" time="0.031" /><testcase classname="tests.unit.test_probe_timeouts" name="test_aio_transport_ws_connect_timeout_reports_typed_diagnostic" time="0.001"><failure message="AssertionError: assert 'WS_NETWORK_ERROR' == 'TIMEOUT; no retry'&#10;  &#10;  - TIMEOUT; no retry&#10;  + WS_NETWORK_ERROR">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x10b6691f0&gt;
+
+    def test_aio_transport_ws_connect_timeout_reports_typed_diagnostic(
+        monkeypatch: pytest.MonkeyPatch,
+    ) -&gt; None:
+        class ConnectTimeoutSession(CaptureSession):
+            async def ws_connect(self, url: str, **kwargs: object) -&gt; object:
+                self.calls.append(("WS", url, kwargs))
+                raise aiohttp.ConnectionTimeoutError("SYNTHETIC_WS_CONNECT_TIMEOUT")
+
+        session = ConnectTimeoutSession()
+        monkeypatch.setattr(aiohttp, "ClientSession", lambda **options: session)
+
+        report = asyncio.run(
+            run_probe(
+                AioTransport(),
+                ProbeLimits(
+                    total_seconds=2.0,
+                    connect_seconds=0.2,
+                    rest_total_seconds=0.2,
+                    max_messages=1,
+                ),
+            )
+        )
+
+        assert report["status"] == "BLOCKED"
+        assert report["rest"]["status"] == "PASS"
+        assert report["ws"]["status"] == "BLOCKED"
+&gt;       assert report["reason"] == "TIMEOUT; no retry"
+E       AssertionError: assert 'WS_NETWORK_ERROR' == 'TIMEOUT; no retry'
+E
+E         - TIMEOUT; no retry
+E         + WS_NETWORK_ERROR
+
+tests/unit/test_probe_timeouts.py:530: AssertionError</failure></testcase><testcase classname="tests.unit.test_probe_timeouts" name="test_aio_transport_ws_receive_timeout_reports_typed_diagnostic" time="0.001"><failure message="AssertionError: assert 'WS_RECEIVE_ERROR' == 'TIMEOUT; no retry'&#10;  &#10;  - TIMEOUT; no retry&#10;  + WS_RECEIVE_ERROR">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x10b66b410&gt;
+
+    def test_aio_transport_ws_receive_timeout_reports_typed_diagnostic(
+        monkeypatch: pytest.MonkeyPatch,
+    ) -&gt; None:
+        class TimeoutSocket(TextSocket):
+            async def receive(self) -&gt; object:
+                raise aiohttp.SocketTimeoutError("SYNTHETIC_WS_RECEIVE_TIMEOUT")
+
+        session = CaptureSession()
+        session.socket = TimeoutSocket()
+        monkeypatch.setattr(aiohttp, "ClientSession", lambda **options: session)
+
+        report = asyncio.run(
+            run_probe(
+                AioTransport(),
+                ProbeLimits(
+                    total_seconds=2.0,
+                    connect_seconds=0.2,
+                    rest_total_seconds=0.2,
+                    idle_seconds=0.2,
+                    max_messages=1,
+                ),
+            )
+        )
+
+        assert report["status"] == "BLOCKED"
+        assert report["rest"]["status"] == "PASS"
+        assert report["ws"]["status"] == "BLOCKED"
+&gt;       assert report["reason"] == "TIMEOUT; no retry"
+E       AssertionError: assert 'WS_RECEIVE_ERROR' == 'TIMEOUT; no retry'
+E
+E         - TIMEOUT; no retry
+E         + WS_RECEIVE_ERROR
+
+tests/unit/test_probe_timeouts.py:565: AssertionError</failure></testcase><testcase classname="tests.unit.test_probe_timeouts" name="test_global_deadline_shorter_than_rest_total_stops_before_ws" time="1.001" /><testcase classname="tests.unit.test_probe_timeouts" name="test_ws_receive_keeps_global_elapsed_budget_after_rest_success" time="1.003" /><testcase classname="tests.unit.test_probe_timeouts" name="test_cleanup_timeout_blocks_otherwise_successful_probe" time="1.002" /><testcase classname="tests.unit.test_probe_timeouts" name="test_save_probe_persists_timeout_limits_and_offline_diagnostics" time="0.004" /><testcase classname="tests.unit.test_probe_timeouts" name="test_save_probe_persists_blocked_timeout_diagnostics" time="1.003" /></testsuite></testsuites>

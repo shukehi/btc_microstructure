@@ -1,0 +1,32 @@
+{
+  "evidence_kind": "SYNTHETIC",
+  "reference_code": "fd4fbd73fc6a7c0c2a4cff77ba97492dfdc56525",
+  "scale": "legacy REST/connection0.06s; chunk interval0.03s<idle0.05s; complete body requires >0.06s",
+  "http_session_total": 0.06,
+  "status": "BLOCKED",
+  "reason": "TIMEOUT; no retry",
+  "rest": {
+    "status": "BLOCKED",
+    "method": "GET",
+    "url": "https://fapi.binance.com/fapi/v1/exchangeInfo",
+    "params": {},
+    "request_started_ns": 1791792482977939000,
+    "http_status": 200,
+    "rate_headers": {
+      "x-mbx-used-weight-1m": "7"
+    },
+    "response_received_ns": 1791792483045787000,
+    "headers_received_ns": 1791792482978001000,
+    "body_bytes_observed": 100,
+    "body_complete": false,
+    "body_read_state": "INTERRUPTED",
+    "truncated": true
+  },
+  "bytes_received": 100,
+  "logical_calls": {
+    "rest": 1,
+    "ws": 0
+  },
+  "elapsed_seconds": 0.06831666606012732,
+  "cleanup": "PASS"
+}
