@@ -1,0 +1,23 @@
+{
+  "verification_kind": "offline post-run evidence consistency and privacy inspection; no network",
+  "expected_application_invocations": 1,
+  "exit_code": 1,
+  "response_http_status": 200,
+  "body_complete": false,
+  "sample_bytes_and_hash_match": true,
+  "metadata_not_parsed_or_accepted": true,
+  "ws_not_attempted": true,
+  "retry_count": 0,
+  "blocked_retry_count": 0,
+  "cleanup": "PASS",
+  "privacy_pattern_scan": {
+    "protocol_probe_report.json": [],
+    "rest-response.bin": [],
+    "endpoint_budget.json": []
+  },
+  "pattern_scan_limit": "heuristic plus manual review of all published JSON/log fields, not proof of universal secrecy",
+  "raw_sample_publication": "withheld local-only; no sample excerpt necessary",
+  "report_and_budget_byte_identical": true,
+  "verification_exit_code": 0,
+  "exit_code_semantics": "exit_code=1 is the actual probe CLI outcome, not the verification command"
+}

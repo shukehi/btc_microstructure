@@ -1,0 +1,15 @@
+{
+  "files": {
+    "protocol_probe_report.json": "901c14db26988cc48f7f47b2699eab394f8b14b8480506e8dc517a678f869575",
+    "stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "evidence-verification.json": "d855559a85ca699d350783aaa005bdf293f4c858ed7ff3f36fd68dc68b7569cc",
+    "stdout.log": "5ef9884a724427894c74de6e55d2a6af19e5473414728656d9c9f4ef6670ac6e",
+    "endpoint_budget.json": "887db8c88aaab44647e58f404fdefc0d9af38a935a4cc9340e1c03cf6dc531b2",
+    "local-originals-manifest.json": "75ca991f3f3b53c979616a9fa8e4afe8986684225a32c61795b34bfc5e700085",
+    "invocation.redacted.json": "3e55798a3f7c679c0b003376158644c24ecd53129a5d4c0e5d4481f8ffaa010a",
+    "environment.json": "0a3116cefc2e4b3e05c7a493669c5eaf804fdba8114ffd86dd32a95de0924e0b"
+  },
+  "evidence_kind": "LIVE",
+  "raw_response_in_repo": false,
+  "original_user_changes_preserved": true
+}
