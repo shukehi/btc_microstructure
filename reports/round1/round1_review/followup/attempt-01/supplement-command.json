@@ -1,0 +1,16 @@
+{
+  "cwd": "<review-checkout>",
+  "argv": [
+    ".venv/bin/python",
+    "-m",
+    "pytest",
+    "-q",
+    "reports/round1/round1_review/followup/control_boundaries.py",
+    "--junitxml=reports/round1/round1_review/followup/attempt-01/control-boundaries.xml"
+  ],
+  "exit_code": 0,
+  "tests": 3,
+  "failures": 0,
+  "skipped": 0,
+  "post_run_change": "Ruff format only; no assertions changed"
+}
