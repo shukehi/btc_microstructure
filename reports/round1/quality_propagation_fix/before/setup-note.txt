@@ -1,0 +1,1 @@
+Initial evidence metadata collection accidentally used systemPython3.14 and could not query pyarrow metadata. The actual before tests and original script used .venv Python3.12.13 and reproduced expected failures. Metadata collection rerun with that interpreter; no package or lock changes.

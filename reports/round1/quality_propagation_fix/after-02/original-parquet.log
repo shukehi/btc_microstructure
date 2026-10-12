@@ -1,0 +1,27 @@
+{
+  "reviewed_commit": "0b65be4933e9c36abedf784e608b832c56cee131",
+  "evidence_kind": "SYNTHETIC",
+  "original_fixture_sha256": "e9fe002d6b8b1ddcd87f7fc01be68f62cf18f9b689fce33ca2640d1349aa4357",
+  "trigger": "add quality_flags=[GAP_KNOWN] to first synthetic RAW only",
+  "expected": {
+    "normalized_flag_contains": "GAP_KNOWN",
+    "feature_flag_contains": "GAP_KNOWN",
+    "trade_delta_base": null,
+    "volume_base": null
+  },
+  "actual": {
+    "collect_status": "PASS",
+    "raw_flags": [
+      "GAP_KNOWN"
+    ],
+    "normalized_flags": [
+      "GAP_KNOWN"
+    ],
+    "feature_flags": [
+      "GAP_KNOWN"
+    ],
+    "trade_delta_base": "None",
+    "volume_base": "None"
+  },
+  "output": "/Users/aries/Dve/btc_microstructure/data/r104-quality-final-02/attempt-wbv5gwub"
+}

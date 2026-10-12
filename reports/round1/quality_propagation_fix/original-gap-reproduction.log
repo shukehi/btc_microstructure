@@ -1,0 +1,30 @@
+{
+  "reviewed_commit": "0b65be4933e9c36abedf784e608b832c56cee131",
+  "evidence_kind": "SYNTHETIC",
+  "original_fixture_sha256": "e9fe002d6b8b1ddcd87f7fc01be68f62cf18f9b689fce33ca2640d1349aa4357",
+  "trigger": "add quality_flags=[GAP_KNOWN] to first synthetic RAW only",
+  "expected": {
+    "normalized_flag_contains": "GAP_KNOWN",
+    "feature_flag_contains": "GAP_KNOWN",
+    "trade_delta_base": null,
+    "volume_base": null
+  },
+  "actual": {
+    "collect_status": "PASS",
+    "raw_flags": [
+      "GAP_KNOWN"
+    ],
+    "normalized_flags": [],
+    "feature_flags": [],
+    "trade_delta_base": "0.40",
+    "volume_base": "0.60"
+  },
+  "output": "/Users/aries/Dve/btc_microstructure/data/r104/checkout/data/r104-gap-probes/attempt-sbkgh48r"
+}
+Traceback (most recent call last):
+  File "/Users/aries/Dve/btc_microstructure/reports/round1/round1_review/reproduce_gap_flag.py", line 86, in <module>
+    main()
+  File "/Users/aries/Dve/btc_microstructure/reports/round1/round1_review/reproduce_gap_flag.py", line 80, in main
+    assert feature["trade_delta_base"] is None, (
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: GAP_KNOWN must invalidate the affected flow window (docs/01 quality contract)
