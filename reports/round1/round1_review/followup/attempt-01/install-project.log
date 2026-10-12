@@ -1,0 +1,16 @@
+Obtaining file://<review-checkout>
+  Checking if build backend supports build_editable: started
+  Checking if build backend supports build_editable: finished with status 'done'
+  Preparing editable metadata (pyproject.toml): started
+  Preparing editable metadata (pyproject.toml): finished with status 'done'
+Building wheels for collected packages: btc-microstructure
+  Building editable for btc-microstructure (pyproject.toml): started
+  Building editable for btc-microstructure (pyproject.toml): finished with status 'done'
+  Created wheel for btc-microstructure: filename=btc_microstructure-0.1.0-0.editable-py3-none-any.whl size=1733 sha256=2741f0c3efb6fb2d63c689c9080565149bdbea389dd14e8c57aade6d211ac239
+  Stored in directory: /private/var/folders/s9/rbq781b922s1xp3jhmtct8yc0000gn/T/pip-ephem-wheel-cache-i6t89ghb/wheels/ee/0f/bb/6b3e343425a08e7b8c05bcc5b586233b798f0a41c1b0d11486
+Successfully built btc-microstructure
+Installing collected packages: btc-microstructure
+Successfully installed btc-microstructure-0.1.0
+
+[notice] A new release of pip is available: 25.0.1 -> 26.2.1
+[notice] To update, run: <review-checkout>/.venv/bin/python -m pip install --upgrade pip

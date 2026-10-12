@@ -1,0 +1,19 @@
+{
+  "issue": "https://github.com/shukehi/btc_microstructure/issues/6",
+  "continuation": "https://github.com/shukehi/btc_microstructure/issues/6#issuecomment-6118293337",
+  "review_ids": [
+    5483287314,
+    5483466192,
+    5483555449,
+    5485855471,
+    5486128414,
+    5486282114
+  ],
+  "reviewed_commit": "4962325fe3ed9a0d03ce8c3d2b42a2db898a7cbe",
+  "evidence_kinds": [
+    "current offline execution",
+    "current code and assertion reading",
+    "historical GitHub report/review readback"
+  ],
+  "new_live_observations": false
+}

@@ -1,0 +1,68 @@
+[
+  {
+    "command": [
+      "/Users/aries/Dve/btc_microstructure/data/r104/checkout/.venv/bin/python",
+      "-m",
+      "btc_microstructure",
+      "validate-offline",
+      "config/offline.synthetic.yaml"
+    ],
+    "exit_code": 0
+  },
+  {
+    "command": [
+      "/Users/aries/Dve/btc_microstructure/data/r104/checkout/.venv/bin/python",
+      "-m",
+      "btc_microstructure",
+      "collect",
+      "config/offline.synthetic.yaml",
+      "--mode",
+      "synthetic",
+      "--output",
+      "ci-results/offline-smoke/collect"
+    ],
+    "exit_code": 0
+  },
+  {
+    "command": [
+      "/Users/aries/Dve/btc_microstructure/data/r104/checkout/.venv/bin/python",
+      "-m",
+      "btc_microstructure",
+      "replay",
+      "config/offline.synthetic.yaml",
+      "--input",
+      "ci-results/offline-smoke/collect",
+      "--output",
+      "ci-results/offline-smoke/replay1"
+    ],
+    "exit_code": 0
+  },
+  {
+    "command": [
+      "/Users/aries/Dve/btc_microstructure/data/r104/checkout/.venv/bin/python",
+      "-m",
+      "btc_microstructure",
+      "replay",
+      "config/offline.synthetic.yaml",
+      "--input",
+      "ci-results/offline-smoke/collect",
+      "--output",
+      "ci-results/offline-smoke/replay2"
+    ],
+    "exit_code": 0
+  },
+  {
+    "command": [
+      "/Users/aries/Dve/btc_microstructure/data/r104/checkout/.venv/bin/python",
+      "-m",
+      "btc_microstructure",
+      "build-features",
+      "config/offline.synthetic.yaml",
+      "--input",
+      "ci-results/offline-smoke/raw-only",
+      "--output",
+      "ci-results/offline-smoke/build"
+    ],
+    "exit_code": 0
+  }
+]

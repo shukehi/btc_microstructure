@@ -1,0 +1,7 @@
+{
+  "reviewed_commit": "0b65be4933e9c36abedf784e608b832c56cee131",
+  "review_branch": "review/r1-04-round1-assessment",
+  "isolated_checkout": "data/r104/checkout",
+  "user_AGENTS_sha256": "97774315d2c048fecc4d14f55f017612756441bf55387499ac70b91f14e3bf8a",
+  "new_cli_session_required": true
+}

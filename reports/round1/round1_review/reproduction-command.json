@@ -1,0 +1,11 @@
+{
+  "argv": [
+    ".venv/bin/python",
+    "/Users/aries/Dve/btc_microstructure/reports/round1/round1_review/reproduce_gap_flag.py"
+  ],
+  "cwd": "/Users/aries/Dve/btc_microstructure/data/r104/checkout",
+  "exit_code": 1,
+  "expected_contract_result": "affected volume and Delta null with GAP_KNOWN",
+  "actual_result": "healthy flags empty, volume0.60/Delta0.40, collectPASS",
+  "finding_id": "R104-01"
+}
