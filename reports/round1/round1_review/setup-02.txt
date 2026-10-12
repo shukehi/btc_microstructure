@@ -1,0 +1,1 @@
+Evidence-copy attempt repeated incorrect relative report path while cwd was isolated checkout, causing FileNotFoundError and no writes. Corrected to absolute primary report directory. Source and tests unchanged; installation itself succeeded.

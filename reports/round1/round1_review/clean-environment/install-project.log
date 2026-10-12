@@ -1,0 +1,16 @@
+Obtaining file:///Users/aries/Dve/btc_microstructure/data/r104/checkout
+  Checking if build backend supports build_editable: started
+  Checking if build backend supports build_editable: finished with status 'done'
+  Preparing editable metadata (pyproject.toml): started
+  Preparing editable metadata (pyproject.toml): finished with status 'done'
+Building wheels for collected packages: btc-microstructure
+  Building editable for btc-microstructure (pyproject.toml): started
+  Building editable for btc-microstructure (pyproject.toml): finished with status 'done'
+  Created wheel for btc-microstructure: filename=btc_microstructure-0.1.0-0.editable-py3-none-any.whl size=1733 sha256=cf59eebb28b1c3cdbbb4406bf77685ff4549d7f2efaf8ab0d42493cdd1b0f2e4
+  Stored in directory: /private/var/folders/s9/rbq781b922s1xp3jhmtct8yc0000gn/T/pip-ephem-wheel-cache-gs8keyjq/wheels/43/3d/18/a474238276083cad8bd4fea468ae4222548ee6c38e13da0c43
+Successfully built btc-microstructure
+Installing collected packages: btc-microstructure
+Successfully installed btc-microstructure-0.1.0
+
+[notice] A new release of pip is available: 25.0.1 -> 26.2.1
+[notice] To update, run: /Users/aries/Dve/btc_microstructure/data/r104/checkout/.venv/bin/python -m pip install --upgrade pip

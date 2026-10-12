@@ -1,0 +1,15 @@
+{
+  "feature_rows": 70,
+  "limitations": {
+    "continuous_collection": "NOT_RUN",
+    "quantity_unit_for_live": "UNKNOWN_UNVERIFIED",
+    "real_binance_rest": "BLOCKED_HISTORICAL",
+    "real_binance_ws": "NOT_RUN"
+  },
+  "normalized_rows": 3,
+  "offline_config_sha256": "6da02b16a314b315c6e9d3fa588c3beb2791ee240bcedd88c8178378c9e71c2b",
+  "output_root": "ci-results/offline-smoke/collect",
+  "quarantine_rows": 1,
+  "run_id": "r1-03-synthetic-offline",
+  "status": "PASS"
+}

@@ -1,0 +1,7 @@
+[
+  {
+    "command": "/bin/zsh -lc \"PYTHONDONTWRITEBYTECODE=1 .venv/bin/python - <<'PY'\nimport socket\nfrom btc_microstructure.offline import OfflineConfig, fixture_rows\nfrom btc_microstructure.offline_core import Core\n\ndef denied(*args, **kwargs):\n    raise AssertionError('network forbidden')\nfor name in ('create_connection', 'getaddrinfo'):\n    setattr(socket, name, denied)\nsocket.socket.connect = denied\nsocket.socket.connect_ex = denied\nconfig = OfflineConfig.load('config/offline.synthetic.yaml')\nrows = fixture_rows(config)\nengine = Core(config.core_config(), config.metadata)\nfor row in rows:\n    if row['kind'] == 'RAW' and row['raw_ref'] == 'fixture:1':\n        row['quality_flags'] = ['GAP_KNOWN']\n        print('raw_flags=', row['quality_flags'])\n    engine.process(row)\nprint('normalized_flags=', engine.normalized[0]['quality_flags'])\nfeature = next(r for r in engine.features if r['feature_cutoff_ns'] == 31_000_000_000 and r['window_seconds'] == 30)\nprint('feature_flags=', feature['quality_flags'], 'delta=', feature['trade_delta_base'])\nassert feature['trade_delta_base'] is None, 'contract: GAP_KNOWN must make affected flow window unavailable'\nPY\"",
+    "exit_code": 1,
+    "aggregated_output": "Traceback (most recent call last):\n  File \"<stdin>\", line 22, in <module>\nAssertionError: contract: GAP_KNOWN must make affected flow window unavailable\nraw_flags= ['GAP_KNOWN']\nnormalized_flags= []\nfeature_flags= [] delta= 0.40\n"
+  }
+]

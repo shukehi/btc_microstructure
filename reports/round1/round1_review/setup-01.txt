@@ -1,0 +1,1 @@
+Initial baseline manifest write attempted from isolated checkout before creating its report directory: FileNotFoundError. No baseline manifest created there. Corrected orchestration cwd to primary review branch; clean environment install continued in isolated checkout. No protected files modified.

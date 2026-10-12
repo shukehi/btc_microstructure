@@ -1,0 +1,38 @@
+[
+  {
+    "argv": [
+      "/Users/aries/Dve/btc_microstructure/.venv/bin/python",
+      "-m",
+      "venv",
+      ".venv"
+    ],
+    "cwd": "/Users/aries/Dve/btc_microstructure/data/r104/checkout",
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      ".venv/bin/python",
+      "-m",
+      "pip",
+      "install",
+      "-r",
+      "requirements-dev.lock"
+    ],
+    "cwd": "/Users/aries/Dve/btc_microstructure/data/r104/checkout",
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      ".venv/bin/python",
+      "-m",
+      "pip",
+      "install",
+      "--no-build-isolation",
+      "--no-deps",
+      "-e",
+      "."
+    ],
+    "cwd": "/Users/aries/Dve/btc_microstructure/data/r104/checkout",
+    "exit_code": 0
+  }
+]

@@ -1,0 +1,8 @@
+{
+  "new_cli": true,
+  "cli_version": "codex-cli0.162.1",
+  "session_id": "01a12d62-2d5f-7ce1-9000-188a35649b85",
+  "inherits_implementation_chat": false,
+  "sandbox": "workspace-write",
+  "reviewed_commit": "0b65be4933e9c36abedf784e608b832c56cee131"
+}
