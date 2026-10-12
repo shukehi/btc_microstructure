@@ -14,7 +14,15 @@ from typing import Any, cast
 import yaml
 
 from .config import ConfigError, UniqueKeyLoader
-from .offline_core import ADAPTER_VERSION, FEATURE_VERSION, SCHEMA_VERSION, Core, exact
+from .offline_core import (
+    ADAPTER_VERSION,
+    FEATURE_VERSION,
+    FLOW_INVALID_FLAGS,
+    NORMALIZATION_VERSION,
+    SCHEMA_VERSION,
+    Core,
+    exact,
+)
 from .offline_storage import Store
 
 JsonRow = dict[str, Any]
@@ -22,6 +30,8 @@ VENUE = "binance"
 MARKET_TYPE = "um_perpetual"
 INSTRUMENT_ID = "binance:um_perpetual:BTCUSDT"
 SOURCE_STREAM = "um_agg_trade"
+LEGACY_FEATURE_VERSION = "delta.1"
+LEGACY_NORMALIZATION_VERSION = "trades.1"
 
 
 def _canonical_json(value: Any) -> str:
@@ -537,7 +547,7 @@ def replay_run(config: OfflineConfig, input_root: Path, output_root: Path | None
     core = Core(config.core_config(), config.metadata)
     source = Store(input_root)
     source_rows = source.read_rows()
-    _validate_replay_source(config, input_root, source_rows)
+    _validate_replay_source(config, input_root, source_rows, operation="replay")
     for row in source_rows:
         core.process(row)
     _write_outputs(store, core, config)
@@ -583,7 +593,7 @@ def build_features(config: OfflineConfig, input_root: Path, output_root: Path) -
     core = Core(config.core_config(), config.metadata)
     source = Store(input_root)
     source_rows = source.read_rows()
-    _validate_replay_source(config, input_root, source_rows)
+    _validate_replay_source(config, input_root, source_rows, operation="build")
     for row in source_rows:
         core.process(row)
     _write_outputs(store, core, config)
@@ -625,7 +635,11 @@ def _write_outputs(store: Store, core: Core, config: OfflineConfig) -> None:
     store.close()
 
 
-def _validate_replay_source(config: OfflineConfig, input_root: Path, rows: list[JsonRow]) -> None:
+def _validate_replay_source(
+    config: OfflineConfig, input_root: Path, rows: list[JsonRow], *, operation: str
+) -> None:
+    if operation not in {"replay", "build"}:
+        raise ValueError("unsupported replay source validation operation")
     expected_digest = config.digest()
     for row in rows:
         if row.get("schema_version") != SCHEMA_VERSION:
@@ -653,13 +667,27 @@ def _validate_replay_source(config: OfflineConfig, input_root: Path, rows: list[
         run_metadata = manifest.get("run_metadata", {})
         if not isinstance(run_metadata, dict):
             raise ConfigError("replay input: manifest run_metadata missing")
+        manifest_kind = manifest.get("kind")
         if run_metadata.get("offline_config_sha256") != expected_digest:
             raise ConfigError("replay input: manifest config hash does not match replay config")
         if run_metadata.get("schema_version") != SCHEMA_VERSION:
             raise ConfigError("replay input: manifest schema version mismatch")
         if run_metadata.get("adapter_version") != ADAPTER_VERSION:
             raise ConfigError("replay input: manifest adapter version mismatch")
-        if run_metadata.get("feature_version") != FEATURE_VERSION:
+        feature_version = run_metadata.get("feature_version")
+        normalization_version = run_metadata.get("normalization_version")
+        if feature_version == FEATURE_VERSION:
+            if normalization_version != NORMALIZATION_VERSION:
+                raise ConfigError("replay input: manifest normalization version mismatch")
+        elif feature_version == LEGACY_FEATURE_VERSION:
+            if manifest_kind == "derived_table" and operation == "replay":
+                raise ConfigError(
+                    "replay input: derived tables use legacy feature version delta.1; "
+                    "rebuild from raw logs with build-features for delta.2-quality"
+                )
+            if normalization_version not in {None, LEGACY_NORMALIZATION_VERSION}:
+                raise ConfigError("replay input: legacy manifest normalization version mismatch")
+        else:
             raise ConfigError("replay input: manifest feature version mismatch")
         if run_metadata.get("evidence_kind") != "SYNTHETIC":
             raise ConfigError("replay input: manifest evidence kind mismatch")
@@ -673,6 +701,7 @@ def _run_metadata(config: OfflineConfig) -> JsonRow:
     return {
         "schema_version": SCHEMA_VERSION,
         "adapter_version": ADAPTER_VERSION,
+        "normalization_version": NORMALIZATION_VERSION,
         "feature_version": FEATURE_VERSION,
         "run_id": config.run_id,
         "evidence_kind": "SYNTHETIC",
@@ -743,13 +772,31 @@ def _pyarrow_version() -> str:
 
 
 def _summary(root: Path, core: Core, config: OfflineConfig, status: str) -> JsonRow:
+    feature_rows = [*core.features, *core.pending_features]
+    quality_counts = _quality_counts(feature_rows)
+    invalid_rows = sum(1 for row in feature_rows if row.get("data_valid") is False)
+    non_warmup_invalid_rows = sum(
+        1
+        for row in feature_rows
+        if row.get("data_valid") is False
+        and set(row.get("quality_flags", []))
+        & ((FLOW_INVALID_FLAGS - {"WARMUP"}) | {"FATAL_HEALTH"})
+    )
     return {
         "status": status,
         "run_id": config.run_id,
         "output_root": str(root),
         "normalized_rows": len(core.normalized),
         "quarantine_rows": len(core.quarantine),
-        "feature_rows": len(core.features) + len(core.pending_features),
+        "feature_rows": len(feature_rows),
+        "feature_valid_rows": len(feature_rows) - invalid_rows,
+        "feature_invalid_rows": invalid_rows,
+        "feature_quality_counts": quality_counts,
+        "data_health": {
+            "status": "DEGRADED" if non_warmup_invalid_rows else "PASS",
+            "non_warmup_invalid_feature_rows": non_warmup_invalid_rows,
+            "warmup_only_invalid_allowed": True,
+        },
         "offline_config_sha256": config.digest(),
         "limitations": {
             "real_binance_rest": "BLOCKED_HISTORICAL",
@@ -758,6 +805,18 @@ def _summary(root: Path, core: Core, config: OfflineConfig, status: str) -> Json
             "continuous_collection": "NOT_RUN",
         },
     }
+
+
+def _quality_counts(rows: list[JsonRow]) -> dict[str, int]:
+    counts: dict[str, int] = {}
+    for row in rows:
+        flags = row.get("quality_flags", [])
+        if not flags:
+            counts["OK"] = counts.get("OK", 0) + 1
+            continue
+        for flag in flags:
+            counts[str(flag)] = counts.get(str(flag), 0) + 1
+    return counts
 
 
 def _logical_digest(rows: list[JsonRow]) -> str:

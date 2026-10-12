@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="4" time="0.159" timestamp="2026-10-11T20:34:42.251701-05:00" hostname="AriesdeMacBook-Pro.local"><testcase classname="review.R1_04.checks.test_r104_quality_review" name="test_healthy_fixed_control" time="0.001" /><testcase classname="review.R1_04.checks.test_r104_quality_review" name="test_gap_control_events_still_invalidate" time="0.000" /><testcase classname="review.R1_04.checks.test_r104_quality_review" name="test_raw_gap_survives_normalization" time="0.001"><failure message="AssertionError: assert 'GAP_KNOWN' in []">def test_raw_gap_survives_normalization():
+        core = run_case(flagged=True)
+        raw = next(r for r in core.history if r['kind']=='RAW')
+        assert raw['quality_flags'] == ['GAP_KNOWN']
+&gt;       assert 'GAP_KNOWN' in core.normalized[0]['quality_flags']
+E       AssertionError: assert 'GAP_KNOWN' in []
+
+review/R1_04/checks/test_r104_quality_review.py:72: AssertionError</failure></testcase><testcase classname="review.R1_04.checks.test_r104_quality_review" name="test_raw_gap_invalidates_flow_window" time="0.000"><failure message="AssertionError: {'agg_message_count': 3, 'buy_volume_base': Decimal('0.50'), 'dataset_revision': 'synthetic-original', 'dependency_available_ns': 31000000000, ...}&#10;assert Decimal('0.40') is None">def test_raw_gap_invalidates_flow_window():
+        core = run_case(flagged=True)
+        feature = core.features[0]
+&gt;       assert feature['trade_delta_base'] is None, feature
+E       AssertionError: {'agg_message_count': 3, 'buy_volume_base': Decimal('0.50'), 'dataset_revision': 'synthetic-original', 'dependency_available_ns': 31000000000, ...}
+E       assert Decimal('0.40') is None
+
+review/R1_04/checks/test_r104_quality_review.py:78: AssertionError</failure></testcase></testsuite></testsuites>

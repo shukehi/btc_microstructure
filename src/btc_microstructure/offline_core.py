@@ -2,14 +2,56 @@
 
 from copy import deepcopy
 from decimal import Decimal, localcontext
+import json
 from typing import Any
 
 from .probe import ProbeError, decimal_string, integer, object_json
 
 SCHEMA_VERSION = "r1-03.1"
 ADAPTER_VERSION = "um-agg-synthetic.1"
-FEATURE_VERSION = "delta.1"
+NORMALIZATION_VERSION = "trades.2-quality"
+FEATURE_VERSION = "delta.2-quality"
 NS = 1_000_000_000
+
+# docs/01 section12. Book/BBO-specific flags and SOURCE_SAMPLED remain
+# traceable without invalidating the trade family. CLOCK_UNCERTAIN on a RAW
+# observation retains its documented lead-lag restriction; the existing clock
+# control event still causes fatal health degradation.
+QUALITY_FLAGS = frozenset(
+    {
+        "WARMUP",
+        "GAP_KNOWN",
+        "SEQUENCE_INVALID",
+        "COVERAGE_INSUFFICIENT",
+        "STALE",
+        "CLOCK_UNCERTAIN",
+        "UNIT_UNKNOWN",
+        "SOURCE_SAMPLED",
+        "DUPLICATE_CONFLICT",
+        "SOURCE_SCHEMA_CHANGED",
+        "HISTORY_ONLY",
+    }
+)
+FLOW_INVALID_FLAGS = frozenset(
+    {
+        "WARMUP",
+        "GAP_KNOWN",
+        "UNIT_UNKNOWN",
+        "DUPLICATE_CONFLICT",
+        "SOURCE_SCHEMA_CHANGED",
+        "HISTORY_ONLY",
+    }
+)
+
+
+def incoming_quality(row: dict[str, Any]) -> list[str]:
+    # Older artificial envelopes omitted the field. Explicit null is not absence.
+    flags = row.get("quality_flags", [])
+    if not isinstance(flags, list) or any(
+        not isinstance(flag, str) or flag not in QUALITY_FLAGS for flag in flags
+    ):
+        raise ProbeError("quality_flags: expected list of documented quality strings")
+    return sorted(set(flags))
 
 
 def exact(value: Any, field: str, zero: bool = False) -> Decimal:
@@ -48,6 +90,9 @@ class Core:
         self.session: str | None = None
         self.last_cutoff = -1
         self.history: list[dict[str, Any]] = []
+        # (receipt sequence, observed receive time, first economic receive time, flags)
+        # Keep receipt-level knowledge separately from immutable unique trades.
+        self.quality_observations: list[tuple[int, int, int, tuple[str, ...]]] = []
 
     def process(self, row: dict[str, Any]) -> None:
         row = deepcopy(row)
@@ -124,8 +169,26 @@ class Core:
         try:
             trade = self._normalize(row)
         except (ProbeError, ValueError, KeyError, ArithmeticError) as exc:
+            upstream = row.get("quality_flags", [])
+            known = (
+                sorted(
+                    {flag for flag in upstream if isinstance(flag, str) and flag in QUALITY_FLAGS}
+                )
+                if isinstance(upstream, list)
+                else []
+            )
+            flags = sorted(set(known) | {"SOURCE_SCHEMA_CHANGED"})
             self.quarantine.append(
-                {**row, "quality_flags": ["SOURCE_SCHEMA_CHANGED"], "reason": str(exc)}
+                {
+                    **row,
+                    "quality_flags": flags,
+                    "reason": str(exc),
+                    "upstream_quality_flags_json": json.dumps(upstream, sort_keys=True),
+                    "normalization_version": NORMALIZATION_VERSION,
+                }
+            )
+            self.quality_observations.append(
+                (row["ingest_sequence"], row["ts_receive_ns"], row["ts_receive_ns"], tuple(flags))
             )
             self.errors.append(row["ts_receive_ns"])
             return
@@ -133,6 +196,15 @@ class Core:
             str(trade[k]) for k in ("venue", "market_type", "symbol", "record_kind", "agg_trade_id")
         )
         previous = self.seen.get(key)
+        if trade["quality_flags"]:
+            self.quality_observations.append(
+                (
+                    trade["ingest_sequence"],
+                    trade["ts_receive_ns"],
+                    previous["ts_receive_ns"] if previous is not None else trade["ts_receive_ns"],
+                    tuple(trade["quality_flags"]),
+                )
+            )
         if previous is not None:
             fields = (
                 "price_quote",
@@ -145,7 +217,13 @@ class Core:
             )
             conflict = any(previous[k] != trade[k] for k in fields)
             flag = "DUPLICATE_CONFLICT" if conflict else "DUPLICATE"
-            self.quarantine.append({**trade, "quality_flags": [flag]})
+            self.quarantine.append(
+                {
+                    **trade,
+                    "quality_flags": sorted(set(trade["quality_flags"]) | {flag}),
+                    "economic_ingest_sequence": previous["ingest_sequence"],
+                }
+            )
             if conflict:
                 self.conflicts.append((row["ts_receive_ns"], previous["ts_receive_ns"]))
             return
@@ -153,6 +231,7 @@ class Core:
         self.normalized.append(trade)
 
     def _normalize(self, row: dict[str, Any]) -> dict[str, Any]:
+        flags = incoming_quality(row)
         for field, expected in (
             ("venue", "binance"),
             ("market_type", "um_perpetual"),
@@ -190,8 +269,10 @@ class Core:
             and meta.get("evidence_kind") == "SYNTHETIC"
             and str(meta.get("unit_evidence_id", "")).startswith("SYNTHETIC:")
             and row.get("evidence_kind") == "SYNTHETIC"
+            and "UNIT_UNKNOWN" not in flags
         )
-        flags = [] if verified else ["UNIT_UNKNOWN"]
+        if not verified:
+            flags = sorted(set(flags) | {"UNIT_UNKNOWN"})
         with localcontext() as context:
             context.prec = 80
             for name, value in (("price_tick", price), ("quantity_step", quantity)):
@@ -215,6 +296,7 @@ class Core:
             "source_time_unit": unit,
             "schema_version": SCHEMA_VERSION,
             "adapter_version": ADAPTER_VERSION,
+            "normalization_version": NORMALIZATION_VERSION,
             "metadata_version": meta.get("metadata_version", "UNKNOWN"),
             "unit_evidence_id": meta.get("unit_evidence_id"),
             "quantity_unit": "BTC" if verified else "UNKNOWN",
@@ -271,9 +353,21 @@ class Core:
             or any(r["quantity_base"] is None for r in selected)
         ):
             reasons.append("UNIT_UNKNOWN")
+        upstream = {
+            flag
+            for sequence, observed, economic_time, flags in self.quality_observations
+            if sequence <= high
+            and observed <= cutoff
+            and (left <= observed < cutoff or left <= economic_time < cutoff)
+            for flag in flags
+        }
+        # No inferred gap interval: use only the known receipt/economic points.
+        # A later receipt may degrade a current window, never an earlier snapshot.
+        invalid = bool(reasons) or bool(upstream & FLOW_INVALID_FLAGS)
+        reasons.extend(flag for flag in sorted(upstream) if flag not in reasons)
         buy = sell = volume = delta = imbalance = None
         count = None
-        if not reasons:
+        if not invalid:
             with localcontext() as context:
                 context.prec = 80
                 buy = sum(
@@ -299,6 +393,7 @@ class Core:
             "trade_imbalance": imbalance,
             "agg_message_count": count,
             "quality_flags": reasons,
+            "data_valid": not invalid,
             "time_view": "as_received",
             "feature_version": FEATURE_VERSION,
             "schema_version": SCHEMA_VERSION,
