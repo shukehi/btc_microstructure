@@ -94,7 +94,7 @@
 
 - PR #1最终复核5483287314针对ce8cd8a；PR #5原发现5483466192针对03ce9c7；修复复核5483555449针对9a363dc。原文与最新评论快照在github/。旧结论仅证明当时范围，R103-A/B/C已解决；本次不据旧失败重开它们。
 - main push [38185147921](https://github.com/shukehi/btc_microstructure/actions/runs/38185147921)的event=push、head=`0b65be4933e9c36abedf784e608b832c56cee131`、SUCCESS。实际下载产物核对四份JUnit269/15/9/8均0fail/error/skip、十一项退出0；这是**历史运行读回**，不是本次重跑。证据 `github/main-push-run.json`、`main-push-artifacts.json`及`main-push-readback/`。
-- 本报告PR精确head及新Actions在创建后记录；新PR的绿色CI只证明原十一项检查运行，**不会消除R104-01**，补充反例不在原suite内，未改工作流使其变绿。
+- 本报告PR及首个实际Actions见下节；最终归档head与对应Actions在PR正文/交付答复记录；新PR的绿色CI只证明原十一项检查运行，**不会消除R104-01**，补充反例不在原suite内，未改工作流使其变绿。
 - workflow_dispatch未触发，**NOT_RUN**；没有为了补记录改变CI。只提交指定报告/小型证据，不提交venv/运行数据/整工程ZIP/秘密或用户AGENTS改动。
 
 ## 后续依赖顺序（仅建议，不执行）
@@ -105,3 +105,14 @@
 4. 足够合格数据与研究设计齐备后再讨论多期限描述/研究；不推导买卖信号、收益承诺或交易能力。
 
 本次仅提交报告PR，正文使用 **Refs #6**；不自动关闭Issue、不合并、不自行修复或执行这些后续建议。报告交付后停止，等待独立复核。
+
+## 报告PR及实际远程检查回执
+
+- 报告PR：[PR #7](https://github.com/shukehi/btc_microstructure/pull/7)，base main，**Refs #6**，未关闭Issue、未合并、未开启auto-merge。
+- 首个报告提交：`02589b1ed56be7fbeaa3b06b8f3f352108d4b055`。随后只补归档远程回执；最终head见PR正文。**reviewed_commit始终是0b65be4933e9c36abedf784e608b832c56cee131。**
+- 报告PR [Actions38186551699](https://github.com/shukehi/btc_microstructure/actions/runs/38186551699)，event=pull_request，head=上述报告提交，**SUCCESS**；required job `Python 3.12 offline checks` SUCCESS，实际Linux/Python3.12.15。
+- 四份JUnit实际269/15/9/8，全部0fail/error/skip；results.tsv十一项退出0；网络命名空间隔离和CLI/Parquet smoke成功。小型实际日志/JUnit存 `report-pr-ci-38186551699/`，GitHub回执在 `github/report-pr-run-38186551699.json`。
+- 完整人工运行产物随Actions artifact保留14天，artifact元数据在github/report-pr-artifacts.json；不把人工数据/整工程ZIP提交进本PR。
+- **此CI没有执行报告目录中的失败反例，不表示R104-01已修复或关闭。** 新发现仍阻塞无条件离线验收；全面覆盖仍PARTIAL。被审源码、原测试和工作流保持不变，这种差异已在本报告和PR正文明确记录。
+
+Artifact `ci-logs-38186551699-1` ID11719996434，330155字节，GitHub摘要 `sha256:eecaa3e86ad954b75abd37bc32accd6a51444f92efb666c5363819d2cbe77db3`（元数据读回，未把它冒充独立下载ZIP哈希验收）。
