@@ -1,0 +1,1 @@
+Native architect model gpt-5.4-mini unavailable for this account (400). Independent read-only Codex CLI session used installed architect prompt instead; authoring lane did not substitute its own review. Session and final followup receipt are recorded separately. No approval or merge performed.

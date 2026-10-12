@@ -18,6 +18,8 @@ class AioTransport:
         self._blocked_reentries = 0
         self._metadata_reply: Reply | None = None
         self._metadata_body = bytearray()
+        self._metadata_phase = "NOT_STARTED"
+        self._timeout_diagnostic: dict[str, str] | None = None
 
     @property
     def request_attempts(self) -> dict[str, int]:
@@ -34,6 +36,16 @@ class AioTransport:
         if self._metadata_reply is None:
             return None
         return replace(self._metadata_reply, body=bytes(self._metadata_body))
+
+    @property
+    def timeout_diagnostic(self) -> dict[str, str] | None:
+        """Safe timeout provenance from public aiohttp exception classes only."""
+        return None if self._timeout_diagnostic is None else dict(self._timeout_diagnostic)
+
+    @property
+    def metadata_phase(self) -> str:
+        """Current REST metadata phase without transport exception attribution."""
+        return self._metadata_phase
 
     async def _single_attempt(
         self, request: aiohttp.ClientRequest, handler: aiohttp.ClientHandlerType
@@ -86,8 +98,19 @@ class AioTransport:
         session = await self._get_session(limits)
         self._metadata_reply = None
         self._metadata_body.clear()
+        self._metadata_phase = "REST_WAIT_HEADERS_OR_CONNECT"
+        self._timeout_diagnostic = None
+        request_options: dict[str, Any] = {"allow_redirects": False}
+        if limits.rest_total_seconds is not None:
+            request_options["timeout"] = aiohttp.ClientTimeout(
+                total=limits.rest_total_seconds,
+                connect=limits.connect_seconds,
+                sock_connect=limits.connect_seconds,
+                sock_read=limits.idle_seconds,
+            )
         try:
-            async with session.get(REST_URL, allow_redirects=False) as response:
+            async with session.get(REST_URL, **request_options) as response:
+                self._metadata_phase = "REST_READ_BODY"
                 self._metadata_reply = Reply(
                     response.status,
                     budget_headers(dict(response.headers)),
@@ -100,6 +123,7 @@ class AioTransport:
                     self._metadata_reply = replace(
                         self._metadata_reply, body_read_state="NOT_READ_HTTP_REJECTION"
                     )
+                    self._metadata_phase = "HTTP_REJECTION"
                     observation = self.metadata_observation
                     assert observation is not None
                     return observation
@@ -120,7 +144,23 @@ class AioTransport:
                 observation = self.metadata_observation
                 assert observation is not None
                 return observation
+        except aiohttp.ConnectionTimeoutError:
+            self._timeout_diagnostic = {
+                "phase": "BODY" if self._metadata_phase == "REST_READ_BODY" else "REQUEST",
+                "source": "AIOHTTP_CONNECT_TIMEOUT",
+            }
+            raise TimeoutError
+        except aiohttp.SocketTimeoutError:
+            self._timeout_diagnostic = {
+                "phase": "BODY" if self._metadata_phase == "REST_READ_BODY" else "REQUEST",
+                "source": "AIOHTTP_SOCKET_READ_TIMEOUT",
+            }
+            raise TimeoutError
         except TimeoutError:
+            self._timeout_diagnostic = {
+                "phase": "BODY" if self._metadata_phase == "REST_READ_BODY" else "REQUEST",
+                "source": "PYTHON_TIMEOUT_UNKNOWN",
+            }
             raise
         except aiohttp.ClientError as exc:
             if self._metadata_reply is not None:
@@ -135,6 +175,7 @@ class AioTransport:
 
     async def connect(self, limits: ProbeLimits) -> Reply:
         session = await self._get_session(limits)
+        self._timeout_diagnostic = None
         try:
             async with asyncio.timeout(limits.connect_seconds):
                 self.ws = await session.ws_connect(
@@ -151,14 +192,51 @@ class AioTransport:
             raise AccessError(
                 "WS_HANDSHAKE_REJECTED", Reply(exc.status, dict(exc.headers or {}))
             ) from exc
+        except aiohttp.ConnectionTimeoutError:
+            self._timeout_diagnostic = {
+                "phase": "WS_CONNECT",
+                "source": "AIOHTTP_CONNECT_TIMEOUT",
+            }
+            raise TimeoutError
+        except aiohttp.SocketTimeoutError:
+            self._timeout_diagnostic = {
+                "phase": "WS_CONNECT",
+                "source": "AIOHTTP_SOCKET_READ_TIMEOUT",
+            }
+            raise TimeoutError
+        except TimeoutError:
+            self._timeout_diagnostic = {
+                "phase": "WS_CONNECT",
+                "source": "PYTHON_TIMEOUT_UNKNOWN",
+            }
+            raise
         except aiohttp.ClientError as exc:
             raise AccessError("WS_NETWORK_ERROR") from exc
 
     async def receive(self) -> bytes:
         if self.ws is None:
             raise AccessError("WS_NOT_CONNECTED")
+        self._timeout_diagnostic = None
         try:
             message = await self.ws.receive()
+        except aiohttp.ConnectionTimeoutError:
+            self._timeout_diagnostic = {
+                "phase": "WS_RECEIVE",
+                "source": "AIOHTTP_CONNECT_TIMEOUT",
+            }
+            raise TimeoutError
+        except aiohttp.SocketTimeoutError:
+            self._timeout_diagnostic = {
+                "phase": "WS_RECEIVE",
+                "source": "AIOHTTP_SOCKET_READ_TIMEOUT",
+            }
+            raise TimeoutError
+        except TimeoutError:
+            self._timeout_diagnostic = {
+                "phase": "WS_RECEIVE",
+                "source": "PYTHON_TIMEOUT_UNKNOWN",
+            }
+            raise
         except aiohttp.ClientError as exc:
             raise AccessError("WS_RECEIVE_ERROR") from exc
         if message.type == aiohttp.WSMsgType.TEXT:

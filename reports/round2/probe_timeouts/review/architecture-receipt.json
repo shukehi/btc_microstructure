@@ -1,0 +1,14 @@
+[
+  {
+    "log": "architecture-review.jsonl",
+    "session_id": "01a12f2f-d309-7c83-b40a-f5094ff958c2",
+    "completed": true,
+    "mode": "independent read-only CLI architect; no tests/network/editing"
+  },
+  {
+    "log": "architecture-review-final.jsonl",
+    "session_id": "01a12f2f-d309-7c83-b40a-f5094ff958c2",
+    "completed": true,
+    "mode": "independent read-only CLI architect; no tests/network/editing"
+  }
+]

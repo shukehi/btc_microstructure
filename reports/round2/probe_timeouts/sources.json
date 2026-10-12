@@ -1,0 +1,13 @@
+{
+  "issue": "https://github.com/shukehi/btc_microstructure/issues/14",
+  "related_issue": "https://github.com/shukehi/btc_microstructure/issues/12",
+  "review": "https://github.com/shukehi/btc_microstructure/pull/13#pullrequestreview-5487778265",
+  "baseline": "fd4fbd73fc6a7c0c2a4cff77ba97492dfdc56525",
+  "technical_sources": [
+    "https://docs.aiohttp.org/en/v3.12.15/client_reference.html#aiohttp.ClientTimeout",
+    "https://docs.python.org/3.12/library/asyncio-task.html#timeouts"
+  ],
+  "documentation_checked_date": "2026-10-12",
+  "live_probe_this_task": "NOT_RUN; not authorized",
+  "all_new_examples": "SYNTHETIC"
+}

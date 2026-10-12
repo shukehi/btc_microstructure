@@ -1,0 +1,84 @@
+{
+  "schema_version": "probe-0.2",
+  "evidence_kind": "SYNTHETIC",
+  "started_ns": 1791793524678895000,
+  "limits": {
+    "total_seconds": 2.0,
+    "connect_seconds": 0.02,
+    "rest_total_seconds": 0.055,
+    "idle_seconds": 0.2,
+    "max_messages": 20,
+    "max_bytes": 2048,
+    "max_frame_bytes": 65536
+  },
+  "configured_timeouts": {
+    "total_seconds": 2.0,
+    "connect_seconds": 0.02,
+    "rest_total_seconds": 0.055,
+    "rest_total_mode": "EXPLICIT",
+    "idle_seconds": 0.2,
+    "cleanup_seconds": 1.0
+  },
+  "effective_timeouts": {
+    "work_seconds": 1.0,
+    "work_deadline_source": "TOTAL_MINUS_CLEANUP_RESERVE",
+    "rest_total_seconds": 0.05500000005122274,
+    "rest_total_mode": "EXPLICIT",
+    "rest_total_cap_source": "REST_TOTAL"
+  },
+  "status": "BLOCKED",
+  "rest": {
+    "status": "BLOCKED",
+    "method": "GET",
+    "url": "https://fapi.binance.com/fapi/v1/exchangeInfo",
+    "params": {},
+    "timeout_diagnostics": {
+      "phase": "REST_HEADERS_OR_BODY",
+      "source": "REST_TOTAL",
+      "transport_phase": "REST_READ_BODY",
+      "transport_source": "UNKNOWN"
+    },
+    "request_started_ns": 1791793524678917000,
+    "http_status": 200,
+    "rate_headers": {
+      "x-mbx-used-weight-1m": "2"
+    },
+    "response_received_ns": 1791793524735128000,
+    "headers_received_ns": 1791793524679060000,
+    "body_bytes_observed": 12,
+    "body_complete": false,
+    "body_read_state": "INTERRUPTED",
+    "truncated": true,
+    "sample": "rest-response.bin",
+    "sha256": "04ed0130a1aa7572f918655df7567b8d04b7c40ee880244b5feaf8f5794ce6d7"
+  },
+  "ws": {
+    "status": "NOT_RUN",
+    "url": "wss://fstream.binance.com/market/stream?streams=btcusdt@aggTrade",
+    "subscription": "URL combined stream",
+    "messages": [],
+    "frames_seen": 0,
+    "timeout_diagnostics": {
+      "phase": "NOT_STARTED",
+      "source": "NOT_EXPIRED"
+    }
+  },
+  "bytes_received": 12,
+  "logical_calls": {
+    "rest": 1,
+    "ws": 0
+  },
+  "transport_attempts": {
+    "rest": 0,
+    "ws": 0
+  },
+  "retry_count": 0,
+  "backoff_cap_seconds": 0,
+  "continuous_collection_enabled": false,
+  "reason": "TIMEOUT; no retry",
+  "retry_count_scope": "APPLICATION_AND_REQUEST_HANDLER",
+  "blocked_retry_count": 0,
+  "cleanup": "PASS",
+  "ended_ns": 1791793524735149000,
+  "elapsed_seconds": 0.05625641706865281
+}

@@ -44,6 +44,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         "--allow-network", action="store_true", help="explicit opt-in to real public access"
     )
     probe.add_argument("--seconds", type=float, default=30.0)
+    probe.add_argument("--rest-total-seconds", type=float, default=None)
     probe.add_argument("--messages", type=int, default=20)
     probe.add_argument("--max-bytes", type=int, default=2097152)
     args = parser.parse_args(argv)
@@ -78,7 +79,10 @@ def main(argv: Sequence[str] | None = None) -> int:
             from .probe import ProbeLimits, run_probe, save_probe
 
             limits = ProbeLimits(
-                total_seconds=args.seconds, max_messages=args.messages, max_bytes=args.max_bytes
+                total_seconds=args.seconds,
+                rest_total_seconds=args.rest_total_seconds,
+                max_messages=args.messages,
+                max_bytes=args.max_bytes,
             )
             if (
                 config.endpoints.um_rest != "https://fapi.binance.com"

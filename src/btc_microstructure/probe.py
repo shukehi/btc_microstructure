@@ -21,6 +21,7 @@ class ProbeLimits(BaseModel):
     model_config = ConfigDict(extra="forbid", strict=True)
     total_seconds: float = Field(default=30.0, ge=2, le=60, allow_inf_nan=False)
     connect_seconds: float = Field(default=5.0, gt=0, le=10, allow_inf_nan=False)
+    rest_total_seconds: float | None = Field(default=None, gt=0, le=20, allow_inf_nan=False)
     idle_seconds: float = Field(default=5.0, gt=0, le=10, allow_inf_nan=False)
     max_messages: int = Field(default=20, ge=1, le=20)
     max_bytes: int = Field(default=2097152, ge=2048, le=2097152)
@@ -203,19 +204,43 @@ async def run_probe(
     *,
     evidence_kind: Literal["SYNTHETIC", "LIVE"] = "SYNTHETIC",
 ) -> dict[str, Any]:
+    loop = asyncio.get_running_loop()
+    started = time.monotonic()
+    work_deadline = loop.time() + limits.total_seconds - 1
+    active_timeout: dict[str, Any] = {"phase": "NOT_STARTED", "scopes": {}}
+    rest_mode = "EXPLICIT" if limits.rest_total_seconds is not None else "FALLBACK_CONNECT"
     report: dict[str, Any] = {
         "schema_version": "probe-0.2",
         "evidence_kind": evidence_kind,
         "started_ns": time.time_ns(),
         "limits": limits.model_dump(),
+        "configured_timeouts": {
+            "total_seconds": limits.total_seconds,
+            "connect_seconds": limits.connect_seconds,
+            "rest_total_seconds": limits.rest_total_seconds,
+            "rest_total_mode": rest_mode,
+            "idle_seconds": limits.idle_seconds,
+            "cleanup_seconds": 1.0,
+        },
+        "effective_timeouts": {
+            "work_seconds": limits.total_seconds - 1,
+            "work_deadline_source": "TOTAL_MINUS_CLEANUP_RESERVE",
+        },
         "status": "NOT_RUN",
-        "rest": {"status": "NOT_RUN", "method": "GET", "url": REST_URL, "params": {}},
+        "rest": {
+            "status": "NOT_RUN",
+            "method": "GET",
+            "url": REST_URL,
+            "params": {},
+            "timeout_diagnostics": {"phase": "NOT_STARTED", "source": "NOT_EXPIRED"},
+        },
         "ws": {
             "status": "NOT_RUN",
             "url": WS_URL,
             "subscription": "URL combined stream",
             "messages": [],
             "frames_seen": 0,
+            "timeout_diagnostics": {"phase": "NOT_STARTED", "source": "NOT_EXPIRED"},
         },
         "bytes_received": 0,
         "logical_calls": {"rest": 0, "ws": 0},
@@ -256,12 +281,86 @@ async def run_probe(
             if isinstance(observation, Reply):
                 retain_metadata(observation)
 
-    async def perform() -> None:
+    def deadline_cap_source(deadline: float, *candidates: tuple[str, float]) -> str:
+        minimum = min(value for _, value in candidates)
+        if deadline != minimum:
+            return "UNKNOWN"
+        tied = [name for name, value in candidates if value == minimum]
+        if len(tied) == 1:
+            return tied[0]
+        if len(tied) > 1:
+            return "SHARED_DEADLINE"
+        return "UNKNOWN"
+
+    def timeout_source(scopes: dict[str, asyncio.Timeout]) -> str:
+        expired = sorted(name for name, scope in scopes.items() if scope.expired())
+        if len(expired) == 1:
+            return expired[0]
+        if len(expired) > 1:
+            return "MULTIPLE_EXPIRED"
+        return "UNKNOWN"
+
+    def timeout_diagnostic() -> dict[str, Any]:
+        diagnostic = {
+            "phase": active_timeout.get("phase", "UNKNOWN"),
+            "source": timeout_source(active_timeout.get("scopes", {})),
+        }
+        transport_phase = getattr(transport, "metadata_phase", None)
+        transport_diagnostic = getattr(transport, "timeout_diagnostic", None)
+        if isinstance(transport_diagnostic, dict):
+            diagnostic["transport_phase"] = transport_diagnostic.get("phase", "UNKNOWN")
+            diagnostic["transport_source"] = transport_diagnostic.get("source", "UNKNOWN")
+        elif isinstance(transport_phase, str) and stage == "rest":
+            diagnostic["transport_phase"] = transport_phase
+            diagnostic["transport_source"] = "UNKNOWN"
+        else:
+            diagnostic["transport_phase"] = "UNKNOWN"
+            diagnostic["transport_source"] = "UNKNOWN"
+        return diagnostic
+
+    def active_scopes(
+        primary: str,
+        cap_source: str,
+        primary_timeout: asyncio.Timeout,
+        global_timeout: asyncio.Timeout,
+    ) -> dict[str, asyncio.Timeout]:
+        scopes = {"GLOBAL_WORK": global_timeout}
+        if cap_source != "GLOBAL_WORK":
+            scopes[primary] = primary_timeout
+        return scopes
+
+    async def perform(global_timeout: asyncio.Timeout) -> None:
         nonlocal stage
         report["rest"]["request_started_ns"] = time.time_ns()
         report["logical_calls"]["rest"] += 1
-        async with asyncio.timeout(limits.connect_seconds):
-            reply = await transport.metadata(limits)
+        rest_started = loop.time()
+        configured_rest = (
+            limits.rest_total_seconds
+            if limits.rest_total_seconds is not None
+            else limits.connect_seconds
+        )
+        rest_configured_deadline = rest_started + configured_rest
+        rest_deadline = min(work_deadline, rest_configured_deadline)
+        rest_effective = max(0.0, rest_deadline - rest_started)
+        report["effective_timeouts"]["rest_total_seconds"] = rest_effective
+        report["effective_timeouts"]["rest_total_mode"] = rest_mode
+        rest_cap_source = deadline_cap_source(
+            rest_deadline,
+            ("REST_TOTAL", rest_configured_deadline),
+            ("GLOBAL_WORK", work_deadline),
+        )
+        report["effective_timeouts"]["rest_total_cap_source"] = rest_cap_source
+        request_limits = (
+            limits.model_copy(update={"rest_total_seconds": rest_effective})
+            if limits.rest_total_seconds is not None
+            else limits
+        )
+        async with asyncio.timeout_at(rest_deadline) as rest_timeout:
+            active_timeout["phase"] = "REST_HEADERS_OR_BODY"
+            active_timeout["scopes"] = active_scopes(
+                "REST_TOTAL", rest_cap_source, rest_timeout, global_timeout
+            )
+            reply = await transport.metadata(request_limits)
         fits = retain_metadata(reply)
         if reply.status != 200:
             report["rest"]["status"] = (
@@ -279,7 +378,22 @@ async def run_probe(
         stage = "ws"
         report["ws"]["request_started_ns"] = time.time_ns()
         report["logical_calls"]["ws"] += 1
-        async with asyncio.timeout(limits.connect_seconds):
+        ws_connect_started = loop.time()
+        ws_connect_deadline = min(work_deadline, ws_connect_started + limits.connect_seconds)
+        report["effective_timeouts"]["ws_connect_seconds"] = max(
+            0.0, ws_connect_deadline - ws_connect_started
+        )
+        ws_connect_cap_source = deadline_cap_source(
+            ws_connect_deadline,
+            ("CONNECT", ws_connect_started + limits.connect_seconds),
+            ("GLOBAL_WORK", work_deadline),
+        )
+        report["effective_timeouts"]["ws_connect_cap_source"] = ws_connect_cap_source
+        async with asyncio.timeout_at(ws_connect_deadline) as ws_connect_timeout:
+            active_timeout["phase"] = "WS_CONNECT"
+            active_timeout["scopes"] = active_scopes(
+                "CONNECT", ws_connect_cap_source, ws_connect_timeout, global_timeout
+            )
             handshake = await transport.connect(limits)
         store(handshake, "ws")
         if handshake.status != 101:
@@ -291,7 +405,22 @@ async def run_probe(
                 report["status"] = report["ws"]["status"]
                 report["reason"] = "BYTE_BUDGET_REACHED; no additional receive"
                 return
-            async with asyncio.timeout(limits.idle_seconds):
+            receive_started = loop.time()
+            receive_deadline = min(work_deadline, receive_started + limits.idle_seconds)
+            report["effective_timeouts"]["ws_receive_seconds"] = max(
+                0.0, receive_deadline - receive_started
+            )
+            ws_receive_cap_source = deadline_cap_source(
+                receive_deadline,
+                ("IDLE", receive_started + limits.idle_seconds),
+                ("GLOBAL_WORK", work_deadline),
+            )
+            report["effective_timeouts"]["ws_receive_cap_source"] = ws_receive_cap_source
+            async with asyncio.timeout_at(receive_deadline) as ws_receive_timeout:
+                active_timeout["phase"] = "WS_RECEIVE"
+                active_timeout["scopes"] = active_scopes(
+                    "IDLE", ws_receive_cap_source, ws_receive_timeout, global_timeout
+                )
                 body = await transport.receive()
             report["ws"]["frames_seen"] += 1
             fits = account(body)
@@ -311,14 +440,14 @@ async def run_probe(
             "bounded protocol sample only; quantity unit and continuous budget unverified"
         )
 
-    started = time.monotonic()
     try:
         # Reserve one second of the total cap for bounded close, not extra network work.
-        async with asyncio.timeout(limits.total_seconds - 1):
-            await perform()
+        async with asyncio.timeout_at(work_deadline) as global_timeout:
+            await perform(global_timeout)
     except TimeoutError:
         report[stage]["status"] = report["status"] = "BLOCKED"
         report["reason"] = "TIMEOUT; no retry"
+        report[stage]["timeout_diagnostics"] = timeout_diagnostic()
     except AccessError as exc:
         report[stage]["status"] = report["status"] = "BLOCKED"
         report["reason"] = exc.reason

@@ -184,3 +184,20 @@ GAP_KNOWN使受影响窗口的流量和TI为null；SOURCE_SAMPLED等提示保留
 ```
 
 新独立4案例和原Parquet反例断言均已纳入CI；原十一项检查、默认套件及R1-01/02/03保持。此次仅关闭R104-01的定向实现范围，R1-04整体覆盖仍PARTIAL；真实REST/WS、单位、预算、24h及研究能力状态不升级。
+
+## R2-02：可选 REST 完整响应时限
+
+现有 `probe` 新增 `--rest-total-seconds`，只调整一次 REST 请求从开始到完整正文的预算，包含连接和响应头；不是收到头后重新计时。省略时仍回退到原连接参数（默认5秒），保留旧命令行为。显式值必须是有限正数且不超过20秒，不能用布尔值冒充。
+
+`--seconds` 保持默认30秒、2–60秒范围；工作域预留最多1秒清理。连接获取/新连接仍默认5秒，HTTP部分数据读取空闲及WS完整消息等待仍默认5秒。REST和WS各阶段都受剩余全局工作期限约束，REST成功后不重置总预算；共享session不会将可选REST总预算变成WS预算。时限存在事件循环调度和底层计时精度，不能将shell启动/本地写报告称为硬实时保证。
+
+候选总30秒/连接5秒/REST15秒/读取空闲5秒只在本轮人工输入上验证，不是新默认或真实请求授权。以下命令**没有网络启用开关**，保持NOT_RUN门槛；输出目录必须不存在：
+
+```sh
+.venv/bin/python -m btc_microstructure probe config/research.example.yaml --seconds 30 --rest-total-seconds 15 --messages 20 --max-bytes 2097152 --output data/r2-02-disabled
+.venv/bin/python -m pytest -q tests/unit/test_probe_timeouts.py
+```
+
+报告兼容追加配置/实际生效时限和安全超时诊断。发生超时时的观察阶段与能证明的计时器来源分开，未知/重叠不归因DNS、TLS、代理或地区；响应头首个观察时刻仍为headers_received_ns，response_received_ns不替代它。不完整正文保留前缀/hash但不能通过元数据验证或继续WS。外部取消传播、零重试/重连、TLS/代理/重定向和字节/消息边界不变。
+
+R2-01-A1最近一次真实结果仍HTTP200但正文不完整的BLOCKED、WS NOT_RUN；单位UNKNOWN、持续预算UNVERIFIED、连续采集/24h NOT_RUN。修改独立复核并获授权合并后，真实重测还需新的目标环境/版本/单次计划授权。详见 [R2-02报告](reports/round2/02_probe_timeouts.md)。
