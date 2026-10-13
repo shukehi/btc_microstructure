@@ -1,0 +1,14 @@
+{
+  "src/btc_microstructure/probe.py": "341b0ac0e66b545b3a737035a30e83eb559093146ef9e330770f5dfec10d8480",
+  "tests/unit/test_probe_timeout_rounding.py": "86fcf70d246f370c4cc31a39a9e6e06f481eeffdb2f4942674b93081d321da37",
+  "reports/round2/03_ci_timeout_rounding_fix.md": "c5030d0a168994682d8dfbe3a1802aa7130658366a1bfb07a11497ab8010d76a",
+  "reports/round2/ci_timeout_rounding_fix/after-targeted.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+  "reports/round2/ci_timeout_rounding_fix/after-targeted.log": "12f4413f483a271ec4ce335accc2c7265f233d433101ea99aada673ee4abc3fb",
+  "reports/round2/ci_timeout_rounding_fix/before.exit": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+  "reports/round2/ci_timeout_rounding_fix/before.log": "95c8cd5274bee22de1fec1795f288a344090d141acd4e215bfd19ea66241659a",
+  "reports/round2/ci_timeout_rounding_fix/environment.json": "1205c77dd405d156772be4f9ceb323103f29655178473b2b62cbf2c425eb6299",
+  "reports/round2/ci_timeout_rounding_fix/local-ci.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+  "reports/round2/ci_timeout_rounding_fix/local-ci.log": "2b65482269903dd54e6ac2a190f1df2c96d89a38df921cae88a5b76caee7698d",
+  "reports/round2/ci_timeout_rounding_fix/results.tsv": "3258e97f4d7670d357d8bd64fd9d0bf795ef9a1118487aeb3a2e00b64bec313b",
+  "reports/round2/ci_timeout_rounding_fix/verification.json": "2410fb38d1f7d70c6294494b173f7cc3d8e9de6e2748f2041efd51530c8005ef"
+}

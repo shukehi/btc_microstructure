@@ -341,7 +341,13 @@ async def run_probe(
         )
         rest_configured_deadline = rest_started + configured_rest
         rest_deadline = min(work_deadline, rest_configured_deadline)
-        rest_effective = max(0.0, rest_deadline - rest_started)
+        # Preserve the configured duration unless the global deadline clips it.
+        # Subtracting absolute float timestamps can round beyond that duration.
+        rest_effective = (
+            configured_rest
+            if rest_deadline == rest_configured_deadline
+            else min(configured_rest, max(0.0, rest_deadline - rest_started))
+        )
         report["effective_timeouts"]["rest_total_seconds"] = rest_effective
         report["effective_timeouts"]["rest_total_mode"] = rest_mode
         rest_cap_source = deadline_cap_source(

@@ -1,0 +1,128 @@
+Local run: Linux network-namespace validation NOT_RUN
+::group::pytest
+........................................................................ [ 22%]
+........................................................................ [ 44%]
+........................................................................ [ 66%]
+........................................................................ [ 88%]
+......................................                                   [100%]
+- generated xml file: <WORKTREE>/ci-results/pytest.xml -
+326 passed in 13.88s
+Exit code: 0
+::endgroup::
+::group::pytest-independent-r1-01
+...............                                                          [100%]
+- generated xml file: <WORKTREE>/ci-results/pytest-independent-r1-01.xml -
+15 passed in 0.41s
+Exit code: 0
+::endgroup::
+::group::pytest-independent-r1-02
+.........                                                                [100%]
+- generated xml file: <WORKTREE>/ci-results/pytest-independent-r1-02.xml -
+9 passed in 0.17s
+Exit code: 0
+::endgroup::
+::group::pytest-independent-r1-03
+........                                                                 [100%]
+- generated xml file: <WORKTREE>/ci-results/pytest-independent-r1-03.xml -
+8 passed in 0.15s
+Exit code: 0
+::endgroup::
+::group::pytest-independent-r1-04
+....                                                                     [100%]
+- generated xml file: <WORKTREE>/ci-results/pytest-independent-r1-04.xml -
+4 passed in 0.06s
+Exit code: 0
+::endgroup::
+::group::r104-original-parquet
+<PYARROW_BUILD>/arrow/cpp/src/arrow/util/cpu_info.cc:239: IOError: sysctlbyname failed for 'hw.l1dcachesize'. Detail: [errno 1] Operation not permitted
+<PYARROW_BUILD>/arrow/cpp/src/arrow/util/cpu_info.cc:239: IOError: sysctlbyname failed for 'hw.l2cachesize'. Detail: [errno 1] Operation not permitted
+<PYARROW_BUILD>/arrow/cpp/src/arrow/util/cpu_info.cc:239: IOError: sysctlbyname failed for 'hw.l3cachesize'. Detail: [errno 1] Operation not permitted
+<PYARROW_BUILD>/arrow/cpp/src/arrow/util/cpu_info.cc:239: IOError: sysctlbyname failed for 'hw.optional.neon'. Detail: [errno 1] Operation not permitted
+{
+  "reviewed_commit": "0b65be4933e9c36abedf784e608b832c56cee131",
+  "evidence_kind": "SYNTHETIC",
+  "original_fixture_sha256": "e9fe002d6b8b1ddcd87f7fc01be68f62cf18f9b689fce33ca2640d1349aa4357",
+  "trigger": "add quality_flags=[GAP_KNOWN] to first synthetic RAW only",
+  "expected": {
+    "normalized_flag_contains": "GAP_KNOWN",
+    "feature_flag_contains": "GAP_KNOWN",
+    "trade_delta_base": null,
+    "volume_base": null
+  },
+  "actual": {
+    "collect_status": "PASS",
+    "raw_flags": [
+      "GAP_KNOWN"
+    ],
+    "normalized_flags": [
+      "GAP_KNOWN"
+    ],
+    "feature_flags": [
+      "GAP_KNOWN"
+    ],
+    "trade_delta_base": "None",
+    "volume_base": "None"
+  },
+  "output": "<WORKTREE>/ci-results/r104-original/attempt-yu2unl1u"
+}
+Exit code: 0
+::endgroup::
+::group::ruff-check
+All checks passed!
+Exit code: 0
+::endgroup::
+::group::ruff-format
+31 files already formatted
+Exit code: 0
+::endgroup::
+::group::mypy
+Success: no issues found in 12 source files
+Exit code: 0
+::endgroup::
+::group::pip-check
+WARNING: The directory '<PIP_CACHE>' or its parent directory is not owned or is not writable by the current user. The cache has been disabled. Check the permissions and owner of that directory. If executing pip with sudo, you should use sudo's -H flag.
+No broken requirements found.
+Exit code: 0
+::endgroup::
+::group::validate-config
+{"runtime_capabilities": {"book_band_coverage": "UNVERIFIED", "event_time_per_source_support": "UNVERIFIED", "instrument_metadata": "UNVERIFIED", "oi_absolute_unit_evidence": "UNVERIFIED", "protocol_routes_and_budget": "UNVERIFIED"}, "sha256": "b037004b544ca834855821374bd65520a535b509c0b952d9c3f37a97a30d3b43", "status": "CONFIG_VALID"}
+Exit code: 0
+::endgroup::
+::group::validate-offline
+{"input_mode": "synthetic", "network_access": "DISABLED", "sha256": "6da02b16a314b315c6e9d3fa588c3beb2791ee240bcedd88c8178378c9e71c2b", "status": "OFFLINE_CONFIG_VALID"}
+Exit code: 0
+::endgroup::
+::group::offline-e2e
+validate 0 {"input_mode": "synthetic", "network_access": "DISABLED", "sha256": "6da02b16a314b315c6e9d3fa588c3beb2791ee240bcedd88c8178378c9e71c2b", "status": "OFFLINE_CONFIG_VALID"}
+ 
+collect 0 {"data_health": {"non_warmup_invalid_feature_rows": 0, "status": "PASS", "warmup_only_invalid_allowed": true}, "feature_invalid_rows": 35, "feature_quality_counts": {"OK": 35, "WARMUP": 35}, "feature_rows": 70, "feature_valid_rows": 35, "limitations": {"continuous_collection": "NOT_RUN", "quantity_unit_for_live": "UNKNOWN_UNVERIFIED", "real_binance_rest": "BLOCKED_HISTORICAL", "real_binance_ws": "NOT_RUN"}, "normalized_rows": 3, "offline_config_sha256": "6da02b16a314b315c6e9d3fa588c3beb2791ee240bcedd88c8178378c9e71c2b", "output_root": "ci-results/offline-smoke/collect", "quarantine_rows": 1, "run_id": "r1-03-synthetic-offline", "status": "PASS"}
+ <PYARROW_BUILD>/arrow/cpp/src/arrow/util/cpu_info.cc:239: IOError: sysctlbyname failed for 'hw.l1dcachesize'. Detail: [errno 1] Operation not permitted
+<PYARROW_BUILD>/arrow/cpp/src/arrow/util/cpu_info.cc:239: IOError: sysctlbyname failed for 'hw.l2cachesize'. Detail: [errno 1] Operation not permitted
+<PYARROW_BUILD>/arrow/cpp/src/arrow/util/cpu_info.cc:239: IOError: sysctlbyname failed for 'hw.l3cachesize'. Detail: [errno 1] Operation not permitted
+<PYARROW_BUILD>/arrow/cpp/src/arrow/util/cpu_info.cc:239: IOError: sysctlbyname failed for 'hw.optional.neon'. Detail: [errno 1] Operation not permitted
+
+replay1 0 {"data_health": {"non_warmup_invalid_feature_rows": 0, "status": "PASS", "warmup_only_invalid_allowed": true}, "feature_available_time_source": "FEATURE_PUBLISHED_LOG", "feature_invalid_rows": 35, "feature_quality_counts": {"OK": 35, "WARMUP": 35}, "feature_rows": 70, "feature_valid_rows": 35, "input_root": "ci-results/offline-smoke/collect", "limitations": {"continuous_collection": "NOT_RUN", "quantity_unit_for_live": "UNKNOWN_UNVERIFIED", "real_binance_rest": "BLOCKED_HISTORICAL", "real_binance_ws": "NOT_RUN"}, "normalized_rows": 3, "offline_config_sha256": "6da02b16a314b315c6e9d3fa588c3beb2791ee240bcedd88c8178378c9e71c2b", "original_logical_sha256": "4b933651c8a63ca21381a101538061c00cc4b0c015e1d631b23d1f6c94fab0f9", "output_root": "ci-results/offline-smoke/replay1", "quarantine_rows": 1, "recovery_events": [], "replay_elapsed_ns": 127484250, "replay_logical_sha256": "4b933651c8a63ca21381a101538061c00cc4b0c015e1d631b23d1f6c94fab0f9", "run_id": "r1-03-synthetic-offline", "status": "PASS"}
+ <PYARROW_BUILD>/arrow/cpp/src/arrow/util/cpu_info.cc:239: IOError: sysctlbyname failed for 'hw.l1dcachesize'. Detail: [errno 1] Operation not permitted
+<PYARROW_BUILD>/arrow/cpp/src/arrow/util/cpu_info.cc:239: IOError: sysctlbyname failed for 'hw.l2cachesize'. Detail: [errno 1] Operation not permitted
+<PYARROW_BUILD>/arrow/cpp/src/arrow/util/cpu_info.cc:239: IOError: sysctlbyname failed for 'hw.l3cachesize'. Detail: [errno 1] Operation not permitted
+<PYARROW_BUILD>/arrow/cpp/src/arrow/util/cpu_info.cc:239: IOError: sysctlbyname failed for 'hw.optional.neon'. Detail: [errno 1] Operation not permitted
+
+replay2 0 {"data_health": {"non_warmup_invalid_feature_rows": 0, "status": "PASS", "warmup_only_invalid_allowed": true}, "feature_available_time_source": "FEATURE_PUBLISHED_LOG", "feature_invalid_rows": 35, "feature_quality_counts": {"OK": 35, "WARMUP": 35}, "feature_rows": 70, "feature_valid_rows": 35, "input_root": "ci-results/offline-smoke/collect", "limitations": {"continuous_collection": "NOT_RUN", "quantity_unit_for_live": "UNKNOWN_UNVERIFIED", "real_binance_rest": "BLOCKED_HISTORICAL", "real_binance_ws": "NOT_RUN"}, "normalized_rows": 3, "offline_config_sha256": "6da02b16a314b315c6e9d3fa588c3beb2791ee240bcedd88c8178378c9e71c2b", "original_logical_sha256": "4b933651c8a63ca21381a101538061c00cc4b0c015e1d631b23d1f6c94fab0f9", "output_root": "ci-results/offline-smoke/replay2", "quarantine_rows": 1, "recovery_events": [], "replay_elapsed_ns": 120785667, "replay_logical_sha256": "4b933651c8a63ca21381a101538061c00cc4b0c015e1d631b23d1f6c94fab0f9", "run_id": "r1-03-synthetic-offline", "status": "PASS"}
+ <PYARROW_BUILD>/arrow/cpp/src/arrow/util/cpu_info.cc:239: IOError: sysctlbyname failed for 'hw.l1dcachesize'. Detail: [errno 1] Operation not permitted
+<PYARROW_BUILD>/arrow/cpp/src/arrow/util/cpu_info.cc:239: IOError: sysctlbyname failed for 'hw.l2cachesize'. Detail: [errno 1] Operation not permitted
+<PYARROW_BUILD>/arrow/cpp/src/arrow/util/cpu_info.cc:239: IOError: sysctlbyname failed for 'hw.l3cachesize'. Detail: [errno 1] Operation not permitted
+<PYARROW_BUILD>/arrow/cpp/src/arrow/util/cpu_info.cc:239: IOError: sysctlbyname failed for 'hw.optional.neon'. Detail: [errno 1] Operation not permitted
+
+build 0 {"build_elapsed_ns": 114170542, "build_logical_sha256": "4b933651c8a63ca21381a101538061c00cc4b0c015e1d631b23d1f6c94fab0f9", "data_health": {"non_warmup_invalid_feature_rows": 0, "status": "PASS", "warmup_only_invalid_allowed": true}, "feature_available_time_source": "FEATURE_PUBLISHED_LOG", "feature_invalid_rows": 35, "feature_quality_counts": {"OK": 35, "WARMUP": 35}, "feature_rows": 70, "feature_valid_rows": 35, "input_root": "ci-results/offline-smoke/raw-only", "limitations": {"continuous_collection": "NOT_RUN", "quantity_unit_for_live": "UNKNOWN_UNVERIFIED", "real_binance_rest": "BLOCKED_HISTORICAL", "real_binance_ws": "NOT_RUN"}, "normalized_rows": 3, "offline_config_sha256": "6da02b16a314b315c6e9d3fa588c3beb2791ee240bcedd88c8178378c9e71c2b", "output_root": "ci-results/offline-smoke/build", "quarantine_rows": 1, "recovery_events": [], "run_id": "r1-03-synthetic-offline", "status": "PASS"}
+ <PYARROW_BUILD>/arrow/cpp/src/arrow/util/cpu_info.cc:239: IOError: sysctlbyname failed for 'hw.l1dcachesize'. Detail: [errno 1] Operation not permitted
+<PYARROW_BUILD>/arrow/cpp/src/arrow/util/cpu_info.cc:239: IOError: sysctlbyname failed for 'hw.l2cachesize'. Detail: [errno 1] Operation not permitted
+<PYARROW_BUILD>/arrow/cpp/src/arrow/util/cpu_info.cc:239: IOError: sysctlbyname failed for 'hw.l3cachesize'. Detail: [errno 1] Operation not permitted
+<PYARROW_BUILD>/arrow/cpp/src/arrow/util/cpu_info.cc:239: IOError: sysctlbyname failed for 'hw.optional.neon'. Detail: [errno 1] Operation not permitted
+
+<PYARROW_BUILD>/arrow/cpp/src/arrow/util/cpu_info.cc:239: IOError: sysctlbyname failed for 'hw.l1dcachesize'. Detail: [errno 1] Operation not permitted
+<PYARROW_BUILD>/arrow/cpp/src/arrow/util/cpu_info.cc:239: IOError: sysctlbyname failed for 'hw.l2cachesize'. Detail: [errno 1] Operation not permitted
+<PYARROW_BUILD>/arrow/cpp/src/arrow/util/cpu_info.cc:239: IOError: sysctlbyname failed for 'hw.l3cachesize'. Detail: [errno 1] Operation not permitted
+<PYARROW_BUILD>/arrow/cpp/src/arrow/util/cpu_info.cc:239: IOError: sysctlbyname failed for 'hw.optional.neon'. Detail: [errno 1] Operation not permitted
+PASS: fixed Decimal values, raw duplicates, 1s grid, Parquet readback, two replays + build
+Exit code: 0
+::endgroup::
