@@ -1,0 +1,114 @@
+FF.......                                                                [100%]
+=================================== FAILURES ===================================
+_ test_rest_duration_and_actual_request_timeout[49.9-49.9-60.0-15.0-15.0-REST_TOTAL] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x107f68290>
+start = 49.9, rest_start = 49.9, total = 60.0, configured = 15.0
+expected = 15.0, cap_source = 'REST_TOTAL'
+
+    @pytest.mark.parametrize(
+        "start,rest_start,total,configured,expected,cap_source",
+        [
+            (49.9, 49.9, 60.0, 15.0, 15.0, "REST_TOTAL"),
+            (49.9, 49.9, 60.0, 20.0, 20.0, "REST_TOTAL"),
+            (0.1, 0.1, 60.0, 15.0, 15.0, "REST_TOTAL"),
+            (50.0, 50.0, 60.0, 15.0, 15.0, "REST_TOTAL"),
+            (49.9, 49.9, 2.0, 15.0, 1.0, "GLOBAL_WORK"),
+            (49.9, 51.9, 2.0, 20.0, 0.0, "GLOBAL_WORK"),
+            (50.0, 50.0, 16.0, 15.0, 15.0, "SHARED_DEADLINE"),
+        ],
+    )
+    def test_rest_duration_and_actual_request_timeout(
+        monkeypatch: pytest.MonkeyPatch,
+        start: float,
+        rest_start: float,
+        total: float,
+        configured: float,
+        expected: float,
+        cap_source: str,
+    ) -> None:
+        session = CaptureSession()
+        monkeypatch.setattr(aiohttp, "ClientSession", lambda **options: session)
+        deadlines: list[float | None] = []
+        original_timeout_at = asyncio.timeout_at
+    
+        def capture_deadline(when: float | None) -> asyncio.Timeout:
+            deadlines.append(when)
+            return original_timeout_at(when)
+    
+        monkeypatch.setattr(asyncio, "timeout_at", capture_deadline)
+        limits = ProbeLimits(total_seconds=total, rest_total_seconds=configured)
+    
+        async def check() -> dict[str, Any]:
+            loop = asyncio.get_running_loop()
+            clock = iter([start, rest_start])
+            # Immediate synthetic rejection avoids wall-clock waits/network I/O.
+            # Restore the real loop clock before asyncio.run shuts down the loop.
+            with monkeypatch.context() as clock_patch:
+                clock_patch.setattr(loop, "time", lambda: next(clock, rest_start))
+                return await run_probe(AioTransport(), limits)
+    
+        report = asyncio.run(check())
+    
+>       assert report["effective_timeouts"]["rest_total_seconds"] == expected
+E       assert 15.000000000000007 == 15.0
+
+tests/unit/test_probe_timeout_rounding.py:82: AssertionError
+_ test_rest_duration_and_actual_request_timeout[49.9-49.9-60.0-20.0-20.0-REST_TOTAL] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x1075ab110>
+start = 49.9, rest_start = 49.9, total = 60.0, configured = 20.0
+expected = 20.0, cap_source = 'REST_TOTAL'
+
+    @pytest.mark.parametrize(
+        "start,rest_start,total,configured,expected,cap_source",
+        [
+            (49.9, 49.9, 60.0, 15.0, 15.0, "REST_TOTAL"),
+            (49.9, 49.9, 60.0, 20.0, 20.0, "REST_TOTAL"),
+            (0.1, 0.1, 60.0, 15.0, 15.0, "REST_TOTAL"),
+            (50.0, 50.0, 60.0, 15.0, 15.0, "REST_TOTAL"),
+            (49.9, 49.9, 2.0, 15.0, 1.0, "GLOBAL_WORK"),
+            (49.9, 51.9, 2.0, 20.0, 0.0, "GLOBAL_WORK"),
+            (50.0, 50.0, 16.0, 15.0, 15.0, "SHARED_DEADLINE"),
+        ],
+    )
+    def test_rest_duration_and_actual_request_timeout(
+        monkeypatch: pytest.MonkeyPatch,
+        start: float,
+        rest_start: float,
+        total: float,
+        configured: float,
+        expected: float,
+        cap_source: str,
+    ) -> None:
+        session = CaptureSession()
+        monkeypatch.setattr(aiohttp, "ClientSession", lambda **options: session)
+        deadlines: list[float | None] = []
+        original_timeout_at = asyncio.timeout_at
+    
+        def capture_deadline(when: float | None) -> asyncio.Timeout:
+            deadlines.append(when)
+            return original_timeout_at(when)
+    
+        monkeypatch.setattr(asyncio, "timeout_at", capture_deadline)
+        limits = ProbeLimits(total_seconds=total, rest_total_seconds=configured)
+    
+        async def check() -> dict[str, Any]:
+            loop = asyncio.get_running_loop()
+            clock = iter([start, rest_start])
+            # Immediate synthetic rejection avoids wall-clock waits/network I/O.
+            # Restore the real loop clock before asyncio.run shuts down the loop.
+            with monkeypatch.context() as clock_patch:
+                clock_patch.setattr(loop, "time", lambda: next(clock, rest_start))
+                return await run_probe(AioTransport(), limits)
+    
+        report = asyncio.run(check())
+    
+>       assert report["effective_timeouts"]["rest_total_seconds"] == expected
+E       assert 20.000000000000007 == 20.0
+
+tests/unit/test_probe_timeout_rounding.py:82: AssertionError
+=========================== short test summary info ============================
+FAILED tests/unit/test_probe_timeout_rounding.py::test_rest_duration_and_actual_request_timeout[49.9-49.9-60.0-15.0-15.0-REST_TOTAL]
+FAILED tests/unit/test_probe_timeout_rounding.py::test_rest_duration_and_actual_request_timeout[49.9-49.9-60.0-20.0-20.0-REST_TOTAL]
+2 failed, 7 passed in 0.22s
