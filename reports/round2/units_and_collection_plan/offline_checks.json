@@ -1,0 +1,50 @@
+{
+  "status": "PASS",
+  "exit_code": 0,
+  "recorded_utc": "2026-10-13T00:56:28.021514+00:00",
+  "baseline": "fd6ad845a913ba41950e01788acc627a31aa8409",
+  "new_cli_session": "01a132a7-1299-7ed0-a66e-739ba7e8a19a",
+  "python": "3.12.13",
+  "platform": "Darwin/arm64",
+  "script_sha256": "3e8dcb0c3e123af57dbc7ff798aedb84580d74957ac0d95af723edd0d18a8b85",
+  "inputs_sha256": {
+    "sources.json": "35f922185a818381f65d44bb77c13b48ef83cd863cddb2394bb02fb3b09032f1",
+    "quantity_unit_evidence.json": "5ec6dcc912b53ba4690df6c8d9c195b6d6abae3a022e877b1b38a5b239564798",
+    "bounded_collection_plan.json": "699c59beda1f01fbf8d55cf9e3b93bd0acfe2d4c1ddb8e4e1b26899f5dd42552"
+  },
+  "market_requests": 0,
+  "scope": "JSON/references/A2 byte hashes/native fields/budget arithmetic; documentary inference separately read, not algorithmically proven",
+  "A2_manifest_files": 31,
+  "A2_ws_samples": 20,
+  "A2_ws_bytes": 4082,
+  "A2_mean_bytes": "204.1",
+  "A2_local_REST": {
+    "status": "PASS",
+    "bytes": 1152517,
+    "sha256": "d5ae0e3682f28512d34ec9ab20131a964df6c76118b8a29e12a76e7b57cbd610",
+    "full_original_unchanged": true
+  },
+  "local_official_PDF_hashes": {
+    "S01": {
+      "status": "PASS",
+      "sha256": "783cb1eb3e538284ed8577eb1687de7f16b3038d43ece2fe8a84d40c0449648a"
+    },
+    "S02": {
+      "status": "PASS",
+      "sha256": "a86691f40d8155992c622715ce727d608d7f972ebb93ce90fa0106830e8a0a36"
+    }
+  },
+  "arithmetic": {
+    "total_seconds": 660,
+    "own_REST_weight": 1,
+    "reserve_example": 240,
+    "own_fraction_of_A2_minute_snapshot": "1/2400",
+    "raw_base64_plus_envelope_upper_bytes": 147405908,
+    "single_raw_envelope_upper_bytes": 88408,
+    "run_bytes": 536870912,
+    "size_example_100000_at_A2_mean": "20410000.0",
+    "not_peak_or_future_forecast": true
+  },
+  "future_implementation_600s_and_24h": "NOT_RUN",
+  "historical_unit_and_budget_preserved": true
+}

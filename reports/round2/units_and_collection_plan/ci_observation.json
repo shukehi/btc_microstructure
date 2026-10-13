@@ -1,0 +1,95 @@
+{
+  "finding_id": "R203-CI-01",
+  "severity": "MEDIUM",
+  "status": "CONFIRMED_CI_FAILURE_EXISTING_BASELINE_CODE_NOT_FIXED",
+  "run_url": "https://github.com/shukehi/btc_microstructure/actions/runs/38329799046",
+  "event": "pull_request",
+  "evidence_head": "4cc3202dc5c4e0eba94b62d9a7cba37ca66b6014",
+  "business_baseline": "fd6ad845a913ba41950e01788acc627a31aa8409",
+  "failed_node": "tests/unit/test_probe_timeouts.py::test_cli_rest_total_seconds_reaches_limits_before_transport",
+  "assertion_file_line": 168,
+  "expected": 15.0,
+  "actual": 15.000000000000007,
+  "junit": {
+    "pytest-independent-r1-04.xml": {
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "pytest-independent-r1-01.xml": {
+      "tests": 15,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "pytest-independent-r1-03.xml": {
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "pytest-independent-r1-02.xml": {
+      "tests": 9,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "pytest.xml": {
+      "tests": 317,
+      "failures": 1,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "results": {
+    "pytest": "1",
+    "pytest-independent-r1-01": "0",
+    "pytest-independent-r1-02": "0",
+    "pytest-independent-r1-03": "0",
+    "pytest-independent-r1-04": "0",
+    "r104-original-parquet": "0",
+    "ruff-check": "0",
+    "ruff-format": "0",
+    "mypy": "0",
+    "pip-check": "0",
+    "validate-config": "0",
+    "validate-offline": "0",
+    "offline-e2e": "0"
+  },
+  "source_path": "src/btc_microstructure/probe.py",
+  "source_locations": [
+    {
+      "line": 342,
+      "source": "rest_configured_deadline = rest_started + configured_rest"
+    },
+    {
+      "line": 343,
+      "source": "rest_deadline = min(work_deadline, rest_configured_deadline)"
+    },
+    {
+      "line": 344,
+      "source": "rest_effective = max(0.0, rest_deadline - rest_started)"
+    },
+    {
+      "line": 354,
+      "source": "limits.model_copy(update={\"rest_total_seconds\": rest_effective})"
+    }
+  ],
+  "source_sha256": "ce455f887e277573c9537a0a2e4d187b7e72f82dbe45a27ae9457bf7ab679aa6",
+  "offline_arithmetic_reproduction": {
+    "start": 49.9,
+    "configured_rest": 15.0,
+    "expression": "(start + configured_rest) - start",
+    "result": 15.000000000000007,
+    "market_or_probe_calls": 0,
+    "exit_code": 0
+  },
+  "interpretation": "absolute-deadline floating addition/subtraction can round effective duration slightly above configured value; model_copy(update=...) passes it totransport; exact15 assertion fails. Not a report-data mutation or evidence of a network cause. Does not establish a materially unsafe time overrun.",
+  "minimal_suggestion": "separate absolute deadline from effective-duration parameter; preserve configured value exactly when not global-clipped, clamp actual duration to configured cap; retain original assertions. Requires separately authorized code work.",
+  "actions_this_task": "no code/test/workflow changes; no failed-check rerun to hide the failure; record observation in report and PR",
+  "artifact_local_hashes": {
+    "pytest.xml": "41ae436c48ffb35e332ff3e34b1d94d65089739ec0235e21dc62f73c4e01765c",
+    "results.tsv": "951718563b3464d11e2153add91d34ea6d936c8d2462a7faf167cead7c7b7639"
+  }
+}

@@ -1,0 +1,129 @@
+{
+  "schema_version": "quantity-unit-evidence-candidate.1",
+  "unit_evidence_id": "DOC:binance:um_perpetual:BTCUSDT:aggTrade:2026-10-13:v1",
+  "evidence_version": "1",
+  "knowledge_as_of_utc": "2026-10-13",
+  "documentary_conclusion": "SUFFICIENT_FOR_BTC_MAPPING_WITHIN_CHECKED_IDENTITY",
+  "review_status": "PENDING_INDEPENDENT_REVIEW",
+  "runtime_applied": false,
+  "instrument": {
+    "venue": "binance",
+    "market": "um_perpetual",
+    "instrument_id": "binance:um_perpetual:BTCUSDT",
+    "symbol": "BTCUSDT",
+    "contract_type": "PERPETUAL",
+    "base_asset": "BTC",
+    "quote_asset": "USDT",
+    "margin_asset": "USDT",
+    "stream": "um_agg_trade",
+    "st_if_present": 1,
+    "route": "wss://fstream.binance.com/market/stream?streams=btcusdt@aggTrade"
+  },
+  "fields": {
+    "q": {
+      "unit": "BTC",
+      "multiplier_decimal": "1",
+      "formula": "quantity_base = Decimal(raw.q)",
+      "coverage": "aggregated market trades including RPI; not insurance-fund/ADL complete ledger"
+    },
+    "nq": {
+      "unit": "BTC",
+      "multiplier_decimal": "1",
+      "formula": "normal_quantity_base = Decimal(raw.nq) if present else null",
+      "coverage": "non-RPI subset; never add q+nq; require0<=nq<=q"
+    },
+    "p": {
+      "unit": "USDT/BTC",
+      "multiplier_decimal": "1",
+      "formula": "price_quote = Decimal(raw.p)"
+    },
+    "notional_quote": {
+      "unit": "USDT",
+      "formula": "Decimal(raw.p) * Decimal(raw.q)",
+      "extra_contract_multiplier": null
+    }
+  },
+  "reasoning": [
+    {
+      "step": "identity",
+      "sources": [
+        "S01",
+        "A2"
+      ],
+      "inference": "A2 records identify BTCUSDT as UM perpetual underlyingBTC quoted/settledUSDT; identity alone insufficient for q"
+    },
+    {
+      "step": "quantity meaning",
+      "sources": [
+        "S03"
+      ],
+      "inference": "q/nq are total/subset market-trade quantity, not two independent flows"
+    },
+    {
+      "step": "physical unit",
+      "sources": [
+        "S01",
+        "S02",
+        "S04"
+      ],
+      "inference": "current formal USDS-M size is underlying quantity; BTC/USDT unit1 base corroborated; bind API quantity toBTC, not COIN-M USD-per-contract"
+    },
+    {
+      "step": "price and notional dimension",
+      "sources": [
+        "S01",
+        "S02",
+        "S03"
+      ],
+      "inference": "linear settlement-quoted price overBTC quantity impliesUSDT/BTC andp*q USDT; no equality of trade price andMark Price claimed"
+    }
+  ],
+  "A2_references": {
+    "protocol_probe_report.json": {
+      "path": "reports/round2/protocol_readiness/a2/20261012-plan-a2-attempt01/protocol_probe_report.json",
+      "sha256": "82a66d4aeed089b744c26c302f6544f89ba6fae5c9ae430f1c07628247e0cab2"
+    },
+    "endpoint_budget.json": {
+      "path": "reports/round2/protocol_readiness/a2/20261012-plan-a2-attempt01/endpoint_budget.json",
+      "sha256": "23687d441846c32738649931349615cb369d1dbca627ab5be8d80d408b3ef00e"
+    },
+    "rest-btcusdt-excerpt.json": {
+      "path": "reports/round2/protocol_readiness/a2/20261012-plan-a2-attempt01/rest-btcusdt-excerpt.json",
+      "sha256": "332c09a8dbb7f70dcbcd9f6557fd0fb7d2cad5f419ef4c6499d6d3906a41d0cf"
+    },
+    "publication-manifest.json": {
+      "path": "reports/round2/protocol_readiness/a2/20261012-plan-a2-attempt01/publication-manifest.json",
+      "sha256": "d940cbf61bb35f5fe3d69d4955ffb09b145809babf1d67b4bef88d9c44dcecfd"
+    }
+  },
+  "A2_full_REST_sha256": "d5ae0e3682f28512d34ec9ab20131a964df6c76118b8a29e12a76e7b57cbd610",
+  "effective_from_observed_ns": null,
+  "effective_from_policy": "first independently approved future run-binding observation; no retrospective rewrite of A1/A2 UNKNOWN or publication history",
+  "runtime_binding_requirements": [
+    "independent approval record and immutable evidence hash/version",
+    "current startup REST full metadata identity and selected unit-relevant fields match; current metadata hash goes in run receipt, not required byte-equal to A2 whole response",
+    "explicit LIVE row/metadata/binding identity, never relabelSYNTHETIC",
+    "new source/normalization/feature namespace and default synthetic rejection intact",
+    "resolver returns binding object, not boolean verified=true or justBTC string"
+  ],
+  "revalidate_on": [
+    "official definition orAPI q/nq/price coverage changes",
+    "symbol/underlying/quote/margin/contract type/market route orst changes",
+    "evidence revoked/amended or first-run metadata filter mismatch",
+    "new adapter/schema version or need to apply to other symbol/market",
+    "candidate older than7days at first binding: documentation recheck required (engineering policy)"
+  ],
+  "excluded": [
+    "OI",
+    "spot",
+    "COIN-M",
+    "other symbols",
+    "accounts/positions/pnl",
+    "runtime unit verification alreadyapplied"
+  ],
+  "historical_records_mutated": false,
+  "source_registry": {
+    "path": "reports/round2/units_and_collection_plan/sources.json",
+    "sha256": "35f922185a818381f65d44bb77c13b48ef83cd863cddb2394bb02fb3b09032f1"
+  }
+}
