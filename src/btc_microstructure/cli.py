@@ -23,6 +23,20 @@ def main(argv: Sequence[str] | None = None) -> int:
         "validate-offline", help="validate the strict R1-03 synthetic offline config"
     )
     validate_offline.add_argument("path")
+    bounded_validate = commands.add_parser(
+        "validate-bounded",
+        help="validate bounded single-source config offline (no permission grant)",
+    )
+    bounded_validate.add_argument("path")
+    bounded_collect = commands.add_parser(
+        "collect-bounded", help="REAL bounded collection is blocked pending separate approvals"
+    )
+    bounded_collect.add_argument("path")
+    bounded_collect.add_argument("--allow-network", action="store_true")
+    bounded_replay = commands.add_parser(
+        "replay-bounded", help="read-only offline trusted-prefix bounded replay"
+    )
+    bounded_replay.add_argument("--input", required=True, type=Path)
     collect = commands.add_parser("collect", help="R1-03 synthetic offline collection only")
     collect.add_argument("path", help="strict offline config")
     collect.add_argument("--mode", choices=["synthetic"], required=True)
@@ -49,6 +63,37 @@ def main(argv: Sequence[str] | None = None) -> int:
     probe.add_argument("--max-bytes", type=int, default=2097152)
     args = parser.parse_args(argv)
     try:
+        if args.command == "collect-bounded":
+            print(
+                "BLOCKED: separate REAL approval, approved unit binding and shared budget required"
+            )
+            return 2
+        if args.command == "validate-bounded":
+            from .bounded_live import BoundedLiveConfig
+
+            bounded_config = BoundedLiveConfig.model_validate_json(Path(args.path).read_bytes())
+            print(
+                json.dumps(
+                    {
+                        "status": "CONFIG_VALID",
+                        "network_access": "DISABLED",
+                        "config": bounded_config.model_dump(mode="json"),
+                    },
+                    sort_keys=True,
+                )
+            )
+            return 0
+        if args.command == "replay-bounded":
+            from .bounded_replay import replay_bounded
+            from .offline_storage import StorageError
+
+            try:
+                result = replay_bounded(args.input)
+            except (StorageError, ValueError, KeyError) as exc:
+                print(f"BLOCKED: bounded replay validation failed: {exc}", file=sys.stderr)
+                return 1
+            print(json.dumps(result, default=str, sort_keys=True))
+            return 0 if result["status"] == "PASS" else 1
         if args.command in {"validate-offline", "collect", "replay", "build-features"}:
             from .offline import OfflineConfig, build_features, replay_run, run_synthetic
 

@@ -6,12 +6,22 @@ import json
 from typing import Any
 
 from .probe import ProbeError, decimal_string, integer, object_json
+from .unit_binding import UnitBinding
 
 SCHEMA_VERSION = "r1-03.1"
 ADAPTER_VERSION = "um-agg-synthetic.1"
 NORMALIZATION_VERSION = "trades.2-quality"
 FEATURE_VERSION = "delta.2-quality"
+BOUND_ADAPTER_VERSION = "um-agg-test-only-live.1"
+BOUND_NORMALIZATION_VERSION = "trades.2-quality-test-only-live"
+BOUND_FEATURE_VERSION = "delta.2-quality-test-only-live"
 NS = 1_000_000_000
+TARGET_VENUE = "binance"
+TARGET_MARKET_TYPE = "um_perpetual"
+TARGET_SYMBOL = "BTCUSDT"
+TARGET_INSTRUMENT_ID = "binance:um_perpetual:BTCUSDT"
+TARGET_SOURCE_STREAM = "um_agg_trade"
+TARGET_WS_STREAM = "btcusdt@aggTrade"
 
 # docs/01 section12. Book/BBO-specific flags and SOURCE_SAMPLED remain
 # traceable without invalidating the trade family. CLOCK_UNCERTAIN on a RAW
@@ -64,10 +74,74 @@ def exact(value: Any, field: str, zero: bool = False) -> Decimal:
     return number
 
 
+def _unit_policy(
+    config: dict[str, Any], metadata: dict[str, Any], binding: UnitBinding | None
+) -> dict[str, Any]:
+    if "unit_binding" in config:
+        raise ValueError("unit_binding: pass an explicit binding=UnitBinding object to Core")
+    if binding is None:
+        return {
+            "mode": "SYNTHETIC_DEFAULT",
+            "accepted_raw_evidence_kind": "SYNTHETIC",
+            "metadata_evidence_kind": "SYNTHETIC",
+            "unit_evidence_id": metadata.get("unit_evidence_id"),
+            "dataset_revision": "synthetic-original",
+            "published_status": "RECORDED_SYNTHETIC",
+            "adapter_version": ADAPTER_VERSION,
+            "normalization_version": NORMALIZATION_VERSION,
+            "feature_version": FEATURE_VERSION,
+            "source_scope": TARGET_SOURCE_STREAM,
+        }
+    if not isinstance(binding, UnitBinding):
+        raise ValueError("binding: expected UnitBinding")
+    if binding.runtime_scope != "TEST_ONLY_OFFLINE":
+        raise ValueError("binding.runtime_scope: only TEST_ONLY_OFFLINE is enabled")
+    if (
+        binding.venue != TARGET_VENUE
+        or binding.market_type != TARGET_MARKET_TYPE
+        or binding.instrument_id != TARGET_INSTRUMENT_ID
+        or binding.symbol != TARGET_SYMBOL
+        or binding.source_stream != TARGET_SOURCE_STREAM
+        or binding.stream_name != TARGET_WS_STREAM
+        or binding.st_if_present != 1
+        or binding.quantity_unit != "BTC"
+        or binding.normal_quantity_unit != "BTC"
+        or binding.price_unit != "USDT/BTC"
+        or binding.notional_unit != "USDT"
+        or binding.quantity_multiplier_decimal != "1"
+        or binding.price_multiplier_decimal != "1"
+    ):
+        raise ValueError("binding: unsupported BTCUSDT aggTrade unit binding")
+    return {
+        "mode": "TEST_ONLY_LIVE",
+        "accepted_raw_evidence_kind": binding.runtime_scope,
+        "metadata_evidence_kind": binding.runtime_scope,
+        "unit_evidence_id": binding.unit_evidence_id,
+        "evidence_version": binding.evidence_version,
+        "evidence_sha256": binding.evidence_sha256,
+        "approval_id": binding.approval_id,
+        "approval_kind": binding.approval_kind,
+        "metadata_version": binding.current_metadata_sha256,
+        "dataset_revision": f"test-only-live:{binding.approval_id}",
+        "published_status": "RECORDED_TEST_ONLY",
+        "binding_scope": binding.runtime_scope,
+        "adapter_version": BOUND_ADAPTER_VERSION,
+        "normalization_version": BOUND_NORMALIZATION_VERSION,
+        "feature_version": BOUND_FEATURE_VERSION,
+        "source_scope": f"{TARGET_SOURCE_STREAM}:test_only_offline",
+    }
+
+
 class Core:
     """Sequential immutable cutoff snapshots; dedup rebuilt from trusted raw on restart."""
 
-    def __init__(self, config: dict[str, Any], metadata: dict[str, Any]):
+    def __init__(
+        self,
+        config: dict[str, Any],
+        metadata: dict[str, Any],
+        *,
+        binding: UnitBinding | None = None,
+    ):
         if config.get("time_view", "as_received") != "as_received":
             raise ValueError("unsupported time_view")
         self.config = deepcopy(config)
@@ -75,6 +149,8 @@ class Core:
         self.windows = config.get("window_seconds", [30])
         if not self.windows or any(type(w) is not int or w <= 0 for w in self.windows):
             raise ValueError("window_seconds: positive integers required")
+        self.binding = binding
+        self.unit_policy = _unit_policy(self.config, self.metadata, binding)
         self.normalized: list[dict[str, Any]] = []
         self.quarantine: list[dict[str, Any]] = []
         self.features: list[dict[str, Any]] = []
@@ -140,7 +216,7 @@ class Core:
             self.last_cutoff = cutoff
             snapshot = self
             if high < seq - 1:
-                snapshot = Core(self.config, self.metadata)
+                snapshot = Core(self.config, self.metadata, binding=self.binding)
                 for previous in self.history:
                     if previous["ingest_sequence"] <= high and previous["kind"] not in (
                         "FEATURE_CUTOFF",
@@ -158,7 +234,7 @@ class Core:
                 raise ValueError("publication precedes dependency availability")
             for value in values:
                 value["feature_available_ns"] = available
-                value["publication_status"] = "RECORDED_SYNTHETIC"
+                value["publication_status"] = self.unit_policy["published_status"]
                 self.features.append(value)
         elif kind not in ("SUBSCRIBED", "RECOVERY", "UNCERTAIN_GAP"):
             raise ValueError(f"unsupported control kind: {kind}")
@@ -241,11 +317,13 @@ class Core:
                 raise ProbeError(f"{field}: unsupported source")
         raw = object_json(row["payload"].encode())
         if "data" in raw:
-            if raw.get("stream") != "btcusdt@aggTrade" or not isinstance(raw["data"], dict):
+            if raw.get("stream") != TARGET_WS_STREAM or not isinstance(raw["data"], dict):
                 raise ProbeError("stream: unexpected wrapper")
             raw = raw["data"]
-        if raw.get("e") != "aggTrade" or raw.get("s") != "BTCUSDT":
+        if raw.get("e") != "aggTrade" or raw.get("s") != TARGET_SYMBOL:
             raise ProbeError("e/s: unsupported source")
+        if "st" in raw and integer(raw.get("st"), "st") != 1:
+            raise ProbeError("st: unsupported source")
         if type(raw.get("m")) is not bool:
             raise ProbeError("m: boolean required")
         price, quantity = exact(raw.get("p"), "p"), exact(raw.get("q"), "q")
@@ -264,13 +342,7 @@ class Core:
         if max(event, time, row["ts_receive_ns"]) > 2**63 - 1:
             raise ProbeError("timestamp: outside int64")
         meta = self.metadata
-        verified = (
-            meta.get("quantity_unit") == "BTC"
-            and meta.get("evidence_kind") == "SYNTHETIC"
-            and str(meta.get("unit_evidence_id", "")).startswith("SYNTHETIC:")
-            and row.get("evidence_kind") == "SYNTHETIC"
-            and "UNIT_UNKNOWN" not in flags
-        )
+        verified = self._unit_verified(row, flags)
         if not verified:
             flags = sorted(set(flags) | {"UNIT_UNKNOWN"})
         with localcontext() as context:
@@ -285,18 +357,30 @@ class Core:
         with localcontext() as context:
             context.prec = 80
             notional = price * quantity if verified else None
+        live_provenance = (
+            {
+                "unit_binding_id": self.unit_policy["unit_evidence_id"],
+                "unit_binding_scope": self.unit_policy["binding_scope"],
+                "unit_evidence_version": self.unit_policy["evidence_version"],
+                "unit_evidence_sha256": self.unit_policy["evidence_sha256"],
+                "unit_approval_id": self.unit_policy["approval_id"],
+                "unit_approval_kind": self.unit_policy["approval_kind"],
+            }
+            if self.unit_policy["mode"] != "SYNTHETIC_DEFAULT"
+            else {}
+        )
         return {
             **{k: v for k, v in row.items() if k not in ("payload", "kind")},
-            "venue": "binance",
-            "market_type": "um_perpetual",
-            "symbol": "BTCUSDT",
-            "instrument_id": "binance:um_perpetual:BTCUSDT",
-            "source_stream": "um_agg_trade",
+            "venue": TARGET_VENUE,
+            "market_type": TARGET_MARKET_TYPE,
+            "symbol": TARGET_SYMBOL,
+            "instrument_id": TARGET_INSTRUMENT_ID,
+            "source_stream": TARGET_SOURCE_STREAM,
             "source_origin": row.get("source_origin", "live_ws"),
             "source_time_unit": unit,
             "schema_version": SCHEMA_VERSION,
-            "adapter_version": ADAPTER_VERSION,
-            "normalization_version": NORMALIZATION_VERSION,
+            "adapter_version": self.unit_policy["adapter_version"],
+            "normalization_version": self.unit_policy["normalization_version"],
             "metadata_version": meta.get("metadata_version", "UNKNOWN"),
             "unit_evidence_id": meta.get("unit_evidence_id"),
             "quantity_unit": "BTC" if verified else "UNKNOWN",
@@ -320,7 +404,53 @@ class Core:
             "symbol_type_raw": raw.get("st"),
             "source_coverage": "AGGREGATED_MARKET_TRADES_NOT_FULL_LEDGER",
             "quality_flags": flags,
+            **live_provenance,
         }
+
+    def _unit_verified(self, row: dict[str, Any], flags: list[str]) -> bool:
+        if "UNIT_UNKNOWN" in flags:
+            return False
+        policy = self.unit_policy
+        meta = self.metadata
+        if policy["mode"] == "SYNTHETIC_DEFAULT":
+            return (
+                meta.get("quantity_unit") == "BTC"
+                and meta.get("evidence_kind") == "SYNTHETIC"
+                and str(meta.get("unit_evidence_id", "")).startswith("SYNTHETIC:")
+                and row.get("evidence_kind") == "SYNTHETIC"
+            )
+        for field, expected in (
+            ("venue", TARGET_VENUE),
+            ("market_type", TARGET_MARKET_TYPE),
+            ("instrument_id", TARGET_INSTRUMENT_ID),
+            ("source_stream", TARGET_SOURCE_STREAM),
+            ("metadata_version", policy["metadata_version"]),
+            ("evidence_kind", policy["accepted_raw_evidence_kind"]),
+        ):
+            if row.get(field) != expected:
+                return False
+        return (
+            row.get("source_origin") == "live_ws"
+            and meta.get("metadata_version") == policy["metadata_version"]
+            and meta.get("quantity_unit") == "BTC"
+            and meta.get("evidence_kind") == policy["metadata_evidence_kind"]
+            and meta.get("unit_evidence_id") == policy["unit_evidence_id"]
+        )
+
+    def _unit_policy_ready(self) -> bool:
+        policy = self.unit_policy
+        if policy["mode"] == "SYNTHETIC_DEFAULT":
+            return (
+                self.metadata.get("quantity_unit") == "BTC"
+                and self.metadata.get("evidence_kind") == "SYNTHETIC"
+                and str(self.metadata.get("unit_evidence_id", "")).startswith("SYNTHETIC:")
+            )
+        return (
+            self.metadata.get("quantity_unit") == "BTC"
+            and self.metadata.get("evidence_kind") == policy["metadata_evidence_kind"]
+            and self.metadata.get("unit_evidence_id") == policy["unit_evidence_id"]
+            and self.metadata.get("metadata_version") == policy["metadata_version"]
+        )
 
     def _window(self, cutoff: int, high: int, window: int) -> dict[str, Any]:
         left = cutoff - window * NS
@@ -346,12 +476,7 @@ class Core:
             for observed, original in self.conflicts
         ):
             reasons.append("DUPLICATE_CONFLICT")
-        if (
-            self.metadata.get("quantity_unit") != "BTC"
-            or self.metadata.get("evidence_kind") != "SYNTHETIC"
-            or not str(self.metadata.get("unit_evidence_id", "")).startswith("SYNTHETIC:")
-            or any(r["quantity_base"] is None for r in selected)
-        ):
+        if not self._unit_policy_ready() or any(r["quantity_base"] is None for r in selected):
             reasons.append("UNIT_UNKNOWN")
         upstream = {
             flag
@@ -381,6 +506,18 @@ class Core:
                 volume, delta = buy + sell, buy - sell
                 imbalance = float(delta / volume) if volume else None
             count = len(selected)
+        live_provenance = (
+            {
+                "unit_binding_id": self.unit_policy["unit_evidence_id"],
+                "unit_binding_scope": self.unit_policy["binding_scope"],
+                "unit_evidence_version": self.unit_policy["evidence_version"],
+                "unit_evidence_sha256": self.unit_policy["evidence_sha256"],
+                "unit_approval_id": self.unit_policy["approval_id"],
+                "unit_approval_kind": self.unit_policy["approval_kind"],
+            }
+            if self.unit_policy["mode"] != "SYNTHETIC_DEFAULT"
+            else {}
+        )
         return {
             "feature_cutoff_ns": cutoff,
             "feature_available_ns": None,
@@ -395,13 +532,14 @@ class Core:
             "quality_flags": reasons,
             "data_valid": not invalid,
             "time_view": "as_received",
-            "feature_version": FEATURE_VERSION,
+            "feature_version": self.unit_policy["feature_version"],
             "schema_version": SCHEMA_VERSION,
             "input_cursor": high,
-            "instrument_id": "binance:um_perpetual:BTCUSDT",
-            "source_scope": "um_agg_trade",
-            "dataset_revision": "synthetic-original",
+            "instrument_id": TARGET_INSTRUMENT_ID,
+            "source_scope": self.unit_policy["source_scope"],
+            "dataset_revision": self.unit_policy["dataset_revision"],
             "publication_status": "UNVERIFIED",
+            **live_provenance,
         }
 
     @property
