@@ -74,6 +74,18 @@ class _PhysicalAudit(NamedTuple):
     files: int
 
 
+class _PhysicalAuditCache:
+    """Cache immutable manifest/data validation while every audit still stats the tree."""
+
+    def __init__(self) -> None:
+        self.trusted: dict[
+            str,
+            tuple[tuple[int, ...], str, tuple[int, ...], str],
+        ] = {}
+        self.hits = 0
+        self.misses = 0
+
+
 def _empty_charges() -> dict[str, int]:
     return dict.fromkeys(PARTITIONS, 0)
 
@@ -163,15 +175,43 @@ def _sha256_file(path: Path) -> str:
     return digest.hexdigest()
 
 
-def _trusted_manifest_charges(root: Path) -> dict[str, str]:
+def _stat_signature(value: os.stat_result) -> tuple[int, ...]:
+    return (
+        value.st_dev,
+        value.st_ino,
+        value.st_mode,
+        value.st_size,
+        value.st_mtime_ns,
+        value.st_ctime_ns,
+    )
+
+
+def _trusted_manifest_charges(
+    files: dict[str, tuple[Path, os.stat_result]],
+    cache: _PhysicalAuditCache | None = None,
+) -> dict[str, str]:
     trusted: dict[str, str] = {}
-    manifest_dir = root / "manifests"
-    if not manifest_dir.exists() or manifest_dir.is_symlink() or not manifest_dir.is_dir():
-        return trusted
-    for manifest_path in sorted(manifest_dir.glob("*.json")):
-        if manifest_path.is_symlink() or not manifest_path.is_file():
+    manifest_keys = sorted(
+        key for key in files if Path(key).parent == Path("manifests") and key.endswith(".json")
+    )
+    for cache_key in manifest_keys:
+        manifest_path, manifest_stat = files[cache_key]
+        if not stat.S_ISREG(manifest_stat.st_mode):
             continue
         try:
+            manifest_signature = _stat_signature(manifest_stat)
+            cached = None if cache is None else cache.trusted.get(cache_key)
+            if cached is not None and cached[0] == manifest_signature:
+                _, relative_key, data_signature, partition = cached
+                cached_file = files.get(relative_key)
+                if cached_file is not None and _stat_signature(cached_file[1]) == data_signature:
+                    trusted[relative_key] = partition
+                    assert cache is not None
+                    cache.hits += 1
+                    continue
+            if cache is not None:
+                cache.misses += 1
+                cache.trusted.pop(cache_key, None)
             manifest = json.loads(
                 manifest_path.read_text(encoding="utf-8"), object_hook=_json_object_hook
             )
@@ -183,15 +223,21 @@ def _trusted_manifest_charges(root: Path) -> dict[str, str]:
             expected_sha = manifest.get("sha256")
             if not isinstance(path_value, str) or not isinstance(expected_sha, str):
                 continue
-            data_path = root / path_value
-            if not _inside(root, data_path) or data_path.is_symlink() or not data_path.is_file():
+            relative = Path(path_value)
+            if relative.is_absolute() or ".." in relative.parts:
                 continue
+            relative_key = relative.as_posix()
+            data_file = files.get(relative_key)
+            if data_file is None:
+                continue
+            data_path, data_stat = data_file
+            data_signature = _stat_signature(data_stat)
             if _sha256_file(data_path) != expected_sha:
                 continue
             kind = manifest.get("kind")
             if (
                 kind == "raw_control_segment"
-                and data_path.parent == root / "raw"
+                and relative.parent == Path("raw")
                 and data_path.name.startswith("raw-control-")
                 and data_path.name.endswith(".jsonl")
             ):
@@ -201,16 +247,25 @@ def _trusted_manifest_charges(root: Path) -> dict[str, str]:
                     continue
                 if actual_class not in {"RAW", "CONTROL"}:
                     continue
-                trusted[data_path.relative_to(root).as_posix()] = (
-                    "ws_raw_envelopes" if actual_class == "RAW" else "control"
-                )
+                partition = "ws_raw_envelopes" if actual_class == "RAW" else "control"
+                trusted[relative_key] = partition
             elif (
                 kind == "derived_table"
                 and data_path.name.endswith(".parquet")
-                and len(data_path.relative_to(root).parts) >= 3
-                and data_path.relative_to(root).parts[0] == "tables"
+                and len(relative.parts) >= 3
+                and relative.parts[0] == "tables"
             ):
-                trusted[data_path.relative_to(root).as_posix()] = _charge_table_file(data_path)
+                partition = _charge_table_file(data_path)
+                trusted[relative_key] = partition
+            else:
+                continue
+            if cache is not None:
+                cache.trusted[cache_key] = (
+                    manifest_signature,
+                    relative_key,
+                    data_signature,
+                    partition,
+                )
         except (OSError, ValueError, TypeError, StorageError):
             continue
     return trusted
@@ -240,15 +295,13 @@ def _charge_file(root: Path, path: Path, size: int, trusted_charges: dict[str, s
     return "temporary_orphan_quarantine_files"
 
 
-def _audit_physical_root(root: Path) -> _PhysicalAudit:
+def _audit_physical_root(root: Path, cache: _PhysicalAuditCache | None = None) -> _PhysicalAudit:
     root_stat = root.lstat()
     if stat.S_ISLNK(root_stat.st_mode):
         raise WriterFailure("PHYSICAL_AUDIT_SYMLINK")
     root = root.resolve(strict=True)
-    trusted_charges = _trusted_manifest_charges(root)
-    charges = _empty_charges()
     entries_seen = 0
-    files = 0
+    files: dict[str, tuple[Path, os.stat_result]] = {}
     stack = [(root, 0)]
     while stack:
         directory, depth = stack.pop()
@@ -264,17 +317,19 @@ def _audit_physical_root(root: Path) -> _PhysicalAudit:
                 mode = stat_result.st_mode
                 if stat.S_ISLNK(mode):
                     raise WriterFailure("PHYSICAL_AUDIT_SYMLINK")
-                if not _inside(root, path):
-                    raise WriterFailure("PHYSICAL_AUDIT_ESCAPE")
                 if stat.S_ISDIR(mode):
                     stack.append((path, depth + 1))
                     continue
                 if not stat.S_ISREG(mode):
                     raise WriterFailure("PHYSICAL_AUDIT_SPECIAL")
-                files += 1
-                partition = _charge_file(root, path, stat_result.st_size, trusted_charges)
-                charges[partition] += stat_result.st_size
-    return _PhysicalAudit(charges=charges, bytes=sum(charges.values()), files=files)
+                relative_key = path.relative_to(root).as_posix()
+                files[relative_key] = (path, stat_result)
+    trusted_charges = _trusted_manifest_charges(files, cache)
+    charges = _empty_charges()
+    for path, stat_result in files.values():
+        partition = _charge_file(root, path, stat_result.st_size, trusted_charges)
+        charges[partition] += stat_result.st_size
+    return _PhysicalAudit(charges=charges, bytes=sum(charges.values()), files=len(files))
 
 
 def _check_root_path(root: Path) -> None:
@@ -543,7 +598,10 @@ def _worker(
             "terminal_audit_bytes": 0,
             "queue_peak_records": 0,
             "queue_peak_bytes": 0,
+            "audit_cache_hits": 0,
+            "audit_cache_misses": 0,
         }
+        audit_cache = _PhysicalAuditCache()
         pending_storage_warning: int | None = None
         wrote_storage_warning = False
 
@@ -559,10 +617,12 @@ def _worker(
             return disk_free
 
         def audit_root() -> None:
-            audit = _audit_physical_root(Path(root))
+            audit = _audit_physical_root(Path(root), audit_cache)
             budget.set_physical_used(audit.charges)
             metrics["audited_bytes"] = audit.bytes
             metrics["audited_files"] = audit.files
+            metrics["audit_cache_hits"] = audit_cache.hits
+            metrics["audit_cache_misses"] = audit_cache.misses
 
         def reserve(charges: dict[str, int]) -> None:
             audit_root()
@@ -1201,6 +1261,8 @@ class ProcessWriter:
             "terminal_audit_bytes",
             "queue_peak_records",
             "queue_peak_bytes",
+            "audit_cache_hits",
+            "audit_cache_misses",
         ):
             if key not in value:
                 continue

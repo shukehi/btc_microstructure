@@ -1,0 +1,180 @@
+{
+  "schema_version": "l04-capacity-evidence-summary-1",
+  "baseline_head": "a6dad88f7bd328f8526f0cd3b200e82fc08e1a66",
+  "environment": {
+    "python": "3.12.13",
+    "platform": "macOS arm64",
+    "network": "socket connect, connect_ex, create_connection and getaddrinfo denied",
+    "transport": "TEST_ONLY artificial BTCUSDT aggTrade",
+    "writer": "ProcessWriter"
+  },
+  "baseline_1000_messages_per_event_second": [
+    {
+      "requested_messages": 100,
+      "processed_raw": 100,
+      "reserved_state_bytes": 7545265,
+      "core_heap_bytes": 370594,
+      "files_bytes": 159768,
+      "parent_cpu_seconds": 0.101352,
+      "child_cpu_seconds": 0.506566
+    },
+    {
+      "requested_messages": 500,
+      "processed_raw": 500,
+      "reserved_state_bytes": 37476465,
+      "core_heap_bytes": 1776754,
+      "files_bytes": 555786,
+      "parent_cpu_seconds": 0.382449,
+      "child_cpu_seconds": 0.612
+    },
+    {
+      "requested_messages": 1000,
+      "processed_raw": 1000,
+      "reserved_state_bytes": 74906607,
+      "core_heap_bytes": 3537704,
+      "files_bytes": 1053557,
+      "parent_cpu_seconds": 0.76198,
+      "child_cpu_seconds": 0.753657
+    },
+    {
+      "requested_messages": 2000,
+      "generated_messages": 2000,
+      "processed_raw": 1782,
+      "stop_reason": "ENCODED_STATE_LIMIT",
+      "core_heap_bytes": 6303328,
+      "files_bytes": 1883552,
+      "parent_cpu_seconds": 1.529323,
+      "child_cpu_seconds": 0.765164
+    }
+  ],
+  "baseline_first_failure": {
+    "operation": "RAW",
+    "sequence": 1787,
+    "processed_raw_before_failure": 1781,
+    "committed_bytes_before": 133072166,
+    "pending_multiplier_bytes": 1069500,
+    "persistent_reserve_bytes": 74440,
+    "scratch_reserve_bytes": 3339,
+    "predicted_bytes": 134219445,
+    "limit_bytes": 134217728,
+    "over_by_bytes": 1717,
+    "core_heap_bytes": 6303497,
+    "core_heap_breakdown_bytes": {
+      "history": 2125475,
+      "normalized": 3954852,
+      "seen_index_exclusive": 216288,
+      "window_and_features": 2856,
+      "quality": 710,
+      "base_and_scalars": 3316
+    },
+    "normalized_seen_shared_values": 1781,
+    "parent_current_rss_bytes": 89014272,
+    "child_current_rss_bytes": 98156544,
+    "files_bytes": 1890329
+  },
+  "optimized_1000_messages_per_event_second": [
+    {
+      "requested_messages": 100,
+      "processed_raw": 100,
+      "committed_state_bytes": 1332593,
+      "core_heap_bytes": 370594,
+      "files_bytes": 159766
+    },
+    {
+      "requested_messages": 500,
+      "processed_raw": 500,
+      "committed_state_bytes": 6365393,
+      "core_heap_bytes": 1776754,
+      "files_bytes": 555784
+    },
+    {
+      "requested_messages": 1000,
+      "processed_raw": 1000,
+      "committed_state_bytes": 12664478,
+      "core_heap_bytes": 3537704,
+      "files_bytes": 1053555
+    },
+    {
+      "requested_messages": 2000,
+      "processed_raw": 2000,
+      "committed_state_bytes": 25336180,
+      "core_heap_bytes": 7071821,
+      "files_bytes": 2070105
+    }
+  ],
+  "optimized_first_failure": {
+    "requested_messages": 100000,
+    "generated_messages": 10500,
+    "processed_raw_before_failure": 10494,
+    "operation": "RAW",
+    "sequence": 10518,
+    "committed_bytes_before": 133124006,
+    "pending_multiplier_bytes": 1078500,
+    "persistent_reserve_bytes": 12676,
+    "scratch_reserve_bytes": 3363,
+    "predicted_bytes": 134218545,
+    "limit_bytes": 134217728,
+    "over_by_bytes": 817,
+    "core_heap_bytes": 37034957,
+    "parent_current_rss_bytes": 146194432,
+    "child_current_rss_bytes": 90603520,
+    "files_bytes": 9966282,
+    "replay_status": "PARTIAL_READ_ONLY_INPUT_UNCHANGED"
+  },
+  "sixty_second_process_writer": {
+    "scenario": "600 messages at 10 messages per simulated event second, grid 1 second",
+    "before": {
+      "messages": 600,
+      "features": 60,
+      "elapsed_seconds": 43.5120614169864,
+      "parent_cpu_seconds": 1.673162,
+      "child_cpu_seconds": 40.976331,
+      "batch_p95_seconds": 0.24618675000965595,
+      "table_p95_seconds": 0.26017233298625797,
+      "reserved_state_bytes": 56699869,
+      "files": 617,
+      "files_bytes": 1620876,
+      "two_replays": "PASS"
+    },
+    "after": {
+      "messages": 600,
+      "features": 60,
+      "elapsed_seconds": 14.99864499992691,
+      "parent_cpu_seconds": 1.641295,
+      "child_cpu_seconds": 13.198324999999999,
+      "batch_p95_seconds": 0.07541408389806747,
+      "table_p95_seconds": 0.08081120799761266,
+      "reserved_state_bytes": 10303181,
+      "files": 617,
+      "files_bytes": 1620876,
+      "audit_cache_hits": 94556,
+      "audit_cache_misses": 307,
+      "two_replays": "PASS"
+    }
+  },
+  "post_change_scaling_check": [
+    {
+      "simulated_seconds": 30,
+      "messages": 300,
+      "files": 317,
+      "elapsed_seconds": 4.5519932500319555,
+      "child_cpu_seconds": 3.936976,
+      "batch_p95_seconds": 0.039431999903172255
+    },
+    {
+      "simulated_seconds": 60,
+      "messages": 600,
+      "files": 617,
+      "elapsed_seconds": 14.99864499992691,
+      "child_cpu_seconds": 13.198324999999999,
+      "batch_p95_seconds": 0.07541408389806747
+    }
+  ],
+  "gates": {
+    "short_semantics_and_resource_checks": "PASS_LIMITED_OFFLINE",
+    "simulated_600_seconds_process_writer_1_5_10_per_second": "NOT_RUN_SCALING_BLOCKED",
+    "single_second_1000_message_burst": "PASS_LIMITED_OFFLINE_BY_1000_MESSAGE_PROFILE",
+    "wall_clock_600_seconds": "NOT_RUN_GATE_NOT_MET",
+    "real_market": "BLOCKED"
+  }
+}

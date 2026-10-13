@@ -229,17 +229,30 @@ class StateReservations:
         size = len(_json_line(row))
         kind = row["kind"]
         if kind == "RAW":
-            if row.get("quality_flags"):
-                return StateCharge(persistent_bytes=32_768 + 4 * size, scratch_bytes=2 * size)
-            return StateCharge(persistent_bytes=65_536 + 8 * size, scratch_bytes=3 * size)
+            # Core retains one history copy plus either a normalized/seen view
+            # or a quarantine view.  Charge four encoded copies plus fixed
+            # Python-container headroom; the old unconditional 64 KiB floor
+            # stopped small valid messages long before either heap or RSS did.
+            scratch_copies = 2 if row.get("quality_flags") else 3
+            return StateCharge(
+                persistent_bytes=8192 + 4 * size,
+                scratch_bytes=scratch_copies * size,
+            )
         if kind == "FEATURE_CUTOFF":
-            windows = len(core.windows) * (16_384 + 512 * len(core.normalized))
+            # A cutoff permanently adds only its history row and bounded
+            # feature rows.  The selected-window pointer list and scans are
+            # temporary, so normalized cardinality belongs only to scratch.
+            persistent_windows = len(core.windows) * 16_384
+            scratch_windows = len(core.windows) * (16_384 + 512 * len(core.normalized))
             high = int(row["input_cursor"])
             sequence = int(row["ingest_sequence"])
-            scratch = windows
+            scratch = scratch_windows
             if high < sequence - 1:
                 scratch += 2 * self.committed_bytes + len(core.history) * 4096
-            return StateCharge(persistent_bytes=16_384 + 2 * size + windows, scratch_bytes=scratch)
+            return StateCharge(
+                persistent_bytes=16_384 + 2 * size + persistent_windows,
+                scratch_bytes=scratch,
+            )
         if kind == "FEATURE_PUBLISHED":
             pending = sum(len(_json_line(item)) for rows in core.pending.values() for item in rows)
             return StateCharge(persistent_bytes=8192 + 2 * size, scratch_bytes=pending)

@@ -317,6 +317,44 @@ def test_physical_audit_rejects_symlink_before_charging_bytes(tmp_path: Path) ->
         bounded_writer._audit_physical_root(root)  # noqa: SLF001
 
 
+def test_physical_audit_cache_reuses_only_unchanged_trusted_files(tmp_path: Path) -> None:
+    root = tmp_path / "run"
+    raw_path = root / "raw" / "raw-control-000001.jsonl"
+    raw_bytes = json.dumps(_raw_row(1), sort_keys=True, separators=(",", ":")).encode() + b"\n"
+    _write(raw_path, raw_bytes)
+    _write_manifest(
+        root,
+        "manifest-raw-000001.json",
+        _manifest_for(
+            "raw/raw-control-000001.jsonl",
+            raw_bytes,
+            kind="raw_control_segment",
+            cursor={"before": None, "after": 1},
+        ),
+    )
+    cache = bounded_writer._PhysicalAuditCache()  # noqa: SLF001
+
+    first = bounded_writer._audit_physical_root(root, cache)  # noqa: SLF001
+    second = bounded_writer._audit_physical_root(root, cache)  # noqa: SLF001
+
+    assert first == second
+    assert first.charges["ws_raw_envelopes"] == len(raw_bytes)
+    assert cache.misses == 1
+    assert cache.hits == 1
+
+    # Same-length tampering changes inode metadata and must invalidate trust.
+    changed = bytearray(raw_bytes)
+    changed[-2] = ord(" ") if changed[-2] != ord(" ") else ord("x")
+    raw_path.write_bytes(bytes(changed))
+    orphan = root / "unknown.tmp"
+    orphan.write_bytes(b"new")
+    third = bounded_writer._audit_physical_root(root, cache)  # noqa: SLF001
+
+    assert cache.misses == 2
+    assert third.charges["ws_raw_envelopes"] == 0
+    assert third.charges["temporary_orphan_quarantine_files"] == len(changed) + len(b"new")
+
+
 def test_terminal_audit_reserve_allows_only_256_bounded_records() -> None:
     budget = Budget(
         total=sum(PARTITIONS.values()),
