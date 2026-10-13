@@ -25,7 +25,7 @@ from .bounded_transport import (
 )
 from .bounded_writer import ProcessWriter, WriterFailure
 from .offline import INSTRUMENT_ID, MARKET_TYPE, SOURCE_STREAM, VENUE
-from .offline_core import ADAPTER_VERSION, NS, SCHEMA_VERSION, Core
+from .offline_core import BOUND_ADAPTER_VERSION, NS, SCHEMA_VERSION, Core
 from .offline_storage import _json_line
 from .probe import ProbeError, inspect_metadata, object_json
 from .unit_binding import STREAM as BINDING_STREAM
@@ -167,6 +167,79 @@ class ResourceLedger:
         self.outbound_control_bytes += size
 
 
+@dataclass
+class StateCharge:
+    persistent_bytes: int = 0
+    scratch_bytes: int = 0
+
+    @property
+    def total(self) -> int:
+        return self.persistent_bytes + self.scratch_bytes
+
+
+@dataclass
+class StateReservations:
+    config: BoundedLiveConfig
+    committed_bytes: int = 0
+    initialized: bool = False
+
+    def check(
+        self,
+        *,
+        sequence: int,
+        core: Core,
+        writer: DurableWriter,
+        pending_bytes: int,
+        reserve_bytes: int | StateCharge = 0,
+    ) -> tuple[int, int]:
+        if sequence > self.config.max_total_inputs:
+            raise StopRun("STATE_INPUT_LIMIT")
+        rss_bytes = _combined_rss_bytes(writer)
+        if rss_bytes > self.config.rss_stop_bytes:
+            raise StopRun("RSS_LIMIT")
+        if not self.initialized:
+            self.committed_bytes = _core_state_snapshot_bytes(core)
+            self.initialized = True
+        charge = (
+            reserve_bytes if isinstance(reserve_bytes, StateCharge) else StateCharge(reserve_bytes)
+        )
+        encoded = self.committed_bytes + 2 * pending_bytes + charge.total
+        if encoded > self.config.max_state_bytes:
+            raise StopRun("ENCODED_STATE_LIMIT")
+        return encoded, rss_bytes
+
+    def commit(self, reserve_bytes: int | StateCharge) -> None:
+        charge = (
+            reserve_bytes if isinstance(reserve_bytes, StateCharge) else StateCharge(reserve_bytes)
+        )
+        self.committed_bytes += charge.persistent_bytes
+
+    def reserve_raw_payload(self, payload_size: int) -> int:
+        # JSON escaping can expand decoded text while two base64 envelopes coexist.
+        # Eight times the application bytes also covers malformed-byte wrappers.
+        return 8192 + 8 * payload_size
+
+    def reserve_core_row(self, row: JsonRow, core: Core) -> StateCharge:
+        size = len(_json_line(row))
+        kind = row["kind"]
+        if kind == "RAW":
+            if row.get("quality_flags"):
+                return StateCharge(persistent_bytes=32_768 + 4 * size, scratch_bytes=2 * size)
+            return StateCharge(persistent_bytes=65_536 + 8 * size, scratch_bytes=3 * size)
+        if kind == "FEATURE_CUTOFF":
+            windows = len(core.windows) * (16_384 + 512 * len(core.normalized))
+            high = int(row["input_cursor"])
+            sequence = int(row["ingest_sequence"])
+            scratch = windows
+            if high < sequence - 1:
+                scratch += 2 * self.committed_bytes + len(core.history) * 4096
+            return StateCharge(persistent_bytes=16_384 + 2 * size + windows, scratch_bytes=scratch)
+        if kind == "FEATURE_PUBLISHED":
+            pending = sum(len(_json_line(item)) for rows in core.pending.values() for item in rows)
+            return StateCharge(persistent_bytes=8192 + 2 * size, scratch_bytes=pending)
+        return StateCharge(persistent_bytes=8192 + 2 * size)
+
+
 class StopRun(RuntimeError):
     def __init__(self, reason: str):
         self.reason = reason
@@ -199,7 +272,8 @@ async def run_test_only_bounded_live(
     core: Core | None = None
     pending: list[JsonRow] = []
     pending_encoded_bytes = 0
-    state_cache: dict[str, int] = {}
+    pending_stored_encoded_bytes = 0
+    state_reservations: StateReservations | None = None
     ledger = ResourceLedger(config)
     seq = _Sequencer()
     status, reason = "PARTIAL", "OBSERVATION_COMPLETE"
@@ -212,6 +286,7 @@ async def run_test_only_bounded_live(
     metadata_hash: str | None = None
     cutoffs = state_bytes = 0
     peak_rss = 0
+    derived_blocked = False
     start = clock.monotonic_ns()
     startup_end = start + config.startup_seconds * NS
     global_end = (
@@ -229,6 +304,7 @@ async def run_test_only_bounded_live(
         phase_end: int | None = None,
         *,
         cleanup: bool = False,
+        postcheck: bool = True,
     ) -> Any:
         now = clock.monotonic_ns()
         if not cleanup:
@@ -251,11 +327,15 @@ async def run_test_only_bounded_live(
             result = await asyncio.wait_for(operation(), remaining)
         except TimeoutError as exc:
             raise StopRun(name) from exc
-        if not cleanup:
+        if postcheck and not cleanup:
             _check_global_deadline(clock, global_end)
             if phase_end == startup_end:
                 _check_startup_deadline(clock, startup_end)
-        if name != "RECEIVE_TIME_LIMIT" and clock.monotonic_ns() - began >= int(cap * NS):
+        if (
+            postcheck
+            and name != "RECEIVE_TIME_LIMIT"
+            and clock.monotonic_ns() - began >= int(cap * NS)
+        ):
             raise StopRun(name)
         if cleanup and phase_end is not None and clock.monotonic_ns() > phase_end:
             raise StopRun(name)
@@ -271,20 +351,36 @@ async def run_test_only_bounded_live(
             )
 
     def flush_raw() -> None:
-        nonlocal pending_encoded_bytes
-        if pending and durable_writer is not None and core is not None:
+        nonlocal derived_blocked, pending_encoded_bytes, pending_stored_encoded_bytes
+        if pending and durable_writer is not None and core is not None and state_reservations:
             writer_budget()
-            _flush_pending_raw(durable_writer, core, pending)
-            pending_encoded_bytes = 0
+            try:
+                _flush_pending_raw(
+                    durable_writer,
+                    core,
+                    pending,
+                    state_reservations=state_reservations,
+                    pending_bytes=lambda: pending_encoded_bytes,
+                )
+            except StopRun as exc:
+                if exc.reason == "ENCODED_STATE_LIMIT":
+                    derived_blocked = True
+                    pending.clear()
+                    pending_encoded_bytes = 0
+                    pending_stored_encoded_bytes = 0
+                raise
+            else:
+                pending_encoded_bytes = 0
+                pending_stored_encoded_bytes = 0
 
     def audit_control(kind: str, **fields: Any) -> None:
-        if durable_writer is None or core is None:
+        if durable_writer is None or core is None or state_reservations is None:
             return
         flush_raw()
         writer_budget()
         row = _control_row(seq, clock, kind, session_id=config.run_id)
         row.update(fields)
-        _append(durable_writer, core, row)
+        _append(durable_writer, core, row, state_reservations, pending_encoded_bytes)
 
     try:
         if (
@@ -293,12 +389,6 @@ async def run_test_only_bounded_live(
         ):
             raise StopRun("DISK_START_LIMIT")
         evidence_bytes = config.unit_evidence_path.read_bytes()
-        metadata = await call(transport.metadata, 15, "REST_TIME_LIMIT", startup_end)
-        if len(metadata.body) > 2_097_152:
-            raise StopRun("REST_BYTE_LIMIT")
-        metadata_object = _require_metadata(metadata)
-        metadata_hash = hashlib.sha256(metadata.body).hexdigest()
-        binding = _resolve_binding(config, evidence_bytes, metadata_object)
         prepare_end = min(startup_end, clock.monotonic_ns() + 5 * NS)
         writer_real_end = min(real_startup_end, time.monotonic() + 5)
         if durable_writer is None:
@@ -321,6 +411,50 @@ async def run_test_only_bounded_live(
                 rss_stop_bytes=config.rss_stop_bytes,
             )
         writer_budget(prepare_end)
+        writer_real_end = real_startup_end
+        writer_budget(startup_end)
+        metadata_start = clock.monotonic_ns()
+        try:
+            metadata = await call(
+                transport.metadata, 15, "REST_TIME_LIMIT", startup_end, postcheck=False
+            )
+        except (StopRun, TransportScopeError, OSError, asyncio.CancelledError) as exc:
+            observed = getattr(transport, "metadata_observation", None)
+            failure_reason = (
+                exc.reason if isinstance(exc, StopRun) else f"{type(exc).__name__}:{exc}"
+            )
+            if isinstance(observed, MetadataReply):
+                metadata_hash = hashlib.sha256(observed.body).hexdigest()
+                _persist_snapshot(
+                    durable_writer,
+                    config=config,
+                    evidence_bytes=evidence_bytes,
+                    approval=config.unit_approval,
+                    metadata_reply=observed,
+                )
+                _append_durable_control(
+                    durable_writer,
+                    seq,
+                    clock,
+                    "REST_RESPONSE",
+                    session_id=config.run_id,
+                    http_status=observed.status,
+                    body_complete=observed.body_complete,
+                    body_sha256=metadata_hash,
+                    body_size=len(observed.body),
+                    validation_status="CAPTURED_FROM_TRANSPORT_EXCEPTION",
+                )
+            _append_durable_control(
+                durable_writer,
+                seq,
+                clock,
+                "STARTUP_FAILURE",
+                session_id=config.run_id,
+                failure_reason=failure_reason,
+                response_observed=isinstance(observed, MetadataReply),
+            )
+            raise
+        metadata_hash = hashlib.sha256(metadata.body).hexdigest()
         _persist_snapshot(
             durable_writer,
             config=config,
@@ -328,12 +462,74 @@ async def run_test_only_bounded_live(
             approval=config.unit_approval,
             metadata_reply=metadata,
         )
-        if clock.monotonic_ns() > prepare_end:
-            raise StopRun("PREPARE_TIME_LIMIT")
+        _append_durable_control(
+            durable_writer,
+            seq,
+            clock,
+            "REST_RESPONSE",
+            session_id=config.run_id,
+            http_status=metadata.status,
+            body_complete=metadata.body_complete,
+            body_sha256=metadata_hash,
+            body_size=len(metadata.body),
+            validation_status="CAPTURED_BEFORE_SEMANTIC_VALIDATION",
+        )
+        if len(metadata.body) > 2_097_152:
+            _append_durable_control(
+                durable_writer,
+                seq,
+                clock,
+                "STARTUP_FAILURE",
+                session_id=config.run_id,
+                failure_reason="REST_BYTE_LIMIT",
+            )
+            raise StopRun("REST_BYTE_LIMIT")
+        _check_global_deadline(clock, global_end)
+        if clock.monotonic_ns() - metadata_start >= 15 * NS:
+            _append_durable_control(
+                durable_writer,
+                seq,
+                clock,
+                "STARTUP_FAILURE",
+                session_id=config.run_id,
+                failure_reason="REST_TIME_LIMIT",
+            )
+            raise StopRun("REST_TIME_LIMIT")
+        _check_startup_deadline(clock, startup_end)
+        try:
+            metadata_object = _require_metadata(metadata)
+            binding = _resolve_binding(config, evidence_bytes, metadata_object)
+        except StopRun as exc:
+            _append_durable_control(
+                durable_writer,
+                seq,
+                clock,
+                "STARTUP_FAILURE",
+                session_id=config.run_id,
+                failure_reason=exc.reason,
+            )
+            raise
+        except (ProbeError, ValueError, KeyError) as exc:
+            _append_durable_control(
+                durable_writer,
+                seq,
+                clock,
+                "STARTUP_FAILURE",
+                session_id=config.run_id,
+                failure_reason=f"{type(exc).__name__}:{exc}",
+            )
+            raise
+        _check_startup_deadline(clock, startup_end)
         core = Core(config.core_config(), dict(binding.core_metadata()), binding=binding)
-        audit_control("REST_RESPONSE", http_status=metadata.status, body_sha256=metadata_hash)
-        if clock.monotonic_ns() > prepare_end:
-            raise StopRun("PREPARE_TIME_LIMIT")
+        state_reservations = StateReservations(config)
+        state_bytes, rss = state_reservations.check(
+            sequence=seq.value,
+            core=core,
+            writer=durable_writer,
+            pending_bytes=pending_encoded_bytes,
+        )
+        peak_rss = max(peak_rss, rss)
+        _check_startup_deadline(clock, startup_end)
         writer_real_end = real_startup_end
         await call(transport.connect, 10, "CONNECT_TIME_LIMIT", startup_end)
         connected = True
@@ -358,8 +554,12 @@ async def run_test_only_bounded_live(
             if time.monotonic() >= writer_real_end:
                 raise StopRun("OBSERVATION_TIME_LIMIT")
             _check_global_deadline(clock, global_end)
-            state_bytes, rss = _check_state_budget(
-                config, seq.value, core, durable_writer, state_cache, pending_encoded_bytes
+            assert state_reservations is not None
+            state_bytes, rss = state_reservations.check(
+                sequence=seq.value,
+                core=core,
+                writer=durable_writer,
+                pending_bytes=pending_encoded_bytes,
             )
             peak_rss = max(peak_rss, rss)
             if clock.monotonic_ns() >= silence_end:
@@ -378,14 +578,52 @@ async def run_test_only_bounded_live(
                 raise StopRun("MARKET_SILENCE")
             now = clock.wall_ns()
             if event is not None and event.kind == "message":
+                assert state_reservations is not None
                 ledger.observe_message(len(event.payload))
                 first_receive = now if first_receive is None else first_receive
                 last_receive = now
                 silence_end = clock.monotonic_ns() + config.market_silence_seconds * NS
+                try:
+                    state_bytes, rss = state_reservations.check(
+                        sequence=seq.value + 1,
+                        core=core,
+                        writer=durable_writer,
+                        pending_bytes=pending_encoded_bytes,
+                        reserve_bytes=state_reservations.reserve_raw_payload(len(event.payload)),
+                    )
+                    peak_rss = max(peak_rss, rss)
+                except StopRun as exc:
+                    if exc.reason == "ENCODED_STATE_LIMIT":
+                        raw_envelope = _raw_preserved_row(
+                            seq, clock, config.run_id, event.payload, binding
+                        )
+                        durable_writer.append_durable(_stored_row(raw_envelope))
+                        derived_blocked = True
+                    raise
                 row = _raw_row(seq, clock, config.run_id, event.payload, binding)
-                durable_writer.append(_stored_row(row))
+                stored = _stored_row(row)
+                pending_row_bytes = len(_json_line(row))
+                stored_row_bytes = len(_json_line(stored))
+                durable_writer.append(stored)
                 pending.append(row)
-                pending_encoded_bytes += len(_json_line(row))
+                pending_encoded_bytes += pending_row_bytes
+                pending_stored_encoded_bytes += stored_row_bytes
+                try:
+                    state_bytes, rss = state_reservations.check(
+                        sequence=seq.value,
+                        core=core,
+                        writer=durable_writer,
+                        pending_bytes=pending_encoded_bytes,
+                    )
+                    peak_rss = max(peak_rss, rss)
+                except StopRun as exc:
+                    if exc.reason == "ENCODED_STATE_LIMIT":
+                        durable_writer.flush()
+                        pending.clear()
+                        pending_encoded_bytes = 0
+                        pending_stored_encoded_bytes = 0
+                        derived_blocked = True
+                    raise
             elif event is not None and event.kind in {"ping", "pong", "close"}:
                 ledger.observe_inbound_control(len(event.payload))
                 audit_control(
@@ -418,7 +656,7 @@ async def run_test_only_bounded_live(
                     raise StopRun("QUEUE_AGE_LIMIT")
                 if (
                     len(pending) >= 500
-                    or sum(len(_json_line(_stored_row(r))) for r in pending) >= 524_288
+                    or pending_stored_encoded_bytes >= 524_288
                     or oldest_age >= 500_000_000
                 ):
                     flush_raw()
@@ -436,18 +674,47 @@ async def run_test_only_bounded_live(
                     cutoff_ns=next_cutoff,
                     input_cursor=durable_writer.cursor,
                 )
-                writer_budget()
-                _append(durable_writer, core, cutoff)
-                state_bytes, rss = _check_state_budget(
-                    config, seq.value, core, durable_writer, state_cache, pending_encoded_bytes
+                assert state_reservations is not None
+                reserve = state_reservations.reserve_core_row(cutoff, core)
+                state_bytes, rss = state_reservations.check(
+                    sequence=seq.value,
+                    core=core,
+                    writer=durable_writer,
+                    pending_bytes=pending_encoded_bytes,
+                    reserve_bytes=reserve,
                 )
                 peak_rss = max(peak_rss, rss)
+                writer_budget()
+                _append(
+                    durable_writer,
+                    core,
+                    cutoff,
+                    state_reservations,
+                    pending_encoded_bytes,
+                    reserved_bytes=reserve,
+                )
                 receipt = durable_writer.write_table("features_pending", core.pending_features)
                 done_ns = clock.wall_ns()
                 published = _published_row(seq, clock, config.run_id, cutoff_ns=next_cutoff)
                 published["compute_done_observed_ns"] = done_ns
                 published["feature_manifest"] = receipt.get("manifest")
-                _append(durable_writer, core, published)
+                reserve = state_reservations.reserve_core_row(published, core)
+                state_bytes, rss = state_reservations.check(
+                    sequence=seq.value,
+                    core=core,
+                    writer=durable_writer,
+                    pending_bytes=pending_encoded_bytes,
+                    reserve_bytes=reserve,
+                )
+                peak_rss = max(peak_rss, rss)
+                _append(
+                    durable_writer,
+                    core,
+                    published,
+                    state_reservations,
+                    pending_encoded_bytes,
+                    reserved_bytes=reserve,
+                )
                 cutoffs += 1
                 next_cutoff += grid
             _check_run_bytes(config)
@@ -466,8 +733,13 @@ async def run_test_only_bounded_live(
         writer_real_end = real_shutdown_end
         close_end = cleanup_start + 5 * NS
         real_close_end = min(real_shutdown_end, time.monotonic() + 5)
+        already_closed = False
         try:
-            if connected:
+            adapter_controls = getattr(transport, "control_counts", {})
+            already_closed = (
+                isinstance(adapter_controls, dict) and adapter_controls.get("outbound_close", 0) > 0
+            )
+            if connected and not already_closed:
                 ledger.reserve_outbound_control(clock.monotonic_ns(), 0, kind="close")
                 await call(
                     lambda: transport.send_control("close", b""),
@@ -485,26 +757,62 @@ async def run_test_only_bounded_live(
             )
         except (Exception, asyncio.CancelledError) as exc:
             cleanup_errors.append(str(exc))
+        if connected and already_closed:
+            ledger.close_reserved = True
         try:
             if durable_writer is not None and core is not None and session_opened:
                 drain_end = min(shutdown_end, clock.monotonic_ns() + 10 * NS)
                 writer_real_end = min(real_shutdown_end, time.monotonic() + 10)
                 writer_budget(drain_end)
-                _flush_pending_raw(durable_writer, core, pending)
-                _append(
-                    durable_writer,
-                    core,
-                    _control_row(seq, clock, "SESSION_CLOSE", session_id=config.run_id),
-                )
+                if not derived_blocked and state_reservations is not None:
+                    _flush_pending_raw(
+                        durable_writer,
+                        core,
+                        pending,
+                        state_reservations=state_reservations,
+                        pending_bytes=lambda: pending_encoded_bytes,
+                    )
+                    pending_encoded_bytes = 0
+                    pending_stored_encoded_bytes = 0
+                else:
+                    durable_writer.flush()
+                    pending.clear()
+                    pending_encoded_bytes = 0
+                    pending_stored_encoded_bytes = 0
+                close_row = _control_row(seq, clock, "SESSION_CLOSE", session_id=config.run_id)
+                close_row.update(stop_reason=reason[:512], stop_status=status)
+                if derived_blocked:
+                    close_row["derivation_status"] = "DERIVATION_NOT_RUN_STATE_LIMIT"
+                    durable_writer.append_durable(_stored_row(close_row))
+                elif state_reservations is not None:
+                    reserve = state_reservations.reserve_core_row(close_row, core)
+                    state_reservations.check(
+                        sequence=seq.value,
+                        core=core,
+                        writer=durable_writer,
+                        pending_bytes=pending_encoded_bytes,
+                        reserve_bytes=reserve,
+                    )
+                    _append(
+                        durable_writer,
+                        core,
+                        close_row,
+                        state_reservations,
+                        pending_encoded_bytes,
+                        reserved_bytes=reserve,
+                    )
+                else:
+                    durable_writer.append_durable(_stored_row(close_row))
                 derived_end = min(shutdown_end, clock.monotonic_ns() + 14 * NS)
                 writer_real_end = min(real_shutdown_end, time.monotonic() + 14)
                 writer_budget(derived_end)
-                for name, rows in (
-                    ("normalized", core.normalized),
-                    ("quarantine", core.quarantine),
-                    ("features", core.features),
-                ):
-                    durable_writer.write_table(name, rows)
+                if not derived_blocked:
+                    for name, rows in (
+                        ("normalized", core.normalized),
+                        ("quarantine", core.quarantine),
+                        ("features", core.features),
+                    ):
+                        durable_writer.write_table(name, rows)
         except (Exception, asyncio.CancelledError) as exc:
             cleanup_errors.append(str(exc))
         finally:
@@ -544,17 +852,34 @@ async def run_test_only_bounded_live(
         "feature_rows": 0 if core is None else len(core.features),
         "pending_feature_rows": 0 if core is None else len(core.pending_features),
         "encoded_state_bytes": state_bytes,
-        "observed_combined_peak_rss_bytes": peak_rss,
+        "reserved_state_upper_bound_bytes": state_bytes,
+        "writer_metrics": dict(getattr(durable_writer, "metrics", {})),
+        "state_budget_semantics": "CONSERVATIVE_PRE_ALLOCATION_RESERVATION_NOT_RSS",
+        "observed_combined_peak_rss_bytes": max(
+            peak_rss,
+            int(
+                getattr(durable_writer, "metrics", {}).get(
+                    "combined_ru_maxrss_peak_upper_bound_bytes", 0
+                )
+            ),
+        ),
         "limitations": {
-            "physical_transport": "BLOCKED_NOT_IMPLEMENTED",
-            "worker_rss_sampling": "COMMAND_BOUNDARY_ONLY_NOT_100MS_DURING_IO",
+            "physical_transport": "TEST_ONLY_INJECTED_AIOHTTP_POLICY_REAL_DISABLED",
+            "worker_rss_sampling": "100MS_CHILD_AND_PARENT_MONITORS_RU_MAXRSS_UPPER_BOUND",
             "formal_unit_approval": "PENDING_INDEPENDENT_REVIEW",
         },
     }
 
 
-def _append(writer: DurableWriter, core: Core, row: JsonRow) -> None:
-    writer.append_durable(_stored_row(row))
+def _append(
+    writer: DurableWriter,
+    core: Core,
+    row: JsonRow,
+    state_reservations: StateReservations | None = None,
+    pending_bytes: int = 0,
+    *,
+    reserved_bytes: int | StateCharge | None = None,
+) -> None:
     if row["kind"] in {
         "RAW",
         "FEATURE_CUTOFF",
@@ -563,7 +888,48 @@ def _append(writer: DurableWriter, core: Core, row: JsonRow) -> None:
         "SESSION_CLOSE",
         "SUBSCRIBED",
     }:
+        reserve = reserved_bytes
+        if state_reservations is not None and row["kind"] != "RAW":
+            if reserve is None:
+                reserve = state_reservations.reserve_core_row(row, core)
+            state_reservations.check(
+                sequence=row["ingest_sequence"],
+                core=core,
+                writer=writer,
+                pending_bytes=pending_bytes,
+                reserve_bytes=reserve,
+            )
+        writer.append_durable(_stored_row(row))
+        if state_reservations is not None and row["kind"] == "RAW":
+            if reserve is None:
+                reserve = state_reservations.reserve_core_row(row, core)
+            state_reservations.check(
+                sequence=row["ingest_sequence"],
+                core=core,
+                writer=writer,
+                pending_bytes=pending_bytes,
+                reserve_bytes=reserve,
+            )
         core.process(row)
+        if state_reservations is not None:
+            assert reserve is not None
+            state_reservations.commit(reserve)
+        return
+    writer.append_durable(_stored_row(row))
+
+
+def _append_durable_control(
+    writer: DurableWriter,
+    seq: _Sequencer,
+    clock: Clock,
+    kind: str,
+    *,
+    session_id: str,
+    **fields: Any,
+) -> None:
+    row = _control_row(seq, clock, kind, session_id=session_id)
+    row.update(fields)
+    writer.append_durable(_stored_row(row))
 
 
 def _stored_row(row: JsonRow) -> JsonRow:
@@ -573,11 +939,28 @@ def _stored_row(row: JsonRow) -> JsonRow:
     return stored
 
 
-def _flush_pending_raw(writer: DurableWriter, core: Core, rows: list[JsonRow]) -> None:
+def _flush_pending_raw(
+    writer: DurableWriter,
+    core: Core,
+    rows: list[JsonRow],
+    *,
+    state_reservations: StateReservations,
+    pending_bytes: Callable[[], int],
+) -> None:
     writer.flush()
-    for row in rows:
+    while rows:
+        row = rows[0]
+        reserve = state_reservations.reserve_core_row(row, core)
+        state_reservations.check(
+            sequence=row["ingest_sequence"],
+            core=core,
+            writer=writer,
+            pending_bytes=pending_bytes(),
+            reserve_bytes=reserve,
+        )
         core.process(row)
-    rows.clear()
+        state_reservations.commit(reserve)
+        rows.pop(0)
 
 
 def _require_metadata(reply: MetadataReply) -> JsonRow:
@@ -585,7 +968,10 @@ def _require_metadata(reply: MetadataReply) -> JsonRow:
         raise StopRun(f"REST_HTTP_{reply.status}")
     if reply.status != 200 or not reply.body_complete:
         raise StopRun("REST_NOT_COMPLETE")
-    inspected = inspect_metadata(reply.body)
+    try:
+        inspected = inspect_metadata(reply.body)
+    except ProbeError as exc:
+        raise StopRun("REST_IDENTITY_MISMATCH") from exc
     if inspected.get("symbol") != "BTCUSDT":
         raise StopRun("REST_IDENTITY_MISMATCH")
     return object_json(reply.body)
@@ -639,7 +1025,7 @@ def _control_row(seq: _Sequencer, clock: Clock, kind: str, *, session_id: str) -
     return {
         "kind": kind,
         "schema_version": SCHEMA_VERSION,
-        "adapter_version": ADAPTER_VERSION,
+        "adapter_version": BOUND_ADAPTER_VERSION,
         "venue": VENUE,
         "market_type": MARKET_TYPE,
         "instrument_id": INSTRUMENT_ID,
@@ -662,7 +1048,7 @@ def _raw_row(
     return {
         "kind": "RAW",
         "schema_version": SCHEMA_VERSION,
-        "adapter_version": ADAPTER_VERSION,
+        "adapter_version": BOUND_ADAPTER_VERSION,
         "venue": VENUE,
         "market_type": MARKET_TYPE,
         "instrument_id": INSTRUMENT_ID,
@@ -681,6 +1067,38 @@ def _raw_row(
         "payload_size": len(payload),
         "raw_ref": f"bounded:{session_id}:{seq.value}",
         "quality_flags": flags,
+    }
+
+
+def _raw_preserved_row(
+    seq: _Sequencer,
+    clock: Clock,
+    session_id: str,
+    payload: bytes,
+    binding: UnitBinding,
+) -> JsonRow:
+    return {
+        "kind": "RAW",
+        "schema_version": SCHEMA_VERSION,
+        "adapter_version": BOUND_ADAPTER_VERSION,
+        "venue": VENUE,
+        "market_type": MARKET_TYPE,
+        "instrument_id": INSTRUMENT_ID,
+        "source_stream": SOURCE_STREAM,
+        "source_origin": "live_ws",
+        "source_time_unit": "ms",
+        "metadata_version": binding.current_metadata_sha256,
+        "evidence_kind": binding.runtime_scope,
+        "session_id": session_id,
+        "ts_receive_ns": clock.wall_ns(),
+        "receive_monotonic_ns": clock.monotonic_ns(),
+        "ingest_sequence": seq.next(),
+        "payload_base64": base64.b64encode(payload).decode("ascii"),
+        "payload_sha256": hashlib.sha256(payload).hexdigest(),
+        "payload_size": len(payload),
+        "raw_ref": f"bounded:{session_id}:{seq.value}",
+        "quality_flags": [],
+        "derivation_status": "DERIVATION_NOT_RUN_STATE_LIMIT",
     }
 
 
@@ -713,53 +1131,35 @@ def _check_startup_deadline(clock: Clock, deadline_ns: int) -> None:
         raise StopRun("STARTUP_TIME_LIMIT")
 
 
-def _check_state_budget(
-    config: BoundedLiveConfig,
-    sequence: int,
-    core: Core,
-    writer: DurableWriter,
-    cache: dict[str, int],
-    pending_bytes: int,
-) -> tuple[int, int]:
-    if sequence > config.max_total_inputs:
-        raise StopRun("STATE_INPUT_LIMIT")
+def _combined_rss_bytes(writer: DurableWriter) -> int:
     rss = int(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
     rss_bytes = rss if sys.platform == "darwin" else rss * 1024
-    rss_bytes += int(getattr(writer, "worker_rss_peak", 0))
-    if rss_bytes > config.rss_stop_bytes:
-        raise StopRun("RSS_LIMIT")
-    # Core changes only at a durable process() boundary. Pending raw has two
-    # parent copies (transient Core envelope and writer queue); charge the larger
-    # encoding twice, so this accounting is a conservative bound, not a scan on
-    # each market packet.
-    if cache.get("cursor") != core.cursor:
-        cache["bytes"] = (
-            len(
-                _json_line(
-                    {
-                        "config": core.config,
-                        "metadata": core.metadata,
-                        "unit_policy": core.unit_policy,
-                        "history": core.history,
-                        "normalized": core.normalized,
-                        "quarantine": core.quarantine,
-                        "features": core.features,
-                        "pending_features": core.pending_features,
-                        "seen": list(core.seen.values()),
-                        "quality": core.quality_observations,
-                        "gaps": core.gaps,
-                        "errors": core.errors,
-                        "conflicts": core.conflicts,
-                    }
-                )
+    return rss_bytes + int(getattr(writer, "worker_rss_peak", 0))
+
+
+def _core_state_snapshot_bytes(core: Core) -> int:
+    return (
+        len(
+            _json_line(
+                {
+                    "config": core.config,
+                    "metadata": core.metadata,
+                    "unit_policy": core.unit_policy,
+                    "history": core.history,
+                    "normalized": core.normalized,
+                    "quarantine": core.quarantine,
+                    "features": core.features,
+                    "pending_features": core.pending_features,
+                    "seen": list(core.seen.values()),
+                    "quality": core.quality_observations,
+                    "gaps": core.gaps,
+                    "errors": core.errors,
+                    "conflicts": core.conflicts,
+                }
             )
-            + 4096
         )
-        cache["cursor"] = core.cursor
-    encoded = cache["bytes"] + 2 * pending_bytes
-    if encoded > config.max_state_bytes:
-        raise StopRun("ENCODED_STATE_LIMIT")
-    return encoded, rss_bytes
+        + 4096
+    )
 
 
 def _check_run_bytes(config: BoundedLiveConfig) -> None:
