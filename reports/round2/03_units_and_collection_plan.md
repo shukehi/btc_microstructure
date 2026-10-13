@@ -141,7 +141,7 @@ Core当前保留历史/标准化与高水位重建状态，有界输入/编码/R
 
 ## 6. 本轮实际验证与可复现方式
 
-新增[verify_plan.py](units_and_collection_plan/verify_plan.py)只读JSON/已有样本/可选本地原件，标准库且无下载/市场网络路径，安装socket阻断后执行；不调用Core/Store或probe。核查JSON重复键/语法、来源ID/引用、31个发布摘要、20样本原字符串及Decimal、原件/摘录/hash、单位候选runtime状态、时间相加、base64/单条/队列/控制/manifest/分区/free/RSS预算关系。人工`100×.30=30USDT`仅公式说明，不是A2实测特征。它不能自动证明文档语义推导，后者由上文所读正文承担。
+新增[verify_plan.py](units_and_collection_plan/verify_plan.py)只读JSON/已有样本/可选本地原件，标准库且无下载/市场网络路径，安装socket阻断后执行；不调用Core/Store或probe。核查JSON重复键/语法、来源ID/引用、31个发布摘要、20样本原字符串及Decimal、原件/摘录/hash、单位候选runtime状态、时间相加、base64/单条/队列/控制/manifest/分区/free预算关系。人工`100×.30=30USDT`仅公式说明，不是A2实测特征。它不能自动证明文档语义推导，后者由上文所读正文承担。
 
 在本任务worktree、既有Python3.12.13实际运行：
 
@@ -162,3 +162,11 @@ Core当前保留历史/标准化与高水位重建状态，有界输入/编码/R
 本任务的证据链/预算草案/最小设计交付完成；单位文档结论明确，候选记录和设计待独立复核，均未应用到runtime。未来真实启动还需要批准的单位绑定/实现验收和可信共享出口窗口约束；未满足则不启动，不用当前A2的低用量头猜余量。A2的历史协议PASS、文档确认单位、运行时绑定尚未实现、持续预算UNVERIFIED及10min/24h NOT_RUN必须分别记录。
 
 只创建本任务报告PR，Refs #17、Refs #12；不合并、不关闭Issue12、不创建/启动下一任务、不执行任何实采或重新probe、不修改网络/代理/TLS与用户改动。完成后停止等待独立复核。
+
+## 首轮既有CI发现（不在本任务修代码）
+
+[Run38329799046](https://github.com/shukehi/btc_microstructure/actions/runs/38329799046) 对证据head4cc3202…实际FAIL：默认316通过/1失败（0error/skip），独立15/9/8/4通过；十三项中pytest退出1、其余十二项0。新文档核查脚本未由该CI执行，不能把它的本机PASS用来覆盖这次失败。小型精确记录见[ci_observation.json](units_and_collection_plan/ci_observation.json)，完整原日志/JUnit下载保留本地。
+
+**R203-CI-01 / MEDIUM：原probe时限反算的浮点精确值。** `test_cli_rest_total_seconds_reaches_limits_before_transport` 第168行期望15.0，实际15.000000000000007。业务代码与基线无差异；run_probe用绝对起点加配置形成截止，再以截止减起点反算rest_effective并model_copy传入transport。纯离线算术起点49.9的`(49.9+15)-49.9`即可得到同一值，无需运行probe/市场请求。该误差远小于实际计时精度，不据此声称严重超额/网络根因，但确实破坏了精确参数断言并造成CI不稳定。
+
+最小建议是分开绝对截止与传给transport的时长：未被全局截断时保留原配置精确值，并将反算有效值夹在配置上限内；不靠放宽原测试制造通过。本轮不实现该建议、不修改业务/旧测试/工作流，不为洗绿重复失败run。此处新增CI观察会产生新的报告提交和正常CI，后续如通过也不代表R203-CI-01已修复；两次结果均在PR正文提供，停止等待独立复核决定后续。单位证据和预算算术结论与该已有代码问题分开。
