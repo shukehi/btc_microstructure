@@ -65,7 +65,11 @@ def _core_row(row: JsonRow) -> JsonRow:
             payload = base64.b64decode(value["payload_base64"], validate=True)
             if hashlib.sha256(payload).hexdigest() != value["payload_sha256"]:
                 raise StorageError("raw application-byte hash mismatch")
-            value["payload"], _ = payload_for_core(payload)
+            value["payload"], flags = payload_for_core(payload)
+            existing = value.get("quality_flags", [])
+            if not isinstance(existing, list):
+                existing = []
+            value["quality_flags"] = sorted(set(existing) | set(flags))
         elif "payload" in value:
             payload = value["payload"].encode()
             if hashlib.sha256(payload).hexdigest() != value["payload_sha256"]:

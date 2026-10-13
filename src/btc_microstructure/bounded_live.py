@@ -34,6 +34,12 @@ from .unit_binding import UnitBinding, load_unit_evidence, resolve_test_only_uni
 JsonRow = dict[str, Any]
 
 
+@dataclass(frozen=True)
+class PendingRaw:
+    envelope: JsonRow
+    payload: bytes
+
+
 class Clock(Protocol):
     def wall_ns(self) -> int: ...
     def monotonic_ns(self) -> int: ...
@@ -246,6 +252,10 @@ class StopRun(RuntimeError):
         super().__init__(reason)
 
 
+class PayloadDerivationError(RuntimeError):
+    """Raw is durable, but its post-ack Core payload could not be constructed."""
+
+
 def fail_closed_real_entry(config: BoundedLiveConfig) -> None:
     if config.network_authorized or config.shared_budget_trusted:
         raise TransportScopeError("R2-04 real startup is blocked pending later approval")
@@ -270,7 +280,7 @@ async def run_test_only_bounded_live(
     config.output_root.mkdir(parents=True)
     durable_writer = writer
     core: Core | None = None
-    pending: list[JsonRow] = []
+    pending: list[PendingRaw] = []
     pending_encoded_bytes = 0
     pending_stored_encoded_bytes = 0
     state_reservations: StateReservations | None = None
@@ -368,6 +378,12 @@ async def run_test_only_bounded_live(
                     pending.clear()
                     pending_encoded_bytes = 0
                     pending_stored_encoded_bytes = 0
+                raise
+            except Exception:
+                derived_blocked = True
+                pending.clear()
+                pending_encoded_bytes = 0
+                pending_stored_encoded_bytes = 0
                 raise
             else:
                 pending_encoded_bytes = 0
@@ -602,10 +618,10 @@ async def run_test_only_bounded_live(
                     raise
                 row = _raw_row(seq, clock, config.run_id, event.payload, binding)
                 stored = _stored_row(row)
-                pending_row_bytes = len(_json_line(row))
+                pending_row_bytes = len(_json_line(row)) + len(event.payload)
                 stored_row_bytes = len(_json_line(stored))
                 durable_writer.append(stored)
-                pending.append(row)
+                pending.append(PendingRaw(row, event.payload))
                 pending_encoded_bytes += pending_row_bytes
                 pending_stored_encoded_bytes += stored_row_bytes
                 try:
@@ -651,7 +667,7 @@ async def run_test_only_bounded_live(
                 raise StopRun("UNKNOWN_CONTROL")
             # Shared time advancement: market messages and empty polls obey the same rules.
             if pending:
-                oldest_age = clock.monotonic_ns() - pending[0]["receive_monotonic_ns"]
+                oldest_age = clock.monotonic_ns() - pending[0].envelope["receive_monotonic_ns"]
                 if oldest_age >= config.max_queue_age_ns:
                     raise StopRun("QUEUE_AGE_LIMIT")
                 if (
@@ -723,7 +739,15 @@ async def run_test_only_bounded_live(
         status, reason = "BLOCKED", "EXTERNAL_CANCELLED"
     except StopRun as exc:
         status, reason = "PARTIAL", exc.reason
-    except (WriterFailure, ProbeError, ValueError, KeyError, OSError, TransportScopeError) as exc:
+    except (
+        WriterFailure,
+        PayloadDerivationError,
+        ProbeError,
+        ValueError,
+        KeyError,
+        OSError,
+        TransportScopeError,
+    ) as exc:
         status, reason = "BLOCKED", f"{type(exc).__name__}:{exc}"
     finally:
         cleanup_errors = []
@@ -942,14 +966,17 @@ def _stored_row(row: JsonRow) -> JsonRow:
 def _flush_pending_raw(
     writer: DurableWriter,
     core: Core,
-    rows: list[JsonRow],
+    rows: list[PendingRaw],
     *,
     state_reservations: StateReservations,
     pending_bytes: Callable[[], int],
 ) -> None:
     writer.flush()
+    if rows and (writer.cursor is None or writer.cursor < rows[-1].envelope["ingest_sequence"]):
+        raise WriterFailure("RAW_BATCH_NOT_ACKNOWLEDGED")
     while rows:
-        row = rows[0]
+        pending = rows[0]
+        row = _raw_for_core(pending.envelope, pending.payload)
         reserve = state_reservations.reserve_core_row(row, core)
         state_reservations.check(
             sequence=row["ingest_sequence"],
@@ -1044,7 +1071,6 @@ def _raw_row(
     payload: bytes,
     binding: UnitBinding,
 ) -> JsonRow:
-    payload_text, flags = payload_for_core(payload)
     return {
         "kind": "RAW",
         "schema_version": SCHEMA_VERSION,
@@ -1061,13 +1087,23 @@ def _raw_row(
         "ts_receive_ns": clock.wall_ns(),
         "receive_monotonic_ns": clock.monotonic_ns(),
         "ingest_sequence": seq.next(),
-        "payload": payload_text,
         "payload_base64": base64.b64encode(payload).decode("ascii"),
         "payload_sha256": hashlib.sha256(payload).hexdigest(),
         "payload_size": len(payload),
         "raw_ref": f"bounded:{session_id}:{seq.value}",
-        "quality_flags": flags,
+        "quality_flags": [],
     }
+
+
+def _raw_for_core(envelope: JsonRow, payload: bytes) -> JsonRow:
+    try:
+        payload_text, flags = payload_for_core(payload)
+    except Exception as exc:
+        raise PayloadDerivationError(f"{type(exc).__name__}:{exc}") from exc
+    row = dict(envelope)
+    row["payload"] = payload_text
+    row["quality_flags"] = flags
+    return row
 
 
 def _raw_preserved_row(

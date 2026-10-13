@@ -98,23 +98,56 @@ def _inside(root: Path, candidate: Path) -> bool:
     return resolved_candidate == resolved_root or resolved_root in resolved_candidate.parents
 
 
-def _charge_raw_file(path: Path, size: int) -> str:
+def _row_segment_class(row: dict[str, Any]) -> str:
+    kind = row.get("kind")
+    if not isinstance(kind, str) or not kind:
+        raise WriterFailure("INVALID_SEGMENT_KIND")
+    return "RAW" if kind == "RAW" else "CONTROL"
+
+
+def _batch_segment_class(rows: list[dict[str, Any]]) -> str:
+    if not rows:
+        raise WriterFailure("EMPTY_SEGMENT")
+    classes = {_row_segment_class(row) for row in rows}
+    if len(classes) != 1:
+        raise WriterFailure("MIXED_SEGMENT_CLASS")
+    return classes.pop()
+
+
+def _raw_file_segment_class(path: Path) -> str | None:
+    classes: set[str] = set()
     try:
         with path.open("rb") as handle:
             for line in handle:
                 if len(line) > MAX_RAW_AUDIT_LINE_BYTES:
-                    return "temporary_orphan_quarantine_files"
+                    return None
                 if not line.strip():
                     continue
                 try:
                     row = json.loads(line)
                 except (ValueError, UnicodeError, RecursionError):
-                    return "temporary_orphan_quarantine_files"
-                if isinstance(row, dict) and row.get("kind") == "RAW":
-                    return "ws_raw_envelopes"
+                    return None
+                if not isinstance(row, dict):
+                    return None
+                try:
+                    classes.add(_row_segment_class(row))
+                except WriterFailure:
+                    return None
+                if len(classes) > 1:
+                    return None
     except OSError:
-        return "temporary_orphan_quarantine_files"
-    return "control" if size else "control"
+        return None
+    return classes.pop() if len(classes) == 1 else None
+
+
+def _charge_raw_file(path: Path, size: int) -> str:
+    _ = size
+    segment_class = _raw_file_segment_class(path)
+    if segment_class == "RAW":
+        return "ws_raw_envelopes"
+    if segment_class == "CONTROL":
+        return "control"
+    return "temporary_orphan_quarantine_files"
 
 
 def _charge_table_file(path: Path) -> str:
@@ -162,8 +195,14 @@ def _trusted_manifest_charges(root: Path) -> dict[str, str]:
                 and data_path.name.startswith("raw-control-")
                 and data_path.name.endswith(".jsonl")
             ):
-                trusted[data_path.relative_to(root).as_posix()] = _charge_raw_file(
-                    data_path, data_path.stat().st_size
+                actual_class = _raw_file_segment_class(data_path)
+                declared_class = manifest.get("segment_class")
+                if declared_class is not None and declared_class != actual_class:
+                    continue
+                if actual_class not in {"RAW", "CONTROL"}:
+                    continue
+                trusted[data_path.relative_to(root).as_posix()] = (
+                    "ws_raw_envelopes" if actual_class == "RAW" else "control"
                 )
             elif (
                 kind == "derived_table"
@@ -597,6 +636,12 @@ def _worker(
         original_manifest = offline_storage._write_json_atomic
 
         def write_manifest(path: Path, payload: dict[str, Any]) -> None:
+            if payload.get("kind") == "raw_control_segment":
+                data_path = Path(root) / str(payload.get("path", ""))
+                segment_class = _raw_file_segment_class(data_path)
+                if segment_class not in {"RAW", "CONTROL"}:
+                    raise WriterFailure("MIXED_SEGMENT_CLASS")
+                payload["segment_class"] = segment_class
             encoded = json.dumps(
                 payload, indent=2, sort_keys=True, default=offline_storage._json_default
             ).encode()
@@ -655,12 +700,11 @@ def _worker(
                 if manifest_count >= 4096:
                     raise WriterFailure("MANIFEST_COUNT_LIMIT")
                 rows = request["rows"]
+                segment_class = _batch_segment_class(rows)
                 size = sum(len(_json_line(row)) for row in rows)
                 metrics["queue_peak_records"] = max(metrics["queue_peak_records"], len(rows))
                 metrics["queue_peak_bytes"] = max(metrics["queue_peak_bytes"], size)
-                category = (
-                    "ws_raw_envelopes" if any(r["kind"] == "RAW" for r in rows) else "control"
-                )
+                category = "ws_raw_envelopes" if segment_class == "RAW" else "control"
                 charges = {
                     category: size,
                     "temporary_orphan_quarantine_files": size + 8192,
@@ -1183,7 +1227,7 @@ class ProcessWriter:
     def append(self, row: dict[str, Any]) -> None:
         single_cap = 98304 if row.get("kind") == "RAW" else 4096
         upper = _json_bound(row) + 1
-        if upper > single_cap or upper + self.encoded_bytes > self.max_bytes:
+        if upper > single_cap or upper > self.max_bytes:
             raise WriterFailure("QUEUE_LIMIT")
         size = len(_json_line(row))
         if self.failed or self.closed:
@@ -1197,6 +1241,8 @@ class ProcessWriter:
             raise WriterFailure(
                 f"{exc}; {self.stop_status}; UNCERTAIN_GAP cursor={self.cursor}"
             ) from exc
+        if self.rows and _row_segment_class(self.rows[0]) != _row_segment_class(row):
+            self.flush()
         if (
             size > 98304
             or (row.get("kind") != "RAW" and size > 4096)

@@ -1,0 +1,81 @@
+{
+  "schema_version": "r2-04-round3-verification-1",
+  "recorded_utc": "2026-10-13T07:40:38Z",
+  "baseline_head": "76d8d05d07a8fcc3e4dc209cf238e0ae79b8f1d9",
+  "review_id": 5500034324,
+  "network_access": "DISABLED",
+  "real_status": "BLOCKED",
+  "findings": {
+    "F22-02-01": "PASS_LIMITED_OFFLINE",
+    "F22-02-02": "PASS_LIMITED_OFFLINE"
+  },
+  "before": {
+    "command_exit": 1,
+    "tests": 7,
+    "passed": 3,
+    "failed": 4,
+    "log_sha256": "3b033efc932f91d9ef252f5e696b8305c40f5bb3b14e60b6f87a1a36f2a0707b",
+    "junit_sha256": "531b2f3d5e95d3bb043a633464e9a9c20b9c1dc9e035060369c2a70a2737aeb0"
+  },
+  "targeted_after": {
+    "command_exit": 0,
+    "tests": 95,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "log_sha256": "db4f0c13ee09abe522cf338e69bcf00bcb767126eb986a2142e394e74fa565cb",
+    "junit_sha256": "40e02439df01e856db072e08646df4713d77fc59a10c7ef1ebd82312486ca4b3"
+  },
+  "offline_ci": {
+    "command_exit": 0,
+    "checks": 13,
+    "nonzero_checks": 0,
+    "default_pytest": {
+      "tests": 465,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "independent_pytest": {
+      "R1-01": 15,
+      "R1-02": 9,
+      "R1-03": 8,
+      "R1-04": 4
+    },
+    "log_sha256": "5a81ad9ab5640129c7123af6091fd0dbf9096d86d29afd69d2d2a673e21ce832",
+    "default_junit_sha256": "3ba58760e713dd6841c76a580abbbfd250537c9824bbfd5a9a32465710f1b2dc"
+  },
+  "physical_pressure": {
+    "1000": {
+      "generated_and_saved": 1000,
+      "status": "PARTIAL",
+      "stop_reason": "DISCONNECT",
+      "input_delivery_seconds": 0.8241034579696134,
+      "full_elapsed_seconds": 1.933427375042811,
+      "trusted_cursor": 1008,
+      "replay": "PASS_TWICE_INPUT_UNCHANGED_MATCHES_ORIGINAL",
+      "result_sha256": "2a4383b9683ef23a7a148c9f55fad834f59c2543b7f5897833b72bf5c131b581"
+    },
+    "100000_requested": {
+      "generated_and_saved": 2209,
+      "status": "PARTIAL",
+      "stop_reason": "ENCODED_STATE_LIMIT",
+      "input_delivery_seconds": 1.7088572080247104,
+      "full_elapsed_seconds": 2.1696359999477863,
+      "trusted_cursor": 2217,
+      "replay": "PARTIAL_TWICE_INPUT_UNCHANGED_NO_COMPLETE_ORIGINAL_TABLE",
+      "result_sha256": "72328b89e78c7aab7f5514fb0107a974ac303e92debcaae2b43fc2dd0b83fc0d"
+    }
+  },
+  "not_run": [
+    "Binance",
+    "probe",
+    "REAL",
+    "600s",
+    "NTP",
+    "physical_disk_full",
+    "power_loss",
+    "hard_OOM",
+    "hosted_Actions"
+  ]
+}
