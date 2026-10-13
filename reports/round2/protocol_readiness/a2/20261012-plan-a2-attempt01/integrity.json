@@ -1,0 +1,9 @@
+{
+  "execution_code_sha": "fa22876158ed1cbfca8b3d0c839b3de03ae91989",
+  "evidence_branch_base": "fa22876158ed1cbfca8b3d0c839b3de03ae91989",
+  "protected_diff_exit": 0,
+  "user_AGENTS_unchanged": true,
+  "original_workspace_status": " M AGENTS.md\n",
+  "A1_local_prefix_unchanged": true,
+  "A2_one_shot_marker_retained": true
+}

@@ -1,0 +1,75 @@
+{
+  "evidence_kind": "LIVE",
+  "representation": "DERIVED_PUBLIC_METADATA_EXCERPT; not byte-identical to raw REST",
+  "source_sample": "rest-response.bin (local-only)",
+  "source_sha256": "d5ae0e3682f28512d34ec9ab20131a964df6c76118b8a29e12a76e7b57cbd610",
+  "rateLimits": [
+    {
+      "rateLimitType": "REQUEST_WEIGHT",
+      "interval": "MINUTE",
+      "intervalNum": 1,
+      "limit": 2400
+    },
+    {
+      "rateLimitType": "ORDERS",
+      "interval": "MINUTE",
+      "intervalNum": 1,
+      "limit": 1200
+    },
+    {
+      "rateLimitType": "ORDERS",
+      "interval": "SECOND",
+      "intervalNum": 10,
+      "limit": 300
+    }
+  ],
+  "symbol": {
+    "symbol": "BTCUSDT",
+    "baseAsset": "BTC",
+    "quoteAsset": "USDT",
+    "marginAsset": "USDT",
+    "contractType": "PERPETUAL",
+    "status": "TRADING",
+    "pricePrecision": 2,
+    "quantityPrecision": 3,
+    "filters": [
+      {
+        "tickSize": "0.10",
+        "filterType": "PRICE_FILTER",
+        "minPrice": "556.80",
+        "maxPrice": "4529764"
+      },
+      {
+        "stepSize": "0.001",
+        "maxQty": "1000",
+        "filterType": "LOT_SIZE",
+        "minQty": "0.001"
+      },
+      {
+        "filterType": "MARKET_LOT_SIZE",
+        "minQty": "0.001",
+        "stepSize": "0.001",
+        "maxQty": "120"
+      },
+      {
+        "filterType": "MAX_NUM_ORDERS",
+        "limit": 200
+      },
+      {
+        "filterType": "MIN_NOTIONAL",
+        "notional": "50"
+      },
+      {
+        "multiplierDecimal": "4",
+        "multiplierDown": "0.9500",
+        "filterType": "PERCENT_PRICE",
+        "multiplierUp": "1.0500"
+      },
+      {
+        "filterType": "POSITION_RISK_CONTROL",
+        "positionControlSide": "NONE"
+      }
+    ]
+  },
+  "quantity_unit_status": "UNKNOWN; baseAsset does not alone prove aggTrade q unit"
+}

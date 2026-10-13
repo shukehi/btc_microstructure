@@ -1,0 +1,122 @@
+{
+  "source_directory": "<repo>/data/r201-a2-preflight/data/r201-probe/20261012-plan-a2-attempt01",
+  "files": {
+    "protocol_probe_report.json": {
+      "bytes": 17130,
+      "sha256": "82a66d4aeed089b744c26c302f6544f89ba6fae5c9ae430f1c07628247e0cab2",
+      "publication": "byte-identical"
+    },
+    "rest-response.bin": {
+      "bytes": 1152517,
+      "sha256": "d5ae0e3682f28512d34ec9ab20131a964df6c76118b8a29e12a76e7b57cbd610",
+      "publication": "local-only, full response withheld"
+    },
+    "ws-019.bin": {
+      "bytes": 204,
+      "sha256": "9728574a65a68df8c9b687e7863f44ea2a10c1c81ec06acb174d8cd503496fae",
+      "publication": "byte-identical"
+    },
+    "ws-018.bin": {
+      "bytes": 204,
+      "sha256": "8554b047a84bb10b72fc6edafff47f3de1dd1b48e4d42b9262060592b0faf587",
+      "publication": "byte-identical"
+    },
+    "ws-008.bin": {
+      "bytes": 204,
+      "sha256": "6d1acb2255a7999df90a4f0790c6d8a0725596afea2c4a0f52c528c5137cf52c",
+      "publication": "byte-identical"
+    },
+    "ws-009.bin": {
+      "bytes": 204,
+      "sha256": "5ed207f5e56140f075012a0d5b3b1028e4d4b29c7181ae3ba175319fa937b8c1",
+      "publication": "byte-identical"
+    },
+    "ws-010.bin": {
+      "bytes": 204,
+      "sha256": "b752b1d507f9cf9b21ba4ebb1f7bbf59b71d7a54c216397d54607e1d21a0a554",
+      "publication": "byte-identical"
+    },
+    "ws-004.bin": {
+      "bytes": 204,
+      "sha256": "65d0461656952577f71bc9f2d1a0bb9498314c8512bb54127953e9af9d57e547",
+      "publication": "byte-identical"
+    },
+    "endpoint_budget.json": {
+      "bytes": 1276,
+      "sha256": "23687d441846c32738649931349615cb369d1dbca627ab5be8d80d408b3ef00e",
+      "publication": "byte-identical"
+    },
+    "ws-005.bin": {
+      "bytes": 205,
+      "sha256": "536b9b1f41818dd62ef096f947b647176be4cbfba4083e2c8c244e92d3f1a962",
+      "publication": "byte-identical"
+    },
+    "ws-011.bin": {
+      "bytes": 204,
+      "sha256": "03bb3ac7d245b28dba00f925a51fe3b0c18f0efa485b2c1707630286912f81b5",
+      "publication": "byte-identical"
+    },
+    "ws-007.bin": {
+      "bytes": 204,
+      "sha256": "030590aa6a6fe63fa0112aec65f991d7fb59702b3f54011e5542bae549e60a36",
+      "publication": "byte-identical"
+    },
+    "ws-013.bin": {
+      "bytes": 204,
+      "sha256": "59b0baee041466db01d09e8c7f5a9764d40c2e1c86bb526414d6c75c1c900cb2",
+      "publication": "byte-identical"
+    },
+    "ws-012.bin": {
+      "bytes": 204,
+      "sha256": "0e9decc48c43edf049d3ec7df4dfc2c2e3558c5abaffce9daa31ab8bb669b13c",
+      "publication": "byte-identical"
+    },
+    "ws-006.bin": {
+      "bytes": 204,
+      "sha256": "63b5f5369eabadadb51312513ffcf28685e0282c87f6e424c5c26f95b55e7c24",
+      "publication": "byte-identical"
+    },
+    "ws-002.bin": {
+      "bytes": 204,
+      "sha256": "fbcf91922025101e9c5d8e515a3e9d2f89806f0440d29d1b9c0ce0bf7de6fb2c",
+      "publication": "byte-identical"
+    },
+    "ws-016.bin": {
+      "bytes": 205,
+      "sha256": "1dcafca31df6d9a070c301cae291fb2f5fbff6c6e59d08f15ff6920fb4fa7ff0",
+      "publication": "byte-identical"
+    },
+    "ws-017.bin": {
+      "bytes": 204,
+      "sha256": "ffe7246072a71936cf62eb434b8ffcfa8029d7cf617f516be05cbda19b31e539",
+      "publication": "byte-identical"
+    },
+    "ws-003.bin": {
+      "bytes": 204,
+      "sha256": "2c555d19805407b7deeff36d71af899bda72d52f1bc284df19a96f6bb10d6a6a",
+      "publication": "byte-identical"
+    },
+    "ws-015.bin": {
+      "bytes": 204,
+      "sha256": "ae67bbc05527a3dc4df037fd64be112bf0f06a88924d37f62e31f6a7ca576c5d",
+      "publication": "byte-identical"
+    },
+    "ws-001.bin": {
+      "bytes": 204,
+      "sha256": "f2fdc204d4ebabd573722ab98f5449ccb234c3e2eb74519e151e37fcb33b1c0f",
+      "publication": "byte-identical"
+    },
+    "ws-000.bin": {
+      "bytes": 204,
+      "sha256": "7d94c1ccf88d5c1cf4c7fc5d64178a942dcbe2ff3f1d2d5df0c95197c9ba4065",
+      "publication": "byte-identical"
+    },
+    "ws-014.bin": {
+      "bytes": 204,
+      "sha256": "3a5efe2259a2de9ecdfc5fe1a3615456e4fc4e86f9bc25d383cc39a836f1a8ac",
+      "publication": "byte-identical"
+    }
+  },
+  "invocation_publication": "cwd redacted; private user-file digest omitted",
+  "rest_excerpt_publication": "derived selection from complete local REST; explicitly not byte-identical"
+}
