@@ -1,0 +1,145 @@
+{
+  "baseline": "fd6ad845a913ba41950e01788acc627a31aa8409",
+  "new_cli_session": "01a132a7-1299-7ed0-a66e-739ba7e8a19a",
+  "issue": "https://github.com/shukehi/btc_microstructure/issues/17",
+  "clarification": "https://github.com/shukehi/btc_microstructure/issues/17#issuecomment-6135185376",
+  "review": "https://github.com/shukehi/btc_microstructure/pull/16#pullrequestreview-5497278104",
+  "sources": [
+    {
+      "id": "S01",
+      "kind": "official_contract_specification",
+      "url": "https://www.binance.com/en/about-legal/contractspecs-usdsmperpetual",
+      "final_document_url": "https://bin.bnbstatic.com/static/cms/cg08ou2ak0tn7mcplvfg/file/783cb1eb3e538284ed8577eb1687de7f16b3038d43ece2fe8a84d40c0449648a.pdf",
+      "title": "Binance Futures Contract Specifications / USDS-Margined (USDS-M) Perpetual Futures",
+      "read_date_utc": "2026-10-13",
+      "publication_date": "2026-01-05",
+      "locator": "PDF pp2-3, clauses5-9 and13",
+      "sha256": "783cb1eb3e538284ed8577eb1687de7f16b3038d43ece2fe8a84d40c0449648a",
+      "bytes": 174265,
+      "short_quote": "The Contract price is quoted in the Settlement Asset.",
+      "supports": [
+        "underlying and settlement identity in contract symbol",
+        "price quoted and settled in settlement asset",
+        "contract size refers to Clearing Procedures"
+      ],
+      "scope": "Binance RIE/RCH USDS-M perpetual",
+      "limits": "clause13 alone does not state the quantity unit; must follow its definition reference",
+      "retrieval": "web viewer read; direct official PDF GET200 after web PDF parser failure; pdftotext plus pages2/3 visually read; full PDF local-only",
+      "final_url": "https://www.binance.com/en/about-legal/contractspecs-usdsmperpetual"
+    },
+    {
+      "id": "S02",
+      "kind": "official_clearing_procedures",
+      "url": "https://www.binance.com/en/about-legal/clearing-procedures",
+      "final_document_url": "https://bin.bnbstatic.com/static/cms/cg08ou2ak0tn7mcplvfg/file/a86691f40d8155992c622715ce727d608d7f972ebb93ce90fa0106830e8a0a36.pdf",
+      "title": "Clearing Procedures",
+      "read_date_utc": "2026-10-13",
+      "publication_date": null,
+      "locator": "PDF p4 (printed p2)4.12/4.13(a); PDF p31 (printed p29)85.1",
+      "sha256": "a86691f40d8155992c622715ce727d608d7f972ebb93ce90fa0106830e8a0a36",
+      "bytes": 666270,
+      "short_quote": "the quantity of the Underlying Asset represented by the relevant Contract",
+      "supports": [
+        "USDS-M size is underlying-asset quantity",
+        "COIN-M contract-count/multiplier definition is distinct",
+        "USDS-M value is linear in size and price"
+      ],
+      "scope": "current linked Binance RCH futures definitions; use USDS-M clauses only",
+      "limits": "no inference of option/COIN-M units; Mark Price valuation is dimensional corroboration, not trade-price equality",
+      "retrieval": "official iframe -> direct PDF GET200; text extraction and relevant pages visually read; PDF local-only",
+      "final_url": "https://www.binance.com/en/about-legal/clearing-procedures"
+    },
+    {
+      "id": "S03",
+      "kind": "official_api_field_specification",
+      "url": "https://developers.binance.com/en/docs/catalog/core-trading-derivatives-trading-usd-s-m-futures/api/ws-streams/market",
+      "title": "Market / Aggregate Trade Streams",
+      "read_date_utc": "2026-10-13",
+      "locator": "Aggregate Trade Streams, Request and Responses",
+      "short_quote": "Quantity with all the market trades; Normal quantity without the trades involving RPI orders",
+      "supports": [
+        "q aggregated market trade quantity including RPI",
+        "nq same quantity family excluding RPI",
+        "p price string, m maker boolean, st1 UM, combined route"
+      ],
+      "limits": "Quantity label alone does not bind BTC; insurance-fund/ADL excluded;100ms is aggregation not all-stream10messages/s",
+      "final_url": "https://developers.binance.com/en/docs/catalog/core-trading-derivatives-trading-usd-s-m-futures/api/ws-streams/market"
+    },
+    {
+      "id": "S04",
+      "kind": "official_explanatory_corroboration",
+      "url": "https://www.binance.com/en-IN/support/faq/detail/85eac2bba0b342819122dc9bd4745e9b",
+      "title": "What Are USD-Margined Futures and COIN-Margined Futures?",
+      "read_date_utc": "2026-10-13",
+      "publication_date": "2021-07-26",
+      "locator": "USD-margined characteristics / clear pricing rules",
+      "short_quote": "one unit of their respective base asset",
+      "supports": [
+        "BTC/USDT contract unit1 base asset, unlike COIN-M USD multiplier"
+      ],
+      "limits": "older explanatory FAQ, corroborating only; current formal definitions take priority",
+      "final_url": "https://www.binance.com/en-IN/support/faq/detail/85eac2bba0b342819122dc9bd4745e9b"
+    },
+    {
+      "id": "S05",
+      "kind": "official_document_index",
+      "url": "https://www.binance.com/en/support/faq/detail/360033161972",
+      "title": "USD-M Perpetual Futures Contract Specifications FAQ",
+      "read_date_utc": "2026-10-13",
+      "updated_date": "2026-01-02",
+      "locator": "Disclaimer / complete text links",
+      "supports": [
+        "official chain toS01/S02",
+        "linear USDT/USDC product family"
+      ],
+      "limits": "FAQ explicitly may be outdated; not sole normative unit basis",
+      "final_url": "https://www.binance.com/en/support/faq/detail/360033161972"
+    },
+    {
+      "id": "S06",
+      "kind": "official_limits",
+      "url": "https://developers.binance.com/en/docs/products/derivatives-trading-usds-futures/general-info",
+      "title": "General Info / LIMITS / IP Limits",
+      "read_date_utc": "2026-10-13",
+      "locator": "LIMITS / IP Limits",
+      "supports": [
+        "IP shared REST limits and used-weight headers",
+        "429/418 stop and no pressure testing"
+      ],
+      "limits": "historical/current header is snapshot, not future free capacity; ORDERS not public GET allowance",
+      "final_url": "https://developers.binance.com/en/docs/products/derivatives-trading-usds-futures/general-info"
+    },
+    {
+      "id": "S07",
+      "kind": "official_ws_connection_rules",
+      "url": "https://developers.binance.com/en/docs/products/derivatives-trading-usds-futures/websocket-market-streams/Connect",
+      "title": "Websocket Market Streams / Connect",
+      "read_date_utc": "2026-10-13",
+      "updated_date": "2026-10-09",
+      "locator": "routed URLs/combined envelope/ping-pong/message limits",
+      "supports": [
+        "server ping every3min/pong within10min",
+        "10 incoming persecond means client-to-server; not server market output",
+        "24h lifetime/1024 streams, single subscription fits"
+      ],
+      "limits": "does not give a connection/IP window quota in the read page; no Spot300/5min copied",
+      "final_url": "https://developers.binance.com/en/docs/products/derivatives-trading-usds-futures/websocket-market-streams/Connect"
+    },
+    {
+      "id": "S08",
+      "kind": "official_rest_specification",
+      "url": "https://developers.binance.com/en/docs/catalog/core-trading-derivatives-trading-usd-s-m-futures/api/rest-api/market-data",
+      "title": "Exchange Information / Request Weight / Responses",
+      "read_date_utc": "2026-10-13",
+      "locator": "Exchange Information",
+      "supports": [
+        "oneGET/fapi/v1/exchangeInfo weight1",
+        "metadata identity/filters/rateLimits"
+      ],
+      "limits": "examples are not observed remaining quota",
+      "final_url": "https://developers.binance.com/en/docs/catalog/core-trading-derivatives-trading-usd-s-m-futures/api/rest-api/market-data"
+    }
+  ],
+  "full_official_documents_committed": false,
+  "market_requests_this_task": 0
+}

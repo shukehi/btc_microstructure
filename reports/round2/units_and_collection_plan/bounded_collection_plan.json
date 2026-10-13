@@ -1,0 +1,165 @@
+{
+  "schema_version": "bounded-collection-plan-draft.1",
+  "plan_id": "R2-03:first-live-session:v1",
+  "status": "DRAFT_PENDING_REVIEW_NOT_EXECUTABLE",
+  "runtime_applied": false,
+  "network_authorized": false,
+  "continuous_collection_enabled": false,
+  "instrument": "binance:um_perpetual:BTCUSDT",
+  "scope": "one future bounded aggTrade session only, not loopingprobe",
+  "probe_unchanged": {
+    "total_default_seconds": 30,
+    "total_allowed_seconds": [
+      2,
+      60
+    ],
+    "max_messages": 20
+  },
+  "time_seconds": {
+    "startup": 30,
+    "observation": 600,
+    "shutdown": 30,
+    "total": 660,
+    "startup_parts": {
+      "local_prepare": 5,
+      "rest_complete": 15,
+      "ws_handshake_url_subscription": 10
+    },
+    "rest_connect": 5,
+    "rest_read_idle": 5,
+    "market_silence_stop": 60,
+    "shutdown_parts": {
+      "freeze_receive": 1,
+      "close_ws_and_http": 5,
+      "raw_drain_flush": 10,
+      "derived_manifest_finish": 14
+    },
+    "single_raw_flush": 2,
+    "watchdog_interval": "0.1"
+  },
+  "network": {
+    "rest_url": "https://fapi.binance.com/fapi/v1/exchangeInfo",
+    "rest_requests": 1,
+    "rest_query_parameters": {},
+    "rest_documented_weight_each": 1,
+    "rest_body_bytes": 2097152,
+    "ws_url": "wss://fstream.binance.com/market/stream?streams=btcusdt@aggTrade",
+    "ws_handshakes": 1,
+    "url_subscriptions": 1,
+    "json_subscription_messages": 0,
+    "retry": 0,
+    "reconnect": 0,
+    "poll": 0,
+    "backfill": 0,
+    "account_credentials": false,
+    "trust_env": false,
+    "tls_verification": true,
+    "redirects": false
+  },
+  "rest_admission": {
+    "own_request_weight": 1,
+    "A2_snapshot_request_weight_limit_per_minute": 2400,
+    "A2_snapshot_used_weight_1m": 1,
+    "safety_fraction": "0.10",
+    "example_reserve": 240,
+    "example_post_request_used_weight_stop_above": 2160,
+    "all_applicable_windows_gate": "coordinated shared used/reserved + own_request<=limit-ceil(0.10*limit); refuse startup if trusted shared constraint unavailable; inspect one authorized REST response and stop if missing/inconsistent/overlimit, do not queryagain",
+    "shared_egress_load": "UNKNOWN",
+    "ws_handshake_REST_weight": "not documented in read WS rules; no invented numeric charge or connection/IP quota",
+    "sustained_budget_status": "UNVERIFIED_FOR_CONTINUOUS_COLLECTION"
+  },
+  "receive": {
+    "max_messages": 100000,
+    "max_ws_payload_bytes": 33554432,
+    "max_message_bytes": 65536,
+    "server_control_messages": 64,
+    "server_control_payload_bytes": 8192,
+    "not_a_market_rate_guarantee": true
+  },
+  "send_control": {
+    "rolling_any_1s_max": 2,
+    "total_max": 64,
+    "max_payload_each": 125,
+    "normal_rolling_1s_max": 1,
+    "normal_total_max": 63,
+    "reserved_close_slots": 1,
+    "policy": "only mandatory same-payloadpong and oneclose, no unsolicitedping/subscribe; if requiredpong exceeds normalbudget, use reserved close and end, never remainLIVE while ignoringheartbeat",
+    "payload_bytes_total_max": 8000
+  },
+  "queue": {
+    "records": 1000,
+    "encoded_bytes": 1048576,
+    "max_age_seconds": "1",
+    "flush_records": 500,
+    "flush_bytes": 524288,
+    "flush_interval_seconds": "0.5",
+    "encoded_single_record_bytes": 98304
+  },
+  "state": {
+    "max_raw_inputs": 100000,
+    "max_control_inputs": 4096,
+    "max_total_inputs": 104096,
+    "max_windows": 6,
+    "first_task_default_windows_seconds": [
+      30
+    ],
+    "example_optional_windows_seconds": [
+      1,
+      5,
+      30,
+      60,
+      300,
+      900
+    ],
+    "grid_seconds": 1,
+    "max_feature_rows": 3600,
+    "encoded_state_bytes": 134217728,
+    "rss_warn_bytes": 402653184,
+    "rss_stop_bytes": 536870912,
+    "rss_is_not_OS_hard_limit": true,
+    "max_cutoffs": 600,
+    "cutoff_schedule_rule": "first grid strictly after recorded observation start, no initial cutoff at start; stop before cutoff601 if wall-clock drift would exceed cap, report PARTIAL/CLOCK condition rather than silently drop grid"
+  },
+  "storage": {
+    "start_free_bytes": 2684354560,
+    "warn_free_bytes": 2415919104,
+    "stop_free_bytes": 2147483648,
+    "run_total_bytes": 536870912,
+    "partition_bytes": {
+      "rest_metadata": 8388608,
+      "ws_raw_envelopes": 201326592,
+      "control": 16777216,
+      "manifests_indexes": 33554432,
+      "normalized_and_quarantine": 100663296,
+      "feature_parquet": 16777216,
+      "temporary_orphan_quarantine_files": 117440512,
+      "diagnostics_and_receipts": 41943040
+    },
+    "raw_payload_storage": "base64 exact application UTF8 bytes; decode afterdurablecommit for same Core, do not persist secondpayload copy without charging",
+    "raw_envelope_overhead_max_bytes": 1024,
+    "max_control_record_bytes": 4096,
+    "max_manifests": 4096,
+    "max_manifest_bytes": 8192,
+    "raw_segment_or_temp_bytes": 1048576,
+    "max_one_Parquet_temp_bytes": 67108864,
+    "terminal_audit_reserve_bytes": 1048576,
+    "terminal_audit_max_records": 256,
+    "terminal_audit_record_bytes": 4096,
+    "reservation_rule": "count every file/temp/orphan/old+new coexistence before write, allocate to exactlyone category; typed lengthsbounded; enforce partition+run+free-space atonce; compression notassumed",
+    "failure_policy": "stop network at shutdown start, never delete sole raw; isolate terminablewriter with boundedacks/deadline and finitejoin; if cannot confirm quiescence/durabletail markSTOP_FAILED/BLOCKED manual intervention, not successfuldrain"
+  },
+  "early_stop_reasons": [
+    "time cap",
+    "message/byte/frame cap",
+    "control budget/heartbeat ormarket silence",
+    "queue records/bytes/age",
+    "state/RSS limit",
+    "free disk/run/partition cap",
+    "schema/identity/unit conflict/clock regression",
+    "network/permission/429/418/451/TLS/redirect",
+    "writer/flush/manifest failure"
+  ],
+  "coverage_rule": "report actual first/last received andstopreason; earlystop<600s isPARTIAL not full10min; caps are engineering choices not peak or24h evidence",
+  "publication_rule": "real cutoff/highwaterdurablebeforecompute; timestamppublisher confirmation afterfeaturepersistence, log actual observed availability; if publication control missing replayUNVERIFIED/null notnewwallclock",
+  "next_implementation_only": true
+}
