@@ -1,0 +1,179 @@
+{
+  "schema_version": "journal-prototype-evidence-1",
+  "baseline_head": "a38b81ae00667785023919d6010c3769c862d3f0",
+  "environment": {
+    "python": "3.12.13",
+    "platform": "macOS arm64",
+    "network": "connect, connect_ex, create_connection and getaddrinfo denied",
+    "fixture": "uniform artificial unique BTCUSDT aggTrade at 10 messages per simulated second",
+    "grid_seconds": 1,
+    "window_seconds": 30
+  },
+  "source_sha256": {
+    "src/btc_microstructure/bounded_live.py": "1cf0f63d1944b478d2ea94c22bb69efb6262a6be81fb7f711dc13925b0a0d35c",
+    "src/btc_microstructure/bounded_writer.py": "a1e97d3d3727de9a6fe8c133e5ea5d3d2d14dd2107d30ad3896ea04945a8dc03",
+    "src/btc_microstructure/journal_prototype.py": "c86818af68ebcc16b12171a8bc2ee75bbf7fd4019a4a5228c7b7fe79fe07fa92",
+    "reports/round2/journal_prototype/benchmark.py": "e75d21de24c9d3c28466210ee3d5a675a85ee13f0ee050c03d98d64aa298ab3b"
+  },
+  "comparisons": [
+    {
+      "simulated_seconds": 30,
+      "logical_sha256": "57172edc32a17524d5055393fd448bec45e9c69da2beec7631e67075cbff5750",
+      "legacy": {
+        "messages": 300,
+        "features": 30,
+        "elapsed_seconds": 4.245539667084813,
+        "parent_cpu_seconds": 0.463883,
+        "child_cpu_seconds": 3.722151,
+        "combined_peak_rss_upper_bound_bytes": 172769280,
+        "state_bytes": 5147916,
+        "files": 317,
+        "file_bytes": 815828,
+        "ack_p95_seconds": 0.038651624927297235,
+        "ack_max_seconds": 0.10108395805582404,
+        "fsync_p95": "NOT_INSTRUMENTED_INCLUDED_IN_ACK"
+      },
+      "journal": {
+        "messages": 300,
+        "features": 30,
+        "elapsed_seconds": 0.6630729159805924,
+        "parent_cpu_seconds": 0.20362600000000003,
+        "child_cpu_seconds": 0.40576799999999996,
+        "combined_peak_rss_upper_bound_bytes": 150175744,
+        "state_bytes": 5082962,
+        "files": 9,
+        "file_bytes": 1003815,
+        "ack_p95_seconds": 0.0015720000956207514,
+        "ack_max_seconds": 0.052091917023062706,
+        "fsync_p95_seconds": 0.00010933296289294958,
+        "frames": 157,
+        "checkpoints": 5,
+        "full_audits": 12
+      },
+      "two_replays_each": "PASS_READ_ONLY_INPUT_UNCHANGED",
+      "cross_writer_logical_match": true,
+      "independent_oracle": "PASS"
+    },
+    {
+      "simulated_seconds": 60,
+      "logical_sha256": "34a5f9e98d622196d735791c0faeee6af088e77e1ecc451f97d3fc12601bc1de",
+      "legacy": {
+        "messages": 600,
+        "features": 60,
+        "elapsed_seconds": 13.847361707943492,
+        "parent_cpu_seconds": 1.403116,
+        "child_cpu_seconds": 12.429682,
+        "combined_peak_rss_upper_bound_bytes": 178880512,
+        "state_bytes": 10277356,
+        "files": 617,
+        "file_bytes": 1612348,
+        "ack_p95_seconds": 0.07270129106473178,
+        "ack_max_seconds": 0.1709949589567259,
+        "fsync_p95": "NOT_INSTRUMENTED_INCLUDED_IN_ACK"
+      },
+      "journal": {
+        "messages": 600,
+        "features": 60,
+        "elapsed_seconds": 0.918322709039785,
+        "parent_cpu_seconds": 0.358279,
+        "child_cpu_seconds": 0.526202,
+        "combined_peak_rss_upper_bound_bytes": 152731648,
+        "state_bytes": 10145262,
+        "files": 9,
+        "file_bytes": 1997493,
+        "ack_p95_seconds": 0.0007258749101310968,
+        "ack_max_seconds": 0.07109416602179408,
+        "fsync_p95_seconds": 0.00006387499161064625,
+        "frames": 308,
+        "checkpoints": 10,
+        "full_audits": 22
+      },
+      "two_replays_each": "PASS_READ_ONLY_INPUT_UNCHANGED",
+      "cross_writer_logical_match": true,
+      "independent_oracle": "PASS"
+    },
+    {
+      "simulated_seconds": 120,
+      "logical_sha256": "bae15c4c78dcb7428af510de6835dbd606661a72a620047c8c690c78f9dfec68",
+      "legacy": {
+        "messages": 1200,
+        "features": 120,
+        "elapsed_seconds": 51.17283299996052,
+        "parent_cpu_seconds": 4.853861,
+        "child_cpu_seconds": 46.186354,
+        "combined_peak_rss_upper_bound_bytes": 191840256,
+        "state_bytes": 20555561,
+        "files": 1217,
+        "file_bytes": 3211953,
+        "ack_p95_seconds": 0.1412991670658812,
+        "ack_max_seconds": 0.3225872080074623,
+        "fsync_p95": "NOT_INSTRUMENTED_INCLUDED_IN_ACK"
+      },
+      "journal": {
+        "messages": 1200,
+        "features": 120,
+        "elapsed_seconds": 1.7083588750101626,
+        "parent_cpu_seconds": 0.713969,
+        "child_cpu_seconds": 0.943599,
+        "combined_peak_rss_upper_bound_bytes": 156958720,
+        "state_bytes": 20289097,
+        "files": 9,
+        "file_bytes": 3993642,
+        "ack_p95_seconds": 0.0009932080283761024,
+        "ack_max_seconds": 0.1909714590292424,
+        "fsync_p95_seconds": 0.00007504201494157314,
+        "frames": 609,
+        "checkpoints": 20,
+        "full_audits": 42,
+        "partition_bytes": {
+          "ws_raw_envelopes": 1132556,
+          "control": 195080,
+          "feature_parquet": 2653549,
+          "manifests_indexes": 2536,
+          "rest_metadata": 9909,
+          "diagnostics_and_receipts": 12,
+          "temporary_orphan_quarantine_files": 0,
+          "normalized_and_quarantine": 0
+        }
+      },
+      "two_replays_each": "PASS_READ_ONLY_INPUT_UNCHANGED",
+      "cross_writer_logical_match": true,
+      "independent_oracle": "PASS"
+    }
+  ],
+  "fault_matrix": {
+    "payload_fsync_then_interrupt": "PASS_TRUSTED_PREFIX_ONLY",
+    "committed_record_truncation": "PASS_TRUSTED_PREFIX_ONLY",
+    "same_length_checksum_mutation": "PASS_TRUSTED_PREFIX_ONLY",
+    "torn_checkpoint_with_older_slot": "PASS_FALLBACK_PARTIAL_READ_ONLY",
+    "external_symlink_recovery": "PASS_BLOCKED_NO_FOLLOW",
+    "active_file_same_length_mutation": "PASS_BLOCKS_NEXT_APPEND",
+    "checkpoint_full_audit_new_orphan": "PASS_BLOCKED",
+    "multi_frame_table_truncated_final_chunk": "PASS_INCOMPLETE_TABLE_NOT_VISIBLE",
+    "legacy_dispatcher": "PASS_EXISTING_READER"
+  },
+  "preserved_development_failures": [
+    {
+      "stage": "initial_120_second_cleanup",
+      "reason": "JOURNAL_FRAME_PAYLOAD_LIMIT",
+      "disposition": "replaced unbounded final table frame with bounded multi-frame table transaction"
+    },
+    {
+      "stage": "first_multi_frame_120_second_cleanup",
+      "reason": "JOURNAL_ACK_TIMEOUT",
+      "disposition": "replaced quadratic chunk planning with single-pass bounded row sizing"
+    }
+  ],
+  "status": {
+    "prototype_reliability": "PASS_LIMITED_OFFLINE",
+    "prototype_performance": "PASS_30_60_120_SIMULATED",
+    "targeted_fault_tests": "10_PASSED",
+    "default_pytest": "477_PASSED",
+    "independent_pytest": "15_9_8_4_PASSED",
+    "thirteen_offline_checks": "ALL_EXIT_0_LOCAL_NETWORK_NAMESPACE_NOT_RUN",
+    "formal_integration": "NOT_DONE_REQUIRES_INDEPENDENT_REVIEW",
+    "l04": "PARTIAL",
+    "real": "BLOCKED",
+    "600_second_tests": "NOT_RUN"
+  }
+}
