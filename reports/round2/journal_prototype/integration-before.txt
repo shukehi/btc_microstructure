@@ -1,0 +1,13 @@
+Baseline: 493b400655d75b430a6e1255b0d2b5ae195691c9
+Command: PYTHONPATH=src python -m pytest -q tests/unit/test_journal_integration.py
+Python 3.12.13 / macOS arm64 / exit 1.
+Local full log SHA256: 35397c3b602a9483cd1c9b19462bb1e150cdd25e5b02ac4d25451e097bb7a0cf
+Exact failure excerpt:
+E       TypeError: run_test_only_bounded_live() got an unexpected keyword argument 'test_only_writer'
+E       assert False
+E        +  where False = all(<generator object test_injected_deadline_capability_receives_controller_deadline.<locals>.<genexpr> at 0x10c8de9b0>)
+E       TypeError: run_test_only_bounded_live() got an unexpected keyword argument 'test_only_writer_factory'
+FAILED tests/unit/test_journal_integration.py::test_explicit_journal_selection_owns_empty_controller_directory
+FAILED tests/unit/test_journal_integration.py::test_injected_deadline_capability_receives_controller_deadline
+FAILED tests/unit/test_journal_integration.py::test_explicit_factory_is_created_after_controller_directory
+3 failed in 0.35s

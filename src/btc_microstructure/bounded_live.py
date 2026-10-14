@@ -281,13 +281,27 @@ async def run_test_only_bounded_live(
     transport: BoundedTransport,
     clock: Clock,
     writer: DurableWriter | None = None,
+    test_only_writer: Literal["process", "journal"] = "process",
+    test_only_writer_factory: Callable[..., DurableWriter] | None = None,
 ) -> JsonRow:
+    """Run one artificial session; Writer selection is an API-only TEST_ONLY option."""
     if config.network_authorized or config.shared_budget_trusted:
         fail_closed_real_entry(config)
     if getattr(transport, "TEST_ONLY", False) is not True:
         raise TransportScopeError("transport: explicit TEST_ONLY marker required")
     if not callable(getattr(transport, "poll", None)):
         raise TransportScopeError("transport: bounded poll protocol required")
+    if test_only_writer not in {"process", "journal"}:
+        raise ValueError("test_only_writer: process or journal required")
+    if writer is not None and (
+        test_only_writer != "process" or test_only_writer_factory is not None
+    ):
+        raise ValueError("writer injection and Writer selection are mutually exclusive")
+    if (
+        test_only_writer_factory is not None
+        and getattr(test_only_writer_factory, "TEST_ONLY", False) is not True
+    ):
+        raise TransportScopeError("writer factory: explicit TEST_ONLY marker required")
     if config.output_root.exists():
         raise FileExistsError("output_root: refusing to overwrite previous run")
     config.output_root.mkdir(parents=True)
@@ -365,12 +379,14 @@ async def run_test_only_bounded_live(
         return result
 
     def writer_budget(phase_end: int | None = None) -> None:
-        if isinstance(durable_writer, ProcessWriter):
+        if durable_writer is not None and hasattr(durable_writer, "deadline"):
             remaining = (global_end - clock.monotonic_ns()) / NS
             if phase_end is not None:
                 remaining = min(remaining, (phase_end - clock.monotonic_ns()) / NS)
-            durable_writer.deadline = min(
-                real_global_end, writer_real_end, time.monotonic() + max(0.0, remaining)
+            setattr(
+                durable_writer,
+                "deadline",
+                min(real_global_end, writer_real_end, time.monotonic() + max(0.0, remaining)),
             )
 
     def flush_raw() -> None:
@@ -426,7 +442,20 @@ async def run_test_only_bounded_live(
                 and shutil.disk_usage(config.output_root).free < config.min_free_bytes
             ):
                 raise StopRun("DISK_START_LIMIT")
-            durable_writer = ProcessWriter(
+            factory: Callable[..., DurableWriter] = ProcessWriter
+            if test_only_writer_factory is not None:
+                factory = test_only_writer_factory
+            elif test_only_writer == "journal":
+                # No normal import/config/REAL path loads or creates Journal.
+                from .journal_prototype import TestOnlyJournalProcessWriter
+
+                factory = TestOnlyJournalProcessWriter
+            constructor_remaining = (
+                min(real_global_end, real_startup_end, writer_real_end) - time.monotonic()
+            )
+            if constructor_remaining <= 0:
+                raise StopRun("STARTUP_TIME_LIMIT")
+            durable_writer = factory(
                 config.output_root,
                 run_metadata={
                     "run_id": config.run_id,
@@ -438,6 +467,7 @@ async def run_test_only_bounded_live(
                 max_records=config.max_queue_records,
                 max_bytes=config.max_queue_bytes,
                 rss_stop_bytes=config.rss_stop_bytes,
+                ack_seconds=min(2.0, constructor_remaining),
             )
         writer_budget(prepare_end)
         writer_real_end = real_startup_end
@@ -855,8 +885,8 @@ async def run_test_only_bounded_live(
         finally:
             if durable_writer is not None:
                 try:
-                    if isinstance(durable_writer, ProcessWriter):
-                        durable_writer.deadline = real_shutdown_end
+                    if hasattr(durable_writer, "deadline"):
+                        setattr(durable_writer, "deadline", real_shutdown_end)
                     durable_writer.close()
                 except (Exception, asyncio.CancelledError) as exc:
                     cleanup_errors.append(str(exc))

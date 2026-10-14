@@ -1880,9 +1880,8 @@ def replay_test_only_journal(root: Path) -> JsonRow:
         ]
         stored_tables = recovered["feature_tables"]
         original = [
-            stored_tables.get("normalized"),
-            stored_tables.get("quarantine"),
-            stored_tables.get("features"),
+            _arrow_table(stored_tables[name]).to_pylist() if name in stored_tables else None
+            for name in ("normalized", "quarantine", "features")
         ]
         matches = None if any(value is None for value in original) else original == replay_tables
         status = recovered["status"]
