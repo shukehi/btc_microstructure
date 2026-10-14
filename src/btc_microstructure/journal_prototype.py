@@ -16,6 +16,8 @@ from multiprocessing.connection import Connection
 import os
 from pathlib import Path
 import resource
+import re
+import select
 import shutil
 import stat
 import struct
@@ -64,12 +66,14 @@ PARTITION_BUDGET = {
     "control": "control",
     "feature": "feature_parquet",
 }
+JOURNAL_NAME = {name: re.compile(rf"^{name}-[0-9]{{6}}\.jnl$") for name in PARTITION_ID}
 DEFAULT_ROLL_BYTES = 4 * MIB
 DEFAULT_AUDIT_INTERVAL = 32
 MAX_FRAME_PAYLOAD_BYTES = 2 * MIB
 MAX_TABLE_CHUNK_PAYLOAD_BYTES = MIB
 MAX_RECOVERY_ROWS = 104_096
 TERMINAL_RESERVE_BYTES = MIB
+MAX_ACK_BYTES = 65_536
 
 
 class _FileRecord(NamedTuple):
@@ -88,6 +92,18 @@ class _Frame(NamedTuple):
     start_offset: int
     end_offset: int
     frame_sha256: str
+
+
+class JournalAuditFailure(WriterFailure):
+    def __init__(
+        self,
+        reason: str,
+        charges: dict[str, int],
+        files: dict[str, _FileRecord],
+    ) -> None:
+        self.charges = dict(charges)
+        self.files = dict(files)
+        super().__init__(reason)
 
 
 def _rss_bytes() -> int:
@@ -204,11 +220,23 @@ def _charge_path(root: Path, path: Path) -> str:
         return "rest_metadata"
     if parts and parts[0] == "checkpoints" and path.name in {"slot-a.json", "slot-b.json"}:
         return "manifests_indexes"
-    if len(parts) == 3 and parts[:2] == ("journal", "raw") and path.suffix == ".jnl":
+    if (
+        len(parts) == 3
+        and parts[:2] == ("journal", "raw")
+        and JOURNAL_NAME["raw"].fullmatch(path.name)
+    ):
         return "ws_raw_envelopes"
-    if len(parts) == 3 and parts[:2] == ("journal", "control") and path.suffix == ".jnl":
+    if (
+        len(parts) == 3
+        and parts[:2] == ("journal", "control")
+        and JOURNAL_NAME["control"].fullmatch(path.name)
+    ):
         return "control"
-    if len(parts) == 3 and parts[:2] == ("journal", "feature") and path.suffix == ".jnl":
+    if (
+        len(parts) == 3
+        and parts[:2] == ("journal", "feature")
+        and JOURNAL_NAME["feature"].fullmatch(path.name)
+    ):
         return "feature_parquet"
     if parts and parts[0] == "errors":
         return "diagnostics_and_receipts"
@@ -227,6 +255,7 @@ def _audit_tree(
     charges = dict.fromkeys(PARTITIONS, 0)
     files: dict[str, _FileRecord] = {}
     events: list[JsonRow] = []
+    blocked_orphans: list[str] = []
     entries_seen = 0
     stack = [(root, 0)]
     while stack:
@@ -258,9 +287,15 @@ def _audit_tree(
                     if checkpoint_temp:
                         events.append({"event_type": "TORN_CHECKPOINT", "path": key})
                     else:
-                        raise WriterFailure(f"JOURNAL_AUDIT_ORPHAN:{key}")
+                        blocked_orphans.append(key)
                 charges[category] += value.st_size
                 files[key] = _FileRecord(path, value.st_size, _stat_signature(value))
+    if blocked_orphans:
+        raise JournalAuditFailure(
+            f"JOURNAL_AUDIT_ORPHAN:{blocked_orphans[0]}",
+            charges,
+            files,
+        )
     return charges, files, events
 
 
@@ -311,19 +346,26 @@ def _frame_bytes(
     return header, payload, trailer, frame_hash
 
 
-def _table_chunks(name: str, rows: list[JsonRow], table_id: str) -> list[list[JsonRow]]:
+def _table_chunks(
+    name: str,
+    rows: list[JsonRow],
+    table_id: str,
+    payload_limit: int = MAX_TABLE_CHUNK_PAYLOAD_BYTES,
+) -> list[list[JsonRow]]:
+    if payload_limit <= 4096:
+        raise WriterFailure("JOURNAL_TABLE_CHUNK_LIMIT")
     chunks: list[list[JsonRow]] = []
     current: list[JsonRow] = []
     current_bytes = 4096 + len(name) + len(table_id)
     for row in rows:
         row_bytes = len(_canonical(row)) + 1
-        if row_bytes + 4096 > MAX_TABLE_CHUNK_PAYLOAD_BYTES:
+        if row_bytes + 4096 > payload_limit:
             raise WriterFailure("JOURNAL_TABLE_ROW_LIMIT")
-        if current and current_bytes + row_bytes > MAX_TABLE_CHUNK_PAYLOAD_BYTES:
+        if current and current_bytes + row_bytes > payload_limit:
             chunks.append(current)
             current = []
             current_bytes = 4096 + len(name) + len(table_id)
-        if current_bytes + row_bytes <= MAX_TABLE_CHUNK_PAYLOAD_BYTES:
+        if current_bytes + row_bytes <= payload_limit:
             current.append(row)
             current_bytes += row_bytes
             continue
@@ -438,6 +480,7 @@ def _checkpoint_bytes(payload: JsonRow) -> bytes:
 
 def _worker(
     connection: Connection,
+    acknowledgement: Connection,
     root_value: str,
     total: int,
     free: int,
@@ -520,8 +563,15 @@ def _worker(
             active_signature(journal)
             return
         journal.close()
-        journal.index += 1
-        journal.path = _partition_path(root, journal.partition, journal.index)
+        next_index = journal.index + 1
+        if (
+            fault_operation == "roll"
+            and fault_stage == "before_create"
+            and next_index == fault_after
+        ):
+            raise OSError("injected roll:before_create")
+        journal.index = next_index
+        journal.path = _partition_path(root, journal.partition, next_index)
         journal.path.parent.mkdir(parents=True, exist_ok=True)
         header = _file_header(journal.partition)
         budget.reserve({PARTITION_BUDGET[journal.partition]: len(header)}, disk_free())
@@ -663,7 +713,7 @@ def _worker(
             _fsync(handle, fsync_samples)
         _fsync_dir(root, fsync_samples)
         full_audit()
-        connection.send_bytes(
+        acknowledgement.send_bytes(
             _canonical({"ok": True, "cursor": None, "worker_rss_peak": _rss_bytes()})
         )
         while True:
@@ -691,7 +741,11 @@ def _worker(
                     raise WriterFailure("JOURNAL_INVALID_TABLE")
                 table_hash = hashlib.sha256(_canonical({"name": name, "rows": rows})).hexdigest()
                 table_id = f"{operation_counts[operation]}:{table_hash}"
-                chunks = _table_chunks(name, rows, table_id)
+                chunk_limit = min(
+                    MAX_TABLE_CHUNK_PAYLOAD_BYTES,
+                    roll_bytes - FILE_HEADER.size - FRAME_HEADER.size - COMMIT_TRAILER.size,
+                )
+                chunks = _table_chunks(name, rows, table_id, chunk_limit)
                 receipts = []
                 for index, chunk in enumerate(chunks):
                     receipts.append(
@@ -746,7 +800,7 @@ def _worker(
                     _fsync(handle, fsync_samples)
                 _fsync_dir(root, fsync_samples)
                 full_audit()
-                connection.send_bytes(
+                acknowledgement.send_bytes(
                     _canonical(
                         {
                             "ok": True,
@@ -764,7 +818,7 @@ def _worker(
                 checkpoint()
             if _rss_bytes() > rss_stop_bytes:
                 raise WriterFailure("WORKER_RSS_LIMIT")
-            connection.send_bytes(
+            acknowledgement.send_bytes(
                 _canonical(
                     {
                         "ok": True,
@@ -800,7 +854,7 @@ def _worker(
         except Exception:
             receipt_status = "FAILED"
         try:
-            connection.send_bytes(
+            acknowledgement.send_bytes(
                 _canonical(
                     {
                         "ok": False,
@@ -819,6 +873,7 @@ def _worker(
         for journal in journals.values():
             journal.close()
         connection.close()
+        acknowledgement.close()
 
 
 class TestOnlyJournalProcessWriter:
@@ -846,7 +901,11 @@ class TestOnlyJournalProcessWriter:
         **_: Any,
     ) -> None:
         del run_metadata
-        if not 1 <= roll_bytes <= 64 * MIB or not 1 <= audit_interval <= 256:
+        if (
+            not 0 < ack_seconds <= 2
+            or not 1 <= roll_bytes <= 64 * MIB
+            or not 1 <= audit_interval <= 256
+        ):
             raise ValueError("journal prototype limits")
         if fault_after <= 0:
             raise ValueError("fault_after")
@@ -865,12 +924,15 @@ class TestOnlyJournalProcessWriter:
         self._worker_metrics: JsonRow = {}
         self._ack_samples: list[float] = []
         context = mp.get_context("spawn")
-        parent, child = context.Pipe(duplex=True)
-        self.connection = parent
+        child, self.send_connection = context.Pipe(duplex=False)
+        self.connection, child_ack = context.Pipe(duplex=False)
+        self._pipes_closed = False
+        self.stop_status = "OPEN"
         self.process = context.Process(
             target=_worker,
             args=(
                 child,
+                child_ack,
                 str(root),
                 max_run_bytes,
                 min_free_bytes,
@@ -884,24 +946,70 @@ class TestOnlyJournalProcessWriter:
             daemon=True,
         )
         self.process.start()
+        os.set_blocking(self.connection.fileno(), False)
+        os.set_blocking(self.send_connection.fileno(), False)
         child.close()
+        child_ack.close()
         try:
-            reply = self._receive()
+            reply = self._receive(self._command_deadline())
             self._accept_reply(reply)
         except Exception:
             self._stop()
             raise
 
-    def _receive(self) -> JsonRow:
-        timeout = self.ack_seconds
+    def _command_deadline(self) -> float:
+        deadline = time.monotonic() + self.ack_seconds
         if self.deadline is not None:
-            timeout = min(timeout, max(0.0, self.deadline - time.monotonic()))
-        if timeout <= 0 or not self.connection.poll(timeout):
-            raise WriterFailure("JOURNAL_ACK_TIMEOUT")
-        return cast(
-            JsonRow,
-            json.loads(self.connection.recv_bytes(), object_hook=_json_object_hook),
-        )
+            deadline = min(deadline, self.deadline)
+        return deadline
+
+    def _send(self, payload: bytes, deadline: float) -> None:
+        wire = struct.pack("!i", len(payload)) + payload
+        descriptor = self.send_connection.fileno()
+        offset = 0
+        while offset < len(wire):
+            remaining = deadline - time.monotonic()
+            wait = min(0.1, remaining)
+            if wait <= 0 or not select.select([], [descriptor], [], wait)[1]:
+                if remaining > 0:
+                    continue
+                raise WriterFailure("JOURNAL_SEND_TIMEOUT")
+            if not self.process.is_alive():
+                raise WriterFailure("JOURNAL_WORKER_EXITED")
+            try:
+                offset += os.write(descriptor, wire[offset:])
+            except BlockingIOError:
+                continue
+            except (BrokenPipeError, OSError) as exc:
+                raise WriterFailure("JOURNAL_WORKER_EXITED") from exc
+
+    def _receive(self, deadline: float) -> JsonRow:
+        descriptor = self.connection.fileno()
+        received = bytearray()
+        expected: int | None = None
+        while expected is None or len(received) < expected + 4:
+            remaining = deadline - time.monotonic()
+            wait = min(0.1, remaining)
+            if wait <= 0 or not select.select([descriptor], [], [], wait)[0]:
+                if remaining > 0:
+                    if not self.process.is_alive():
+                        raise WriterFailure("JOURNAL_WORKER_EXITED")
+                    continue
+                raise WriterFailure("JOURNAL_ACK_TIMEOUT")
+            try:
+                data = os.read(descriptor, 16_384)
+            except BlockingIOError:
+                continue
+            except OSError as exc:
+                raise WriterFailure("JOURNAL_WORKER_EXITED") from exc
+            if not data:
+                raise WriterFailure("JOURNAL_WORKER_EXITED")
+            received.extend(data)
+            if len(received) >= 4 and expected is None:
+                expected = struct.unpack("!i", received[:4])[0]
+                if expected < 0 or expected > MAX_ACK_BYTES:
+                    raise WriterFailure("JOURNAL_ACK_LENGTH")
+        return cast(JsonRow, json.loads(received[4:], object_hook=_json_object_hook))
 
     def _accept_reply(self, reply: JsonRow) -> None:
         self.worker_rss_peak = max(self.worker_rss_peak, int(reply.get("worker_rss_peak", 0)))
@@ -923,13 +1031,17 @@ class TestOnlyJournalProcessWriter:
         payload = _canonical(request)
         began = time.perf_counter()
         try:
-            self.connection.send_bytes(payload)
-            reply = self._receive()
+            deadline = self._command_deadline()
+            self._send(payload, deadline)
+            reply = self._receive(deadline)
             self._accept_reply(reply)
             return reply
-        except Exception:
+        except Exception as exc:
             self.failed = True
-            raise
+            self._stop()
+            if isinstance(exc, WriterFailure):
+                raise
+            raise WriterFailure(f"JOURNAL_IPC:{type(exc).__name__}") from exc
         finally:
             self._ack_samples.append(time.perf_counter() - began)
 
@@ -989,8 +1101,15 @@ class TestOnlyJournalProcessWriter:
     def _stop(self) -> None:
         if self.process.is_alive():
             self.process.terminate()
-            self.process.join(timeout=0.5)
-        self.connection.close()
+            self.process.join(timeout=0.1)
+        if self.process.is_alive():
+            self.process.kill()
+            self.process.join(timeout=0.2)
+        self.stop_status = "STOP_FAILED" if self.process.is_alive() else "STOPPED_UNCERTAIN"
+        if not self._pipes_closed:
+            self.connection.close()
+            self.send_connection.close()
+            self._pipes_closed = True
 
     def close(self) -> None:
         if self.closed:
@@ -1006,7 +1125,10 @@ class TestOnlyJournalProcessWriter:
             self._stop()
             raise WriterFailure("JOURNAL_STOP_FAILED")
         self.closed = True
-        self.connection.close()
+        if not self._pipes_closed:
+            self.connection.close()
+            self.send_connection.close()
+            self._pipes_closed = True
 
 
 def _read_checkpoint(path: Path) -> JsonRow:
@@ -1190,6 +1312,17 @@ def recover_test_only_journal(root: Path) -> JsonRow:
             raise WriterFailure("JOURNAL_FORMAT")
         charges, files, audit_events = _audit_tree(root, allow_checkpoint_temp=True)
         _check_charges(charges, 512 * MIB)
+    except JournalAuditFailure as exc:
+        return {
+            "status": "BLOCKED",
+            "trusted_cursor": None,
+            "rows": [],
+            "feature_tables": {},
+            "recovery_events": [{"event_type": "RECOVERY_FAILED", "reason": str(exc)}],
+            "partition_bytes": exc.charges,
+            "files": len(exc.files),
+            "input_unchanged": before == _safe_tree_digest(root),
+        }
     except (OSError, ValueError, TypeError, WriterFailure) as exc:
         return {
             "status": "BLOCKED",
@@ -1291,27 +1424,92 @@ def recover_test_only_journal(root: Path) -> JsonRow:
                 continue
             group["chunks"][index] = values
             group["last_batch_id"] = max(group["last_batch_id"], frame.batch_id)
-    feature_tables: dict[str, list[JsonRow]] = {}
+    complete_table_groups: dict[tuple[str, str], JsonRow] = {}
+    candidate_feature_tables: dict[str, list[JsonRow]] = {}
     feature_generations: dict[str, int] = {}
-    for (name, _table_id), group in table_groups.items():
+    for (name, table_id), group in table_groups.items():
         if len(group["chunks"]) != group["count"]:
             events.append({"event_type": "FEATURE_TABLE_INCOMPLETE", "name": name})
             continue
+        assembled = [row for index in range(group["count"]) for row in group["chunks"][index]]
+        complete_table_groups[(name, table_id)] = {
+            **group,
+            "rows": assembled,
+            "sha256": hashlib.sha256(_canonical({"name": name, "rows": assembled})).hexdigest(),
+        }
         if group["last_batch_id"] < feature_generations.get(name, -1):
             continue
         feature_generations[name] = group["last_batch_id"]
-        feature_tables[name] = [
-            row for index in range(group["count"]) for row in group["chunks"][index]
+        candidate_feature_tables[name] = assembled
+
+    def matching_cutoff(published: JsonRow) -> JsonRow | None:
+        cutoff = published.get("cutoff_ns")
+        candidates = [
+            row
+            for row in trusted
+            if row.get("kind") == "FEATURE_CUTOFF"
+            and row.get("cutoff_ns") == cutoff
+            and int(row["ingest_sequence"]) < int(published["ingest_sequence"])
+        ]
+        return candidates[-1] if candidates else None
+
+    invalid_publication_sequence: int | None = None
+    trusted_feature_cutoffs: list[int] = []
+    for published in [row for row in trusted if row.get("kind") == "FEATURE_PUBLISHED"]:
+        cutoff = matching_cutoff(published)
+        manifest = published.get("feature_manifest")
+        publication_group: JsonRow | None = None
+        if isinstance(manifest, dict) and isinstance(manifest.get("table_id"), str):
+            publication_group = complete_table_groups.get(
+                ("features_pending", manifest["table_id"])
+            )
+        group_rows = None if publication_group is None else publication_group.get("rows")
+        valid = (
+            cutoff is not None
+            and isinstance(manifest, dict)
+            and isinstance(publication_group, dict)
+            and isinstance(group_rows, list)
+            and manifest.get("sha256") == publication_group.get("sha256")
+            and manifest.get("batch_id") == publication_group.get("last_batch_id")
+            and manifest.get("chunk_count") == publication_group.get("count")
+            and bool(group_rows)
+            and all(
+                row.get("feature_cutoff_ns") == published.get("cutoff_ns")
+                and row.get("input_cursor") == cutoff.get("input_cursor")
+                for row in group_rows
+            )
+        )
+        if not valid:
+            invalid_publication_sequence = (
+                int(cutoff["ingest_sequence"])
+                if cutoff is not None
+                else int(published["ingest_sequence"])
+            )
+            events.append(
+                {
+                    "event_type": "FEATURE_PUBLICATION_UNVERIFIED",
+                    "cutoff_ns": published.get("cutoff_ns"),
+                    "published_sequence": published.get("ingest_sequence"),
+                }
+            )
+            break
+        trusted_feature_cutoffs.append(int(published["cutoff_ns"]))
+    if invalid_publication_sequence is not None:
+        trusted = [
+            row for row in trusted if int(row["ingest_sequence"]) < invalid_publication_sequence
         ]
     clean_close = (root / "writer-closed").exists()
     if not clean_close:
         events.append({"event_type": "NO_WRITER_CLOSE_ACK"})
     status = "PASS" if not events and checkpoint is not None and clean_close else "PARTIAL"
+    feature_tables = candidate_feature_tables if status == "PASS" else {}
     return {
         "status": status,
         "trusted_cursor": len(trusted) or None,
+        "physical_trusted_cursor": expected - 1 or None,
         "rows": trusted,
         "feature_tables": feature_tables,
+        "trusted_feature_cutoffs": trusted_feature_cutoffs,
         "recovery_events": events,
         "checkpoint": checkpoint,
         "partition_bytes": charges,
@@ -1383,9 +1581,12 @@ def replay_test_only_journal(root: Path) -> JsonRow:
                 "UNCERTAIN_GAP",
             }:
                 core.process(_core_row(row))
-        features = [*core.features, *core.pending_features]
+        published_features = list(core.features)
+        pending_features = core.pending_features
+        features_for_digest = [*published_features, *pending_features]
         replay_tables = [
-            _arrow_table(rows).to_pylist() for rows in (core.normalized, core.quarantine, features)
+            _arrow_table(rows).to_pylist()
+            for rows in (core.normalized, core.quarantine, features_for_digest)
         ]
         stored_tables = recovered["feature_tables"]
         original = [
@@ -1409,7 +1610,8 @@ def replay_test_only_journal(root: Path) -> JsonRow:
             "replay_matches_original": matches,
             "normalized": core.normalized,
             "quarantine": core.quarantine,
-            "features": features,
+            "features": published_features,
+            "pending_features": pending_features,
         }
     except Exception as exc:
         return {

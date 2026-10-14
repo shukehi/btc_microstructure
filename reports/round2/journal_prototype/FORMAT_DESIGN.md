@@ -20,6 +20,10 @@ one-second feature grid, and is not reachable from `collect-bounded` or any REAL
 - The worker writes header+payload, flushes and fsyncs, then writes the commit trailer, flushes and
   fsyncs again. Only a complete verified trailer advances the trusted offset/cursor and may be
   acknowledged. A timeout or failure before acknowledgement keeps the parent cursor conservative.
+- Parent→worker send and worker→parent acknowledgement use separate nonblocking pipes under one
+  absolute command deadline. The configured ACK bound is `(0,2]` seconds and cannot be raised;
+  send backpressure, missing ACK, EOF, or worker exit immediately enters bounded terminate/kill
+  cleanup without advancing the last acknowledged cursor.
 - `RAW` frame acknowledgement remains before payload decoding/Core processing.
   `FEATURE_CUTOFF` acknowledgement remains before calculation. A feature frame acknowledgement
   remains before its `FEATURE_PUBLISHED` receipt. Missing publication receipts retain
@@ -35,6 +39,9 @@ one-second feature grid, and is not reachable from `collect-bounded` or any REAL
 - Startup/read-only recovery first performs a complete physical tree audit. It rejects symlinks,
   special files, path escape, partition/total overflow, and unexpected files. It then validates
   both slots, selects the highest valid generation, and cross-checks it against journal frames.
+- Journal basenames are canonical six-digit names. Any alias, duplicate logical number, unexpected
+  `.jnl`, or other object in a legal partition directory is charged to the orphan/temporary
+  partition before the run is rejected; it is never admitted merely because its suffix is `.jnl`.
 - Journals, not checkpoints, are the fact source in this PoC. Frames are scanned with bounded
   lengths, CRC, payload SHA, commit SHA, and per-partition hash chains. Raw/control rows are merged
   by global sequence; only the contiguous prefix beginning at sequence 1 is trusted.
@@ -42,6 +49,11 @@ one-second feature grid, and is not reachable from `collect-bounded` or any REAL
   preceding verified frame and emits `UNCERTAIN_GAP`. A torn newer checkpoint may fall back to the
   older valid slot. Missing format/context, no trustworthy prefix when one is required, permission
   or read failure, or an invalid physical tree is `BLOCKED`; recovery never edits input.
+- Complete feature chunks remain candidates until a trusted `FEATURE_CUTOFF` and later trusted
+  `FEATURE_PUBLISHED` receipt name the exact table id, batch id, chunk count and logical hash. If
+  any link is missing, the derived view stops before that cutoff. Partial raw/control recovery does
+  not expose final derived-cache tables; replay returns published features separately from pending
+  UNVERIFIED rows and preserves the recorded available time only from trusted receipts.
 
 ## Bounded incremental audit
 
@@ -70,6 +82,10 @@ one-second feature grid, and is not reachable from `collect-bounded` or any REAL
 - Prototype metrics expose frame/fsync/ACK timings, file/partition bytes, audit counts, parent and
   worker RSS, recovery events, and checkpoint generation. Benchmark evidence uses the same
   artificial transport/Core/oracle as the legacy `ProcessWriter` comparison.
+- Table chunks use the smaller of the one-MiB table limit and the active roll-file capacity. This
+  permits bounded tests with small roll thresholds without weakening the normal four-MiB default.
+  File numbering and the partition hash chain continue across roll boundaries; failed creation of
+  the next file cannot move the trusted cursor.
 
 ## Explicit non-integration boundary and risks
 
