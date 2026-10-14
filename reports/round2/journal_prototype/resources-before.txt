@@ -1,0 +1,26 @@
+Baseline: b4b8202f6b90be47eca62417900c5557265313e3
+Python: 3.12.13, macOS arm64; artificial readings only.
+Command: PYTHONPATH=src python -m pytest -q tests/unit/test_journal_resources.py
+Exit: 1
+Full local log: data/session/journal-resources-before.log
+Full log SHA256: b25baa6aa5210c23a0bd7ad8fa5e779b0bfef6eaa48394062787730ec087389c
+Exact failure-line excerpt (full log retained locally):
+E           KeyError: 'parent_monitor_samples'
+E       assert False
+E        +  where False = <function test_rss_exceeded_idle_worker_stops_and_keeps_ack.<locals>.<lambda> at 0x1093d40e0>()
+E           Failed: DID NOT RAISE <class 'btc_microstructure.bounded_writer.WriterFailure'>
+E       assert False
+E        +  where False = <function test_rss_exceeded_idle_worker_stops_and_keeps_ack.<locals>.<lambda> at 0x109413240>()
+E           Failed: DID NOT RAISE <class 'btc_microstructure.bounded_writer.WriterFailure'>
+E       AttributeError: 'TestOnlyJournalProcessWriter' object has no attribute '_monitor_stop'
+E       Failed: DID NOT RAISE <class 'btc_microstructure.bounded_writer.WriterFailure'>
+E       KeyError: 'storage_warning_receipt'
+E       Failed: DID NOT RAISE <class 'btc_microstructure.bounded_writer.WriterFailure'>
+FAILED tests/unit/test_journal_resources.py::test_monitor_samples_during_worker_block
+FAILED tests/unit/test_journal_resources.py::test_rss_exceeded_idle_worker_stops_and_keeps_ack[parent]
+FAILED tests/unit/test_journal_resources.py::test_rss_exceeded_idle_worker_stops_and_keeps_ack[worker]
+FAILED tests/unit/test_journal_resources.py::test_parent_monitor_failure_is_fail_closed
+FAILED tests/unit/test_journal_resources.py::test_startup_disk_floor_is_enforced_by_standalone_writer
+FAILED tests/unit/test_journal_resources.py::test_disk_warning_is_durable_once_and_hard_stop_keeps_prefix
+FAILED tests/unit/test_journal_resources.py::test_disk_warning_receipt_failure_stops_before_new_frame
+7 failed in 6.42s

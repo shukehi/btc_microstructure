@@ -22,8 +22,9 @@ import shutil
 import stat
 import struct
 import sys
+import threading
 import time
-from typing import Any, cast, Literal, NamedTuple
+from typing import Any, Callable, cast, Literal, NamedTuple
 import zlib
 
 from .bounded_replay import (
@@ -41,6 +42,9 @@ from .bounded_writer import (
     Budget,
     WriterFailure,
     _request_encoded_upper_bound,
+    STARTUP_FREE_BYTES,
+    WARN_FREE_BYTES,
+    STOP_FREE_BYTES,
 )
 from .offline_core import Core
 from .offline_storage import _arrow_table, _json_line, _json_object_hook
@@ -74,6 +78,13 @@ MAX_TABLE_CHUNK_PAYLOAD_BYTES = MIB
 MAX_RECOVERY_ROWS = 104_096
 TERMINAL_RESERVE_BYTES = MIB
 MAX_ACK_BYTES = 65_536
+RESOURCE_ERRORS = {
+    1: "RSS_LIMIT",
+    2: "WORKER_RSS_LIMIT",
+    3: "CHILD_MONITOR_FAILED",
+    4: "PARENT_MONITOR_FAILED",
+    5: "JOURNAL_WORKER_EXITED",
+}
 
 
 class _FileRecord(NamedTuple):
@@ -490,6 +501,9 @@ def _worker(
     fault_operation: str | None,
     fault_after: int,
     fault_stage: str | None,
+    shared: dict[str, Any],
+    rss_sampler: Callable[[], int] | None,
+    disk_sampler: Callable[[], int] | None,
 ) -> None:
     root = Path(root_value)
     budget = Budget(total, free, terminal_audit_reserve_bytes=TERMINAL_RESERVE_BYTES)
@@ -506,11 +520,74 @@ def _worker(
     last_audit_charges = dict.fromkeys(PARTITIONS, 0)
     last_audit_files = 0
     operation_counts: dict[str, int] = {}
+    monitor_stop = threading.Event()
+    monitor: threading.Thread | None = None
+    storage_warning = storage_warning_receipt = False
+    last_free_bytes = 0
+    receipt_status = "NOT_ATTEMPTED"
+
+    def monitor_rss() -> None:
+        previous = 0
+        try:
+            shared["monitor_alive"].value = 1
+            while not monitor_stop.is_set():
+                if shared["monitor_exit"].value:
+                    raise WriterFailure("injected child monitor exit")
+                now = time.monotonic_ns()
+                observed = int(rss_sampler() if rss_sampler else _rss_bytes())
+                shared["peak"].value = max(shared["peak"].value, observed)
+                shared["samples"].value += 1
+                if previous:
+                    shared["maxgap"].value = max(shared["maxgap"].value, now - previous)
+                previous = now
+                shared["heartbeat"].value = now
+                if observed > rss_stop_bytes:
+                    shared["failure"].value = 2
+                    return
+                monitor_stop.wait(0.1)
+        except Exception:
+            shared["failure"].value = 3
+        finally:
+            shared["monitor_alive"].value = 0
+
+    def check_resources() -> None:
+        failure = int(shared["failure"].value)
+        if failure:
+            raise WriterFailure(RESOURCE_ERRORS.get(failure, "RESOURCE_MONITOR_FAILED"))
+        if monitor is not None and not monitor.is_alive():
+            raise WriterFailure("CHILD_MONITOR_FAILED")
+
+    def observed_free() -> int:
+        return int(disk_sampler() if disk_sampler else shutil.disk_usage(root).free)
 
     def disk_free() -> int:
-        value = int(shutil.disk_usage(root).free)
+        nonlocal last_free_bytes, storage_warning, storage_warning_receipt
+        value = observed_free()
+        last_free_bytes = value
         if value < free:
             raise WriterFailure("DISK_FREE_LIMIT")
+        if value < WARN_FREE_BYTES:
+            storage_warning = True
+            if not storage_warning_receipt:
+                record = _json_line(
+                    {
+                        "event_type": "DISK_FREE_WARNING",
+                        "ts_receive_ns": time.time_ns(),
+                        "trusted_cursor": cursor,
+                        "free_bytes": value,
+                        "threshold_bytes": WARN_FREE_BYTES,
+                    }
+                )
+                budget.reserve_terminal_audit(len(record), value)
+                path = root / "errors" / "storage_events.jsonl"
+                path.parent.mkdir(parents=True, exist_ok=True)
+                with path.open("ab") as handle:
+                    handle.write(record)
+                    if fault_operation == "disk_warning" and fault_stage == "before_fsync":
+                        raise OSError("injected disk_warning:before_fsync")
+                    _fsync(handle, fsync_samples)
+                _fsync_dir(path.parent, fsync_samples)
+                storage_warning_receipt = True
         return value
 
     def metrics() -> JsonRow:
@@ -529,6 +606,12 @@ def _worker(
             "worker_rss_peak_bytes": _rss_bytes(),
             "trusted_cursor": cursor,
             "checkpoint_generation": generation,
+            "storage_warning": storage_warning,
+            "storage_warning_receipt": storage_warning_receipt,
+            "last_free_bytes": last_free_bytes,
+            "terminal_audit_records": budget.terminal_audit_records,
+            "terminal_audit_bytes": budget.terminal_audit_bytes,
+            "failure_receipt_status": receipt_status,
         }
 
     def full_audit() -> None:
@@ -590,6 +673,15 @@ def _worker(
             and stage == fault_stage
         ):
             raise OSError(f"injected {operation}:{stage}")
+        if (
+            operation == fault_operation
+            and operation_counts.get(operation) == fault_after
+            and fault_stage == "hang"
+            and stage == "before_frame"
+        ):
+            while True:
+                check_resources()
+                time.sleep(0.02)
 
     def append_frame(partition: Partition, rows: list[JsonRow], operation: str) -> JsonRow:
         nonlocal batch_id, cursor, frames, command_count
@@ -624,6 +716,8 @@ def _worker(
         journal.handle.write(header)
         journal.handle.write(payload)
         _fsync(journal.handle, fsync_samples)
+        disk_free()
+        check_resources()
         inject(operation, "after_payload_fsync")
         if (
             fault_operation == operation
@@ -635,6 +729,8 @@ def _worker(
             raise OSError(f"injected {operation}:partial_trailer")
         journal.handle.write(trailer)
         _fsync(journal.handle, fsync_samples)
+        disk_free()
+        check_resources()
         value = os.fstat(journal.handle.fileno())
         journal.size = value.st_size
         journal.last_offset = value.st_size
@@ -694,6 +790,8 @@ def _worker(
         if root.exists() and any(root.iterdir()):
             raise WriterFailure("JOURNAL_RUN_DIRECTORY_NOT_EMPTY")
         root.mkdir(parents=True, exist_ok=True)
+        if free >= STOP_FREE_BYTES and observed_free() < STARTUP_FREE_BYTES:
+            raise WriterFailure("STARTUP_DISK_FREE_LIMIT")
         for name in PARTITION_ID:
             (root / "journal" / name).mkdir(parents=True)
         (root / "checkpoints").mkdir()
@@ -713,10 +811,15 @@ def _worker(
             _fsync(handle, fsync_samples)
         _fsync_dir(root, fsync_samples)
         full_audit()
+        monitor = threading.Thread(target=monitor_rss, daemon=True)
+        monitor.start()
         acknowledgement.send_bytes(
             _canonical({"ok": True, "cursor": None, "worker_rss_peak": _rss_bytes()})
         )
         while True:
+            check_resources()
+            if not connection.poll(0.05):
+                continue
             request = json.loads(connection.recv_bytes(), object_hook=_json_object_hook)
             operation = str(request.get("operation"))
             request_bound = _request_encoded_upper_bound(request)
@@ -800,6 +903,7 @@ def _worker(
                     _fsync(handle, fsync_samples)
                 _fsync_dir(root, fsync_samples)
                 full_audit()
+                disk_free()
                 acknowledgement.send_bytes(
                     _canonical(
                         {
@@ -818,6 +922,8 @@ def _worker(
                 checkpoint()
             if _rss_bytes() > rss_stop_bytes:
                 raise WriterFailure("WORKER_RSS_LIMIT")
+            check_resources()
+            disk_free()
             acknowledgement.send_bytes(
                 _canonical(
                     {
@@ -843,7 +949,7 @@ def _worker(
             )
             if len(record) > 4096:
                 raise WriterFailure("TERMINAL_AUDIT_RECORD_LIMIT")
-            budget.reserve_terminal_audit(len(record), disk_free())
+            budget.reserve_terminal_audit(len(record), observed_free())
             error_path = root / "errors" / "storage_events.jsonl"
             error_path.parent.mkdir(parents=True, exist_ok=True)
             with error_path.open("ab") as handle:
@@ -870,6 +976,9 @@ def _worker(
         except (BrokenPipeError, EOFError, OSError):
             pass
     finally:
+        monitor_stop.set()
+        if monitor is not None:
+            monitor.join(timeout=0.2)
         for journal in journals.values():
             journal.close()
         connection.close()
@@ -898,11 +1007,19 @@ class TestOnlyJournalProcessWriter:
         fault_operation: str | None = None,
         fault_after: int = 1,
         fault_stage: str | None = None,
+        parent_rss_sampler: Callable[[], int] | None = None,
+        worker_rss_sampler: Callable[[], int] | None = None,
+        disk_free_sampler: Callable[[], int] | None = None,
         **_: Any,
     ) -> None:
         del run_metadata
         if (
             not 0 < ack_seconds <= 2
+            or not 0 < rss_stop_bytes <= 512 * MIB
+            or not 0 < max_run_bytes <= 512 * MIB
+            or not 0 < max_records <= 1000
+            or not 0 < max_bytes <= MIB
+            or (min_free_bytes != 0 and min_free_bytes < STOP_FREE_BYTES)
             or not 1 <= roll_bytes <= 64 * MIB
             or not 1 <= audit_interval <= 256
         ):
@@ -923,7 +1040,31 @@ class TestOnlyJournalProcessWriter:
         self._rss_stop_bytes = rss_stop_bytes
         self._worker_metrics: JsonRow = {}
         self._ack_samples: list[float] = []
+        self._parent_rss_sampler = parent_rss_sampler
+        self._disk_free_sampler = disk_free_sampler
+        self._min_free_bytes = min_free_bytes
+        self._max_run_bytes = max_run_bytes
+        self._monitor_stop = threading.Event()
+        self._monitor_thread: threading.Thread | None = None
+        self._stop_lock = threading.RLock()
+        self._closing = False
+        self._resource_stopped = False
+        self.resource_failure_reason: str | None = None
+        self._parent_samples = self._parent_peak = self._parent_gap = 0
+        self._parent_last = 0
         context = mp.get_context("spawn")
+        self._shared = {
+            name: context.RawValue("Q", 0)
+            for name in (
+                "peak",
+                "samples",
+                "heartbeat",
+                "maxgap",
+                "failure",
+                "monitor_alive",
+                "monitor_exit",
+            )
+        }
         child, self.send_connection = context.Pipe(duplex=False)
         self.connection, child_ack = context.Pipe(duplex=False)
         self._pipes_closed = False
@@ -942,6 +1083,9 @@ class TestOnlyJournalProcessWriter:
                 fault_operation,
                 fault_after,
                 fault_stage,
+                self._shared,
+                worker_rss_sampler,
+                disk_free_sampler,
             ),
             daemon=True,
         )
@@ -953,9 +1097,132 @@ class TestOnlyJournalProcessWriter:
         try:
             reply = self._receive(self._command_deadline())
             self._accept_reply(reply)
+            self._monitor_thread = threading.Thread(target=self._monitor_resources, daemon=True)
+            self._monitor_thread.start()
         except Exception:
             self._stop()
             raise
+
+    def _monitor_resources(self) -> None:
+        try:
+            while not self._monitor_stop.wait(0.1):
+                self._sample_resources(parent_thread=True)
+                if self.resource_failure_reason:
+                    self._resource_stop()
+                    return
+        except Exception:
+            self.resource_failure_reason = "PARENT_MONITOR_FAILED"
+            self._shared["failure"].value = 4
+            self._resource_stop()
+        finally:
+            if not self._monitor_stop.is_set() and not self._closing:
+                self.resource_failure_reason = "PARENT_MONITOR_FAILED"
+                self._shared["failure"].value = 4
+                self._resource_stop()
+
+    def _sample_resources(self, *, parent_thread: bool = False) -> None:
+        now = time.monotonic_ns()
+        parent = int(self._parent_rss_sampler() if self._parent_rss_sampler else _rss_bytes())
+        self._parent_peak = max(self._parent_peak, parent)
+        self.worker_rss_peak = max(self.worker_rss_peak, int(self._shared["peak"].value))
+        if parent_thread:
+            if self._parent_last:
+                self._parent_gap = max(self._parent_gap, now - self._parent_last)
+            self._parent_last = now
+            self._parent_samples += 1
+        failure = int(self._shared["failure"].value)
+        if failure:
+            self.resource_failure_reason = RESOURCE_ERRORS.get(failure, "RESOURCE_MONITOR_FAILED")
+        elif parent + self.worker_rss_peak > self._rss_stop_bytes:
+            self.resource_failure_reason = "RSS_LIMIT"
+            self._shared["failure"].value = 1
+        elif not self._closing and not self.process.is_alive():
+            self.resource_failure_reason = "JOURNAL_WORKER_EXITED"
+        elif (
+            not self._closing
+            and self._shared["heartbeat"].value
+            and now - self._shared["heartbeat"].value > 1_000_000_000
+        ):
+            self.resource_failure_reason = "CHILD_MONITOR_FAILED"
+            self._shared["failure"].value = 3
+
+    def _resource_stop(self) -> None:
+        with self._stop_lock:
+            if self._resource_stopped:
+                return
+            # Allow the cooperative worker to persist its terminal receipt first.
+            self.process.join(timeout=0.15)
+            self.failed = True
+            self._stop()
+            self._parent_failure_receipt()
+            self._resource_stopped = True
+
+    def _parent_failure_receipt(self) -> None:
+        if self.process.is_alive():
+            self._worker_metrics["failure_receipt_status"] = "STOP_FAILED"
+            return
+        path = self.root / "errors" / "storage_events.jsonl"
+        try:
+            charges, _, _ = _audit_tree(self.root, allow_checkpoint_temp=True)
+            if path.exists() and "JOURNAL_WRITER_FAILURE" in path.read_text():
+                # A killed worker may have written the receipt but not fsynced it.
+                descriptor = os.open(path, os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0))
+                try:
+                    os.fsync(descriptor)
+                finally:
+                    os.close(descriptor)
+                _fsync_dir(path.parent, [])
+                self._worker_metrics["failure_receipt_status"] = "DURABLE_WORKER"
+                return
+            budget = Budget(
+                self._max_run_bytes,
+                self._min_free_bytes,
+                terminal_audit_reserve_bytes=TERMINAL_RESERVE_BYTES,
+            )
+            budget.set_physical_used(charges)
+            free = int(
+                self._disk_free_sampler()
+                if self._disk_free_sampler
+                else shutil.disk_usage(self.root).free
+            )
+            record = _json_line(
+                {
+                    "event_type": "JOURNAL_PARENT_FAILURE",
+                    "ts_receive_ns": time.time_ns(),
+                    "trusted_cursor": self.cursor,
+                    "error": self.resource_failure_reason,
+                    "stop_status": self.stop_status,
+                }
+            )
+            budget.reserve_terminal_audit(len(record), free)
+            path.parent.mkdir(parents=True, exist_ok=True)
+            with path.open("ab") as handle:
+                handle.write(record)
+                handle.flush()
+                os.fsync(handle.fileno())
+            _fsync_dir(path.parent, [])
+            self._worker_metrics["failure_receipt_status"] = "DURABLE_PARENT"
+        except Exception as exc:
+            self._worker_metrics["failure_receipt_status"] = f"FAILED:{type(exc).__name__}"
+
+    def _check_resources(self) -> None:
+        if self._closing:
+            return
+        if (
+            self._monitor_thread is not None
+            and not self._monitor_thread.is_alive()
+            and not self.failed
+        ):
+            self.resource_failure_reason = "PARENT_MONITOR_FAILED"
+            self._shared["failure"].value = 4
+        try:
+            self._sample_resources()
+        except Exception:
+            self.resource_failure_reason = "PARENT_MONITOR_FAILED"
+            self._shared["failure"].value = 4
+        if self.resource_failure_reason:
+            self._resource_stop()
+            raise WriterFailure(self.resource_failure_reason)
 
     def _command_deadline(self) -> float:
         deadline = time.monotonic() + self.ack_seconds
@@ -968,6 +1235,7 @@ class TestOnlyJournalProcessWriter:
         descriptor = self.send_connection.fileno()
         offset = 0
         while offset < len(wire):
+            self._check_resources()
             remaining = deadline - time.monotonic()
             wait = min(0.1, remaining)
             if wait <= 0 or not select.select([], [descriptor], [], wait)[1]:
@@ -988,6 +1256,8 @@ class TestOnlyJournalProcessWriter:
         received = bytearray()
         expected: int | None = None
         while expected is None or len(received) < expected + 4:
+            if self._monitor_thread is not None:
+                self._check_resources()
             remaining = deadline - time.monotonic()
             wait = min(0.1, remaining)
             if wait <= 0 or not select.select([descriptor], [], [], wait)[0]:
@@ -1021,6 +1291,7 @@ class TestOnlyJournalProcessWriter:
         self.cursor = reply.get("cursor")
 
     def _command(self, request: JsonRow) -> JsonRow:
+        self._check_resources()
         if self.failed or self.closed:
             raise WriterFailure("JOURNAL_WRITER_NOT_OPEN")
         upper_bound = _request_encoded_upper_bound(request)
@@ -1046,6 +1317,7 @@ class TestOnlyJournalProcessWriter:
             self._ack_samples.append(time.perf_counter() - began)
 
     def append(self, row: JsonRow) -> None:
+        self._check_resources()
         size = len(_json_line(row))
         if size > self.max_bytes or len(self.rows) + 1 > self.max_records:
             raise WriterFailure("QUEUE_LIMIT")
@@ -1096,9 +1368,23 @@ class TestOnlyJournalProcessWriter:
             "ack_p95_seconds": _percentile(self._ack_samples, 0.95),
             "ack_max_seconds": max(self._ack_samples, default=0.0),
             "child_rss_peak_bytes": self.worker_rss_peak,
+            "parent_rss_peak_bytes": self._parent_peak,
+            "combined_ru_maxrss_peak_upper_bound_bytes": self._parent_peak + self.worker_rss_peak,
+            "rss_warning": self._parent_peak + self.worker_rss_peak > 384 * MIB,
+            "rss_sample_interval_ns": 100_000_000,
+            "parent_monitor_samples": self._parent_samples,
+            "child_monitor_samples": int(self._shared["samples"].value),
+            "parent_monitor_max_sample_gap_ns": self._parent_gap,
+            "child_monitor_max_sample_gap_ns": int(self._shared["maxgap"].value),
+            "resource_failure_reason": self.resource_failure_reason,
         }
 
     def _stop(self) -> None:
+        self._monitor_stop.set()
+        with self._stop_lock:
+            self._stop_inner()
+
+    def _stop_inner(self) -> None:
         if self.process.is_alive():
             self.process.terminate()
             self.process.join(timeout=0.1)
@@ -1118,6 +1404,7 @@ class TestOnlyJournalProcessWriter:
             self._stop()
             raise WriterFailure("JOURNAL_STOPPED_UNCERTAIN")
         self.flush()
+        self._closing = True
         self._command({"operation": "close"})
         self.process.join(timeout=0.5)
         if self.process.is_alive():
@@ -1125,6 +1412,9 @@ class TestOnlyJournalProcessWriter:
             self._stop()
             raise WriterFailure("JOURNAL_STOP_FAILED")
         self.closed = True
+        self._monitor_stop.set()
+        if self._monitor_thread is not None:
+            self._monitor_thread.join(timeout=0.2)
         if not self._pipes_closed:
             self.connection.close()
             self.send_connection.close()

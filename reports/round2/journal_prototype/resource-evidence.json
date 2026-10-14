@@ -1,0 +1,43 @@
+{
+  "schema_version": "journal-resource-contracts-1",
+  "baseline_head": "b4b8202f6b90be47eca62417900c5557265313e3",
+  "source_sha256": "efd674b01ff96ef68b1c2a805d6b2a15e56429792b25f7b91722a2b691e56ff5",
+  "environment": "Python 3.12.13, macOS arm64, artificial offline fixtures",
+  "before": {
+    "exit_code": 1, "failed": 7,
+    "log_sha256": "b25baa6aa5210c23a0bd7ad8fa5e779b0bfef6eaa48394062787730ec087389c",
+    "excerpt": "resources-before.txt"
+  },
+  "after": {
+    "targeted_passed": 47, "default_passed": 514,
+    "independent_passed": [15, 9, 8, 4],
+    "failed": 0, "errors": 0, "skipped": 0,
+    "thirteen_checks_exit_codes": [0,0,0,0,0,0,0,0,0,0,0,0,0],
+    "local_network_namespace": "NOT_RUN"
+  },
+  "protections": {
+    "parent_child_rss_monitor": "PASS_LIMITED_OFFLINE",
+    "blocked_worker_resource_stop": "PASS_LIMITED_OFFLINE",
+    "monitor_failure_and_worker_exit": "PASS_LIMITED_OFFLINE",
+    "disk_startup_warning_stop": "PASS_LIMITED_OFFLINE",
+    "durable_warning_receipt": "PASS_LIMITED_OFFLINE",
+    "warning_write_failure_and_low_space_receipt_failure": "PASS_LIMITED_OFFLINE",
+    "terminal_and_eight_partition_budgets": "REUSED_UNCHANGED",
+    "os_hard_oom_full_disk_power_loss": "NOT_RUN"
+  },
+  "smoke": {
+    "simulated_seconds": 30, "messages": 300, "features": 30,
+    "elapsed_seconds": 0.635069084004499,
+    "parent_cpu_seconds": 0.21479600000000004,
+    "child_cpu_seconds": 0.38948199999999994,
+    "files": 9, "file_bytes": 1003819, "state_reserved_bytes": 5082962,
+    "parent_rss_peak_bytes": 77316096, "child_rss_peak_bytes": 77479936,
+    "sample_target_ns": 100000000,
+    "parent_monitor_samples": 3, "child_monitor_samples": 3,
+    "parent_max_sample_gap_ns": 110057375, "child_max_sample_gap_ns": 110022416,
+    "ack_p95_seconds": 0.0010552919702604413,
+    "fsync_p95_seconds": 0.00006816699169576168,
+    "two_replays": "PASS_READ_ONLY_INPUT_UNCHANGED", "oracle": "PASS"
+  },
+  "status": {"l04": "PARTIAL", "real": "BLOCKED", "integration": "NOT_DONE", "600_seconds": "NOT_RUN"}
+}
