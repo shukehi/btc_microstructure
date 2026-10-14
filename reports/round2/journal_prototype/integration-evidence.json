@@ -1,0 +1,102 @@
+{
+  "schema_version": "journal-test-only-integration-1",
+  "baseline_head": "493b400655d75b430a6e1255b0d2b5ae195691c9",
+  "writer_default": "process",
+  "journal_selection": "API_ONLY_TEST_ONLY_OR_MARKED_FACTORY",
+  "configuration_cli_changed": false,
+  "before": {
+    "failed": 3,
+    "exit_code": 1,
+    "full_log_sha256": "35397c3b602a9483cd1c9b19462bb1e150cdd25e5b02ac4d25451e097bb7a0cf"
+  },
+  "comparison": [
+    {
+      "derived_equal": true,
+      "elapsed_seconds": {
+        "journal": 0.5769659579964355,
+        "process": 4.551296041929163
+      },
+      "features": 30,
+      "files": {
+        "journal": 9,
+        "process": 317
+      },
+      "history_available_equal": true,
+      "logical_sha256": "95b6fe832ecb01109c7e964c45a36d132ac0cdf5c0cd9e11736de0fcf6b037d6",
+      "messages": 300,
+      "oracle": "PASS",
+      "raw_control_equal": true,
+      "raw_control_sha256": "c34de236ab0ee003b630f7831afec27441ed2b7d630e0452084abd7e6879fc96",
+      "seconds": 30,
+      "two_replays_each": "PASS"
+    },
+    {
+      "derived_equal": true,
+      "elapsed_seconds": {
+        "journal": 1.1014082500478253,
+        "process": 16.291698709013872
+      },
+      "features": 60,
+      "files": {
+        "journal": 9,
+        "process": 617
+      },
+      "history_available_equal": true,
+      "logical_sha256": "006993e8f58f3dc1e5ce4c22b1f4563f1e7237289c6ac533c5c9c8e29021559c",
+      "messages": 600,
+      "oracle": "PASS",
+      "raw_control_equal": true,
+      "raw_control_sha256": "8583ab058037c5773b0c52d43276c18d3ea2847f37b0404adc7bde7b7965f1bb",
+      "seconds": 60,
+      "two_replays_each": "PASS"
+    },
+    {
+      "derived_equal": true,
+      "elapsed_seconds": {
+        "journal": 1.8533015419961885,
+        "process": 57.639332417049445
+      },
+      "features": 120,
+      "files": {
+        "journal": 9,
+        "process": 1217
+      },
+      "history_available_equal": true,
+      "logical_sha256": "e685f218d66f6db5a0a261bb3fc5c7a2ac001d461c3e54e8e1437a62070a0c5f",
+      "messages": 1200,
+      "oracle": "PASS",
+      "raw_control_equal": true,
+      "raw_control_sha256": "2f1a78b9e9cc8db0ee9d8b408b2fb5eb6308315e112db6110bc6ec795913f4d8",
+      "seconds": 120,
+      "two_replays_each": "PASS"
+    }
+  ],
+  "comparison_exception": "FEATURE_PUBLISHED.feature_manifest physical receipts differ; each validated against its own format. All other input/control fields compared exactly.",
+  "faults": {
+    "worker_timeout": "PASS_LIMITED_OFFLINE",
+    "partial_commit": "PASS_LIMITED_OFFLINE",
+    "worker_exit": "PASS_LIMITED_OFFLINE",
+    "rss_limit": "PASS_LIMITED_OFFLINE",
+    "disk_warning": "PASS_LIMITED_OFFLINE",
+    "disk_stop": "PASS_LIMITED_OFFLINE"
+  },
+  "verification": {
+    "python": "3.12.13",
+    "targeted_passed": 68,
+    "default_passed": 535,
+    "independent_passed": [15, 9, 8, 4],
+    "failures": 0, "errors": 0, "skipped": 0,
+    "thirteen_exit_codes": [0,0,0,0,0,0,0,0,0,0,0,0,0],
+    "local_linux_namespace": "NOT_RUN"
+  },
+  "source_sha256": {
+    "bounded_live": "a187863146dc893fe59dec405d2c7405d91e0fa15e95456a06834a7bfd87992d",
+    "journal_prototype": "0fdd4dc3bc652ae47a3b0eed984277df9fa311bf2e7f92d25ec7e614f2205d89"
+  },
+  "status": {
+    "l04": "PARTIAL",
+    "real": "BLOCKED",
+    "pr": "DRAFT",
+    "simulation_600_seconds": "NOT_RUN"
+  }
+}

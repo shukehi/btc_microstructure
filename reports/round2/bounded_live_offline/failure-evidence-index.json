@@ -1,0 +1,32 @@
+{
+  "pressure-failure-before.txt": {
+    "raw_sha256": "ec719b92fcbf82dff266f94e0573ca64d6bc2032d2fede45d83a4b8b872a6b39",
+    "published_sha256": "8cd3e5a84115f21f78d50fd833691f87451e5463708d461253a588b093af3385",
+    "source_local_log": "data/session/burst-after-accounting.log",
+    "redactions": [
+      "local worktree",
+      "pytest temporary path",
+      "PyArrow build path"
+    ]
+  },
+  "scheduler-failure-before.txt": {
+    "raw_sha256": "302cc6f6d24126ffb9dc7baee5d9c7bbbf5c389b5a5809fc604a01c6ba2ad5d4",
+    "published_sha256": "7ceb197408c960443cd9a39328241ca4e31204b478b487d7c45e3329bfefe5b9",
+    "source_local_log": "data/session/parent-critical-tests.log",
+    "redactions": [
+      "local worktree",
+      "pytest temporary path",
+      "PyArrow build path"
+    ]
+  },
+  "targeted-final.txt": {
+    "raw_sha256": "e557c2054efaaa3d4d4e9972189c9ddf4163c37555a44bf21bba321d7b8dc546",
+    "published_sha256": "718fc9e96a4449abd9d57b41a622b81cc3ab082b31eeed962f58ec8b04221a16",
+    "source_local_log": "data/session/final-targeted-verified.log",
+    "redactions": [
+      "local worktree",
+      "pytest temporary path",
+      "PyArrow build path"
+    ]
+  }
+}

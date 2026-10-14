@@ -1,0 +1,127 @@
+{
+  "schema_version": "journal-reliability-review-1",
+  "baseline_head": "7019bb8a3b73982fae3e14e0c9bd99b909b1850e",
+  "environment": {
+    "python": "3.12.13",
+    "platform": "macOS arm64",
+    "network": "disabled; no Binance, probe or REAL path",
+    "source_sha256": {
+      "src/btc_microstructure/journal_prototype.py": "e767229c5631f861a67552a1d537c472f6a1735a4436feacf2d2a6ccb0837be1",
+      "reports/round2/journal_prototype/benchmark.py": "e75d21de24c9d3c28466210ee3d5a675a85ee13f0ee050c03d98d64aa298ab3b"
+    }
+  },
+  "before": {
+    "targeted_result": "10_FAILED_3_PASSED",
+    "confirmed_defects": [
+      "parent send_bytes could block outside the two-second ACK deadline",
+      "missing ACK marked failed but did not immediately stop a live worker",
+      "unexpected worker exit leaked BrokenPipeError instead of WriterFailure",
+      "noncanonical .jnl under a legal partition was charged as trusted partition data and skipped by scan",
+      "partial raw/control recovery exposed complete derived-cache tables",
+      "damaged feature frame did not revoke later trusted published features",
+      "table chunk sizing ignored a smaller roll threshold",
+      "new roll-file creation failure had no deterministic injection/cursor evidence"
+    ],
+    "already_correct": [
+      "canonical file-number gap stops later files",
+      "invalid file header stops later files",
+      "broken frame/hash chain stops later files"
+    ],
+    "corrected_test_assumption": "truncating the first rolled file may safely leave no trusted cursor"
+  },
+  "after": {
+    "targeted_result": "25_PASSED",
+    "finite_command_timeout": {
+      "status": "PASS_LIMITED_OFFLINE",
+      "cases": [
+        "worker SIGSTOP plus blocked large send",
+        "worker SIGSTOP after small send with no ACK",
+        "worker killed before command",
+        "ack_seconds above 2 rejected"
+      ],
+      "contract": "send plus ACK share one absolute deadline; timeout stops worker; cursor remains last ACK"
+    },
+    "journal_file_trust": {
+      "status": "PASS_LIMITED_OFFLINE",
+      "cases": [
+        "noncanonical alias charged to temporary/orphan then BLOCKED",
+        "missing number",
+        "invalid header",
+        "broken checksum/hash chain",
+        "same-path inode replacement"
+      ]
+    },
+    "derived_feature_prefix": {
+      "status": "PASS_LIMITED_OFFLINE",
+      "cases": [
+        "partial RAW prefix",
+        "partial CONTROL prefix",
+        "feature-frame corruption"
+      ],
+      "contract": "partial input hides final derived caches; published feature requires matching trusted cutoff, exact feature transaction and trusted published receipt; available time comes from that receipt"
+    },
+    "file_roll": {
+      "status": "PASS_LIMITED_OFFLINE",
+      "roll_threshold_bytes": 32768,
+      "contract": "RAW, CONTROL and FEATURE each cross multiple canonical files with continuous numbering and hash chain; partition charges equal physical files; failed next-file creation keeps cursor; old-file truncation rejects later files; two read-only replays match"
+    }
+  },
+  "performance_regression": [
+    {
+      "simulated_seconds": 30,
+      "messages": 300,
+      "features": 30,
+      "elapsed_seconds": 0.6226898749591783,
+      "files": 9,
+      "ack_p95_seconds": 0.0011736670276150107,
+      "fsync_p95_seconds": 0.00009175005834549665,
+      "combined_peak_rss_upper_bound_bytes": 150798336,
+      "two_replays": "PASS",
+      "oracle": "PASS"
+    },
+    {
+      "simulated_seconds": 60,
+      "messages": 600,
+      "features": 60,
+      "elapsed_seconds": 0.9645802910672501,
+      "files": 9,
+      "ack_p95_seconds": 0.0010150420712307096,
+      "fsync_p95_seconds": 0.00007529195863753557,
+      "combined_peak_rss_upper_bound_bytes": 152977408,
+      "two_replays": "PASS",
+      "oracle": "PASS"
+    },
+    {
+      "simulated_seconds": 120,
+      "messages": 1200,
+      "features": 120,
+      "elapsed_seconds": 1.7840620420174673,
+      "files": 9,
+      "ack_p95_seconds": 0.0005899999523535371,
+      "fsync_p95_seconds": 0.00007133395411074162,
+      "combined_peak_rss_upper_bound_bytes": 157122560,
+      "two_replays": "PASS",
+      "oracle": "PASS"
+    }
+  ],
+  "status": {
+    "format_api_review": "PASS_LIMITED_OFFLINE",
+    "targeted_tests": "25_PASSED",
+    "default_pytest": "492_PASSED",
+    "independent_pytest": "15_9_8_4_PASSED",
+    "thirteen_offline_checks": "ALL_EXIT_0_LOCAL_NETWORK_NAMESPACE_NOT_RUN",
+    "test_only_integration_prerequisite": "MET_FOR_INDEPENDENT_REVIEW_NOT_APPROVAL",
+    "formal_integration": "NOT_DONE",
+    "l04": "PARTIAL",
+    "real": "BLOCKED",
+    "simulation_600_seconds": "NOT_RUN"
+  },
+  "hosted_first_attempt": {
+    "run_id": 38503517372,
+    "head": "020685dd056007f2919b7d22fc785a534f0c34c0",
+    "status": "FAIL",
+    "default_pytest": "489_PASSED_3_FAILED",
+    "reason": "nested Linux spawn exceeded a 0.2 second constructor fixture before fault scenario began",
+    "correction": "constructor and first ACK use the unchanged two-second cap; only the tested command is set to 0.2 seconds"
+  }
+}

@@ -1,0 +1,96 @@
+{
+  "task": "Issue21 R2-04",
+  "baseline": "a082edae460a27b19bd2bc9ded6a26903dbf1b18",
+  "source_state": "UNCOMMITTED",
+  "overall": "PARTIAL",
+  "L04_full": "BLOCKED",
+  "L05_full": "BLOCKED",
+  "python": "3.12.13",
+  "platform": "Darwin arm64",
+  "targeted": {
+    "tests": 65,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "default": {
+    "tests": 391,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "independent": {
+    "pytest-independent-r1-01": {
+      "tests": 15,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "pytest-independent-r1-02": {
+      "tests": 9,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "pytest-independent-r1-03": {
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "pytest-independent-r1-04": {
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "thirteen_exit_codes": {
+    "pytest": 0,
+    "pytest-independent-r1-01": 0,
+    "pytest-independent-r1-02": 0,
+    "pytest-independent-r1-03": 0,
+    "pytest-independent-r1-04": 0,
+    "r104-original-parquet": 0,
+    "ruff-check": 0,
+    "ruff-format": 0,
+    "mypy": 0,
+    "pip-check": 0,
+    "validate-config": 0,
+    "validate-offline": 0,
+    "offline-e2e": 0
+  },
+  "network_market_requests": "NOT_RUN",
+  "physical_adapter": "BLOCKED_NOT_IMPLEMENTED",
+  "pressure_fixture": {
+    "fixture_provenance": "TEST_ONLY manually generated 1000 aggTrade messages",
+    "messages": 1000,
+    "normalized_rows": 1000,
+    "real_elapsed_seconds_including_cleanup": 2.042312959092669,
+    "virtual_input_span_ns": 999000000,
+    "acceptance_status": "PARTIAL_L04_L05_BLOCKED"
+  },
+  "pressure_qualification": "Manually generated TEST_ONLY traffic, not real one-second throughput acceptance",
+  "remaining_offline_gaps": [
+    "worker100ms RSS during IO",
+    "strict state allocation reservation",
+    "free warning ladder and terminal reserve",
+    "100k full pressure/CPU timing",
+    "physical transport adapter and actual frame-send accounting"
+  ],
+  "source_sha256": {
+    "src/btc_microstructure/bounded_live.py": "8e8b38bd5e48d46c88a3e21db63e7251c7cd01030b11bf28e4101995e32f6358",
+    "src/btc_microstructure/bounded_replay.py": "c25d6abe6cc0e22b6c4f9037ad14a2808398a00e4d4dd28f0a33b12ae424109e",
+    "src/btc_microstructure/bounded_transport.py": "b84e951038e958ae453f7fcb5b6f5a3bf77f2fa43797a509aa48998a7095acd0",
+    "src/btc_microstructure/bounded_writer.py": "a9fefcb33c3c7e5d45981e78fd91e28cc0f02bc3cdd71ece83cdafb956259433",
+    "src/btc_microstructure/cli.py": "61fb34f6131e67738e9a798d95d2e685977eb8ad33647f3d7d13d847cc68f64e",
+    "src/btc_microstructure/offline_core.py": "6db8ba3b47763e010612ba872c3f2406faf9d97f8881bef56b28b197ed01f20f",
+    "src/btc_microstructure/unit_binding.py": "a1e4158559b1da7ce3b303f6ced66a13defd1cb1f574bfbc3ac291caf8b74622"
+  },
+  "evidence": {
+    "checks": "ci-results/results.tsv",
+    "targeted": "data/session/final-targeted.xml",
+    "full": "data/session/final-thirteen.log",
+    "pressure": "data/session/final-pressure.json"
+  }
+}

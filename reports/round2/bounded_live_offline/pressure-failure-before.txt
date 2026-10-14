@@ -1,0 +1,44 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_________ test_message_burst_does_not_consume_outbound_control_budget __________
+
+tmp_path = PosixPath('<PYTEST_TMP>/test_message_burst_does_not_co0')
+
+    def test_message_burst_does_not_consume_outbound_control_budget(tmp_path: Path) -> None:
+        clock = FakeClock()
+        start = clock.wall_ns()
+        events = [
+            (
+                start + index * 1_000_000,
+                WsEvent(
+                    kind="message",
+                    payload=agg_trade(
+                        agg_id=index + 1,
+                        quantity="0.001",
+                        buyer_is_maker=bool(index % 2),
+                    ),
+                ),
+            )
+            for index in range(1000)
+        ]
+        events.append((start + NS, WsEvent(kind="disconnect")))
+        transport = FakeTransport(clock, events)
+    
+        summary = run_controller(
+            bounded_config(tmp_path, observation_seconds=1, max_messages=1000),
+            transport,
+            clock,
+        )
+    
+>       assert summary["messages"] == 1000
+E       assert 567 == 1000
+
+tests/unit/test_bounded_live.py:407: AssertionError
+----------------------------- Captured stderr call -----------------------------
+<PYARROW_BUILD>/arrow/cpp/src/arrow/util/cpu_info.cc:239: IOError: sysctlbyname failed for 'hw.l1dcachesize'. Detail: [errno 1] Operation not permitted
+<PYARROW_BUILD>/arrow/cpp/src/arrow/util/cpu_info.cc:239: IOError: sysctlbyname failed for 'hw.l2cachesize'. Detail: [errno 1] Operation not permitted
+<PYARROW_BUILD>/arrow/cpp/src/arrow/util/cpu_info.cc:239: IOError: sysctlbyname failed for 'hw.l3cachesize'. Detail: [errno 1] Operation not permitted
+<PYARROW_BUILD>/arrow/cpp/src/arrow/util/cpu_info.cc:239: IOError: sysctlbyname failed for 'hw.optional.neon'. Detail: [errno 1] Operation not permitted
+=========================== short test summary info ============================
+FAILED tests/unit/test_bounded_live.py::test_message_burst_does_not_consume_outbound_control_budget
+1 failed in 1.35s

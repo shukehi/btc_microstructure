@@ -1,0 +1,55 @@
+{
+  "task": "Issue #21 / PR #22 / review 5498954239",
+  "baseline_sha": "17e131afe40d9b84cb84599259fcf8ea8451a60f",
+  "local_status": "COMPLETE_OFFLINE_REVISION_REAL_BLOCKED",
+  "overall": "PARTIAL",
+  "python_local": "3.12.13",
+  "locked_dependencies": 27,
+  "targeted_contract_tests": {
+    "tests": 16,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "default_tests": {
+    "tests": 454,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "independent_tests": {
+    "r1_01": 15,
+    "r1_02": 9,
+    "r1_03": 8,
+    "r1_04": 4
+  },
+  "thirteen_checks_all_exit_zero": true,
+  "live_market_requests": "NOT_RUN",
+  "real_collect_entry": "BLOCKED",
+  "draft_pr_retained": true,
+  "physical_pressure": {
+    "source_1000_generated": 1000,
+    "source_1000_saved": 1000,
+    "source_1000_delivery_seconds": 0.7411337089724839,
+    "source_100000_generated_before_limit": 2066,
+    "source_100000_stop_reason": "ENCODED_STATE_LIMIT"
+  },
+  "source_sha256": {
+    "src/btc_microstructure/bounded_live.py": "3d111cde760783bae3e7d49ad164af483822f7bbb50c3c9c91062235016ce471",
+    "src/btc_microstructure/bounded_transport.py": "d8f5041e8c8d773149d2eb2fc45cba890c3dc15f63c6550c35f76c5025736c1c",
+    "src/btc_microstructure/bounded_writer.py": "32e1f024e90d49db159fb7cb1de89855319577d1dec31ed95d78e3c4deb10b9f"
+  },
+  "workspace_protection": {
+    "original_status": " M AGENTS.md\n",
+    "original_agents_sha256": "97774315d2c048fecc4d14f55f017612756441bf55387499ac70b91f14e3bf8a",
+    "task_worktree_venv_symlink_removed": true,
+    "original_specs_tests_config_lock_workflow_history_modified": false
+  },
+  "remaining_limits": [
+    "100000 source completed only to the conservative 128 MiB state reservation boundary",
+    "real Binance REST and WebSocket access was not run",
+    "600 second and 24 hour runs were not run",
+    "OS hard OOM, physical full disk, sudden power loss, and NTP behavior were not run",
+    "formal unit approval and trusted shared egress budget remain unavailable"
+  ]
+}

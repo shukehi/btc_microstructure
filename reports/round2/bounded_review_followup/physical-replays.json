@@ -1,0 +1,28 @@
+{
+  "physical-accepted-1000": {
+    "status": "PASS",
+    "two_replays_equal": true,
+    "input_unchanged": true,
+    "input_sha256": "686baddadcec009641244b510a68a74c341f0eb2b6872b483681660a5190a0e8",
+    "application_byte_hashes_verified": 1000,
+    "independent_oracle_features_checked": 1,
+    "original_table_comparison": true,
+    "logical_sha256": "9a1cec9b99bcff5115b24f646b1fe0b74934dfeec514085f175bfbbe11d80d69",
+    "normalized_reconstructed": 1000,
+    "physical_replay_seconds_two_runs": 0.4275856660678983,
+    "network": "DENIED"
+  },
+  "physical-accepted-100k": {
+    "status": "PARTIAL",
+    "two_replays_equal": true,
+    "input_unchanged": true,
+    "input_sha256": "01111217fa3fd630f98ac84dccfbd4cd2b9d12ec8eaf7f94581fd00f170d1d7f",
+    "application_byte_hashes_verified": 2249,
+    "independent_oracle_features_checked": 2,
+    "original_table_comparison": null,
+    "logical_sha256": "3b753aa45ac7ae627a77cb3e506755c1345118337f268808bb8865014b00f0db",
+    "normalized_reconstructed": 2249,
+    "physical_replay_seconds_two_runs": 0.5800494170980528,
+    "network": "DENIED"
+  }
+}

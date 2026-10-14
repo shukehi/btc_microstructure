@@ -1,0 +1,53 @@
+.FF.............                                                         [100%]
+=================================== FAILURES ===================================
+______________ test_silent_tick_flushes_and_publishes_on_utc_grid ______________
+
+tmp_path = PosixPath('<PYTEST_TMP>/test_silent_tick_flushes_and_p0')
+
+    def test_silent_tick_flushes_and_publishes_on_utc_grid(tmp_path: Path) -> None:
+        clock = FakeClock(wall=30 * NS + 250_000_000)
+        start = clock.wall_ns()
+        writer = RecordingWriter(clock)
+        transport = FakeTransport(
+            clock,
+            [
+                (
+                    start + 100_000_000,
+                    WsEvent("message", agg_trade(agg_id=1, quantity="0.30", buyer_is_maker=False)),
+                ),
+                (start + 2 * NS, WsEvent("disconnect")),
+            ],
+        )
+        result = with_writer(bounded_config(tmp_path, window_seconds=[1]), transport, clock, writer)
+        assert result["status"] == "PARTIAL"
+>       assert any(start + 600_000_000 <= stamp <= start + 700_000_000 for stamp in writer.flush_times)
+E       assert False
+E        +  where False = any(<generator object test_silent_tick_flushes_and_publishes_on_utc_grid.<locals>.<genexpr> at 0x10a749fc0>)
+
+tests/unit/test_bounded_parent_review.py:93: AssertionError
+_____________ test_silent_queue_age_limit_is_checked_before_flush ______________
+
+tmp_path = PosixPath('<PYTEST_TMP>/test_silent_queue_age_limit_is0')
+
+    def test_silent_queue_age_limit_is_checked_before_flush(tmp_path: Path) -> None:
+        clock = FakeClock()
+        writer = RecordingWriter(clock)
+        start = clock.wall_ns()
+        transport = FakeTransport(
+            clock,
+            [(start, WsEvent("message", agg_trade(agg_id=1, quantity="0.30", buyer_is_maker=False)))],
+        )
+        result = with_writer(
+            bounded_config(tmp_path, max_queue_age_ns=200_000_000), transport, clock, writer
+        )
+        assert result["stop_reason"] == "QUEUE_AGE_LIMIT"
+>       assert clock.monotonic_ns() <= 30 * NS + 201_000_000
+E       assert 30203000000 <= ((30 * 1000000000) + 201000000)
+E        +  where 30203000000 = monotonic_ns()
+E        +    where monotonic_ns = FakeClock(wall=30203000000, monotonic=30203000000).monotonic_ns
+
+tests/unit/test_bounded_parent_review.py:117: AssertionError
+=========================== short test summary info ============================
+FAILED tests/unit/test_bounded_parent_review.py::test_silent_tick_flushes_and_publishes_on_utc_grid
+FAILED tests/unit/test_bounded_parent_review.py::test_silent_queue_age_limit_is_checked_before_flush
+2 failed, 14 passed in 1.06s

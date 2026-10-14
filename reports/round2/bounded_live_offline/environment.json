@@ -1,0 +1,7 @@
+{
+  "python": "3.12.13",
+  "lock_entries": 27,
+  "all_versions_match": true,
+  "import_from_current_worktree": true,
+  "lock_sha256": "7fe9043dac17556e80030e61786aaeb9cd95dce480661b01c8e207064defa0bc"
+}

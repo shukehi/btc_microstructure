@@ -1,0 +1,95 @@
+{
+  "checks": [
+    {
+      "check": "pytest",
+      "exit_code": 0
+    },
+    {
+      "check": "pytest-independent-r1-01",
+      "exit_code": 0
+    },
+    {
+      "check": "pytest-independent-r1-02",
+      "exit_code": 0
+    },
+    {
+      "check": "pytest-independent-r1-03",
+      "exit_code": 0
+    },
+    {
+      "check": "pytest-independent-r1-04",
+      "exit_code": 0
+    },
+    {
+      "check": "r104-original-parquet",
+      "exit_code": 0
+    },
+    {
+      "check": "ruff-check",
+      "exit_code": 0
+    },
+    {
+      "check": "ruff-format",
+      "exit_code": 0
+    },
+    {
+      "check": "mypy",
+      "exit_code": 0
+    },
+    {
+      "check": "pip-check",
+      "exit_code": 0
+    },
+    {
+      "check": "validate-config",
+      "exit_code": 0
+    },
+    {
+      "check": "validate-offline",
+      "exit_code": 0
+    },
+    {
+      "check": "offline-e2e",
+      "exit_code": 0
+    }
+  ],
+  "junit": {
+    "pytest-independent-r1-01.xml": {
+      "tests": 15,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "pytest-independent-r1-02.xml": {
+      "tests": 9,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "pytest-independent-r1-03.xml": {
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "pytest-independent-r1-04.xml": {
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "pytest.xml": {
+      "tests": 454,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "overall_exit_code": 0,
+  "platform": "Darwin arm64",
+  "python": "3.12.13",
+  "linux_network_namespace": "NOT_RUN",
+  "hosted_actions_this_revision": "NOT_RUN_NO_PUSH",
+  "full_logs": "ci-results/",
+  "first_failed_check_receipts": "data/session/ci-failed-first/"
+}

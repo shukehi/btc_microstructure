@@ -1,0 +1,21 @@
+{
+  "head": "17e131afe40d9b84cb84599259fcf8ea8451a60f",
+  "default": [
+    {
+      "tests": "391",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "20.239"
+    }
+  ],
+  "command": "PYTHONPATH=src <locked-python3.12> -m pytest -q --ignore=<new followup files> --junitxml=data/session/baseline-default.xml",
+  "exit_code": 0,
+  "physical_1000": "physical-before-1000.json",
+  "rest_review_inputs": {
+    "issue21.json": "b117dc5b559d0c28c48a4619465a5c768934a313243c512411f389292df57073",
+    "issue21-comments.json": "3ff94fb672f39a7ece2da63a98853dc7c26f3690619a029a8eb6b02a01276b32",
+    "review5498954239.json": "4f6f4302891a9957444f0c9db92c14abb0d75247d5dab3e6bea8c594ca349723",
+    "review-inline.json": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+  }
+}

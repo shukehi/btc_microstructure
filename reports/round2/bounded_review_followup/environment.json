@@ -1,0 +1,146 @@
+{
+  "python": "3.12.13",
+  "implementation": "CPython",
+  "platform": "darwin",
+  "machine": "arm64",
+  "locked_packages": {
+    "aiohappyeyeballs": {
+      "locked": "2.7.1",
+      "installed": "2.7.1",
+      "matches": true
+    },
+    "aiohttp": {
+      "locked": "3.12.15",
+      "installed": "3.12.15",
+      "matches": true
+    },
+    "aiosignal": {
+      "locked": "1.4.0",
+      "installed": "1.4.0",
+      "matches": true
+    },
+    "annotated-types": {
+      "locked": "0.8.0",
+      "installed": "0.8.0",
+      "matches": true
+    },
+    "attrs": {
+      "locked": "26.1.0",
+      "installed": "26.1.0",
+      "matches": true
+    },
+    "frozenlist": {
+      "locked": "1.8.0",
+      "installed": "1.8.0",
+      "matches": true
+    },
+    "idna": {
+      "locked": "3.20",
+      "installed": "3.20",
+      "matches": true
+    },
+    "iniconfig": {
+      "locked": "2.3.1",
+      "installed": "2.3.1",
+      "matches": true
+    },
+    "multidict": {
+      "locked": "6.9.1",
+      "installed": "6.9.1",
+      "matches": true
+    },
+    "mypy": {
+      "locked": "1.18.2",
+      "installed": "1.18.2",
+      "matches": true
+    },
+    "mypy_extensions": {
+      "locked": "1.1.0",
+      "installed": "1.1.0",
+      "matches": true
+    },
+    "packaging": {
+      "locked": "26.3",
+      "installed": "26.3",
+      "matches": true
+    },
+    "pathspec": {
+      "locked": "1.1.1",
+      "installed": "1.1.1",
+      "matches": true
+    },
+    "pluggy": {
+      "locked": "1.6.0",
+      "installed": "1.6.0",
+      "matches": true
+    },
+    "propcache": {
+      "locked": "0.5.4",
+      "installed": "0.5.4",
+      "matches": true
+    },
+    "pydantic": {
+      "locked": "2.12.3",
+      "installed": "2.12.3",
+      "matches": true
+    },
+    "pydantic_core": {
+      "locked": "2.41.4",
+      "installed": "2.41.4",
+      "matches": true
+    },
+    "Pygments": {
+      "locked": "2.21.0",
+      "installed": "2.21.0",
+      "matches": true
+    },
+    "pytest": {
+      "locked": "8.4.2",
+      "installed": "8.4.2",
+      "matches": true
+    },
+    "PyYAML": {
+      "locked": "6.0.3",
+      "installed": "6.0.3",
+      "matches": true
+    },
+    "ruff": {
+      "locked": "0.14.0",
+      "installed": "0.14.0",
+      "matches": true
+    },
+    "setuptools": {
+      "locked": "80.9.0",
+      "installed": "80.9.0",
+      "matches": true
+    },
+    "types-PyYAML": {
+      "locked": "6.0.12.20250915",
+      "installed": "6.0.12.20250915",
+      "matches": true
+    },
+    "typing-inspection": {
+      "locked": "0.4.4",
+      "installed": "0.4.4",
+      "matches": true
+    },
+    "typing_extensions": {
+      "locked": "4.16.0",
+      "installed": "4.16.0",
+      "matches": true
+    },
+    "yarl": {
+      "locked": "1.25.1",
+      "installed": "1.25.1",
+      "matches": true
+    },
+    "pyarrow": {
+      "locked": "20.0.0",
+      "installed": "20.0.0",
+      "matches": true
+    }
+  },
+  "package_count": 27,
+  "import_resolution": "PYTHONPATH=src current worktree verified",
+  "network": "not used; no installs"
+}
