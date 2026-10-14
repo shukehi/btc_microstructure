@@ -101,4 +101,6 @@
 | `mypy src .github/scripts/offline_smoke.py` | 0 | 18 source files无问题 |
 | `PYTHONPATH=src bash .github/scripts/ci_checks.sh` | 0 | 十三项全部exit0；本机Linux network namespace检查NOT_RUN |
 
-Hosted Actions将在精确提交后记录。PR保持Draft，不合并、不关闭Issue。
+首次Hosted Actions `38503517372` 对提交`020685d…`为FAIL：默认489通过/3失败，三个失败均发生在嵌套spawn helper构造期，Linux worker启动超过测试夹具错误设置的0.2秒，尚未进入SIGSTOP/send/ACK反例；独立15/9/8/4和其余十二项通过。修订只让构造与首个ACK使用原生产上限2秒，首个成功cursor后再把**被测命令**设为0.2秒；命令完成断言仍<0.8秒，未提高实现上限。失败run和官方artifact保留，不用本地绿色覆盖。
+
+最终Hosted Actions将在新精确提交后记录。PR保持Draft，不合并、不关闭Issue。

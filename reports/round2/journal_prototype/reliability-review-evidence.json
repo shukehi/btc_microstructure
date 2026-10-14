@@ -115,5 +115,13 @@
     "l04": "PARTIAL",
     "real": "BLOCKED",
     "simulation_600_seconds": "NOT_RUN"
+  },
+  "hosted_first_attempt": {
+    "run_id": 38503517372,
+    "head": "020685dd056007f2919b7d22fc785a534f0c34c0",
+    "status": "FAIL",
+    "default_pytest": "489_PASSED_3_FAILED",
+    "reason": "nested Linux spawn exceeded a 0.2 second constructor fixture before fault scenario began",
+    "correction": "constructor and first ACK use the unchanged two-second cap; only the tested command is set to 0.2 seconds"
   }
 }

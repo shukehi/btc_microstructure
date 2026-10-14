@@ -51,8 +51,9 @@ def _raw(sequence: int, size: int = 256) -> dict[str, Any]:
 
 def _blocked_command_helper(root_value: str, mode: str, queue: Any) -> None:
     root = Path(root_value)
-    writer = TestOnlyJournalProcessWriter(root, min_free_bytes=0, ack_seconds=0.2)
+    writer = TestOnlyJournalProcessWriter(root, min_free_bytes=0, ack_seconds=2)
     writer.append_durable(_control(1))
+    writer.ack_seconds = 0.2
     worker_pid = writer.process.pid
     queue.put({"phase": "ready", "worker_pid": worker_pid})
     if mode in {"blocked_send", "no_ack"}:
@@ -101,9 +102,9 @@ def test_command_send_and_ack_share_deadline_and_stop_worker(tmp_path: Path, mod
         args=(str(tmp_path / mode), mode, queue),
     )
     process.start()
-    ready = queue.get(timeout=2)
+    ready = queue.get(timeout=5)
     assert ready["phase"] == "ready"
-    process.join(timeout=1.5)
+    process.join(timeout=2)
     if process.is_alive():
         process.terminate()
         process.join(timeout=0.5)
